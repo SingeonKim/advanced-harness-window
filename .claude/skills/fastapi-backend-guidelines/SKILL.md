@@ -1,84 +1,84 @@
 ---
 name: fastapi-backend-guidelines
-description: FastAPI backend development guidelines for Python async applications. Domain-Driven Design with FastAPI routers, SQLModel/SQLAlchemy ORM, repository pattern, service layer, async/await patterns, Pydantic validation, and error handling. Use when creating APIs, routes, services, repositories, or working with backend code.
+description: Python 비동기 애플리케이션을 위한 FastAPI 백엔드 개발 가이드라인. FastAPI 라우터를 사용한 Domain-Driven Design, SQLModel/SQLAlchemy ORM, Repository 패턴, 서비스 레이어, async/await 패턴, Pydantic 유효성 검사, 에러 처리. API, 라우트, 서비스, 레포지토리 생성 또는 백엔드 코드 작업 시 사용하세요.
 ---
 
-# FastAPI Backend Development Guidelines
+# FastAPI 백엔드 개발 가이드라인
 
-## Purpose
+## 목적
 
-Comprehensive guide for modern FastAPI development with async Python, emphasizing Domain-Driven Design, layered architecture (Router → Service → Repository), SQLModel ORM, and async best practices.
+async Python을 사용한 현대적인 FastAPI 개발을 위한 포괄적인 가이드. Domain-Driven Design, 계층형 아키텍처 (Router → Service → Repository), SQLModel ORM, 비동기 모범 사례를 강조합니다.
 
-## When to Use This Skill
+## 이 스킬을 사용하는 경우
 
-- Creating new API routes or endpoints
-- Building domain services and business logic
-- Implementing repositories for data access
-- Setting up database models with SQLModel
-- Async/await patterns and error handling
-- Organizing backend code with DDD
-- Pydantic validation and DTOs
-- Python async best practices
-
----
-
-## Quick Start
-
-### New API Route Checklist
-
-Creating an API endpoint? Follow this checklist:
-
-- [ ] Define route in `backend/api/v1/routers/{domain}.py`
-- [ ] Use FastAPI dependency injection for session
-- [ ] Use `get_read_session_dependency` for reads, `get_write_session_dependency` for writes
-- [ ] Call service layer (don't access repository directly)
-- [ ] Use Pydantic DTOs for request/response
-- [ ] Handle errors with custom exceptions
-- [ ] Add proper HTTP status codes
-- [ ] Use async/await throughout
-- [ ] Document with docstrings
-- [ ] Use type hints on all parameters
-
-### New Domain Feature Checklist
-
-Creating a new domain? Set up this structure:
-
-- [ ] Create `backend/domain/{domain}/` directory
-- [ ] Create `model.py` - SQLModel database models with ULID ID generation
-- [ ] Create `repository.py` - Data access layer extending BaseRepository
-- [ ] Create `service.py` - Business logic layer
-- [ ] Create DTOs in `backend/dtos/{domain}.py`
-- [ ] Create router in `backend/api/v1/routers/{domain}.py`
-- [ ] Register router in `main.py`
-- [ ] Follow async patterns throughout
-- [ ] Add enums to `backend/domain/user/enums.py` if needed
+- 새 API 라우트 또는 엔드포인트 생성 시
+- 도메인 서비스 및 비즈니스 로직 구축 시
+- 데이터 접근을 위한 레포지토리 구현 시
+- SQLModel로 데이터베이스 모델 설정 시
+- Async/await 패턴 및 에러 처리 시
+- DDD로 백엔드 코드 구성 시
+- Pydantic 유효성 검사 및 DTO 작업 시
+- Python 비동기 모범 사례 적용 시
 
 ---
 
-## Project Structure Quick Reference
+## 빠른 시작
 
-Your YGS backend structure:
+### 새 API 라우트 체크리스트
+
+API 엔드포인트를 만들고 있나요? 이 체크리스트를 따르세요:
+
+- [ ] `backend/api/v1/routers/{domain}.py`에 라우트 정의
+- [ ] 세션을 위한 FastAPI 의존성 주입 사용
+- [ ] 읽기에는 `get_read_session_dependency`, 쓰기에는 `get_write_session_dependency` 사용
+- [ ] 서비스 레이어 호출 (레포지토리에 직접 접근하지 않음)
+- [ ] 요청/응답에 Pydantic DTO 사용
+- [ ] 커스텀 예외로 에러 처리
+- [ ] 적절한 HTTP 상태 코드 추가
+- [ ] 전반적으로 async/await 사용
+- [ ] docstring으로 문서화
+- [ ] 모든 파라미터에 타입 힌트 사용
+
+### 새 도메인 기능 체크리스트
+
+새 도메인을 만들고 있나요? 이 구조를 설정하세요:
+
+- [ ] `backend/domain/{domain}/` 디렉토리 생성
+- [ ] `model.py` - ULID ID 생성이 있는 SQLModel 데이터베이스 모델
+- [ ] `repository.py` - BaseRepository를 확장하는 데이터 접근 레이어
+- [ ] `service.py` - 비즈니스 로직 레이어
+- [ ] `backend/dtos/{domain}.py`에 DTO 생성
+- [ ] `backend/api/v1/routers/{domain}.py`에 라우터 생성
+- [ ] `main.py`에 라우터 등록
+- [ ] 전반적으로 비동기 패턴 따르기
+- [ ] 필요한 경우 `backend/domain/user/enums.py`에 열거형 추가
+
+---
+
+## 프로젝트 구조 빠른 참조
+
+YGS 백엔드 구조:
 
 ```
 backend/
   backend/
-    main.py                  # FastAPI app creation with lifespan
+    main.py                  # lifespan이 있는 FastAPI 앱 생성
 
     api/
       v1/
-        routers/             # API route handlers
-          admin.py           # Dashboard, members, matching
-          auth.py            # Login, signup, OAuth
-          match.py           # Match weeks, history
-          user.py            # User management
-          upload.py          # S3 presigned URLs
+        routers/             # API 라우트 핸들러
+          admin.py           # 대시보드, 회원, 매칭
+          auth.py            # 로그인, 회원가입, OAuth
+          match.py           # 매치 주, 이력
+          user.py            # 사용자 관리
+          upload.py          # S3 presigned URL
 
     domain/                  # Domain-Driven Design
       user/
-        model.py             # User, UserProfile, UserLifestyle, etc.
+        model.py             # User, UserProfile, UserLifestyle 등
         repository.py        # UserRepository, UserDataLoader
         service.py           # UserService
-        enums.py             # All domain enums
+        enums.py             # 모든 도메인 열거형
       auth/
         service.py           # AuthService (JWT, Firebase, Kakao)
         repository.py        # AuthRepository
@@ -86,47 +86,47 @@ backend/
         model.py             # ConsultSchedule
         service.py           # AdminService
         repository.py        # AdminRepository
-        matching_service.py  # MatchingService (scoring algorithm)
+        matching_service.py  # MatchingService (점수 알고리즘)
       match/
         model.py             # MatchWeek, MatchHistory, MatchFeedback
         service.py           # MatchService
         repository.py        # MatchRepository
       llm/
-        matching_service.py  # LLM-enhanced matching
+        matching_service.py  # LLM 향상 매칭
       shared/
-        base_repository.py   # Generic BaseRepository
+        base_repository.py   # 제네릭 BaseRepository
 
-    dtos/                    # Pydantic DTOs
-      admin.py               # Dashboard, member DTOs
-      auth.py                # Login, signup, OAuth DTOs
-      match.py               # Match week, history DTOs
-      user.py                # User, profile DTOs
-      llm_match.py           # LLM matching DTOs
+    dtos/                    # Pydantic DTO
+      admin.py               # 대시보드, 회원 DTO
+      auth.py                # 로그인, 회원가입, OAuth DTO
+      match.py               # 매치 주, 이력 DTO
+      user.py                # 사용자, 프로필 DTO
+      llm_match.py           # LLM 매칭 DTO
 
     db/
-      orm.py                 # Read/Write session management
+      orm.py                 # 읽기/쓰기 세션 관리
 
     core/
-      config.py              # Pydantic Settings configuration
+      config.py              # Pydantic Settings 설정
 
-    middleware/              # Middleware
+    middleware/              # 미들웨어
       error_handler.py       # ErrorHandlerMiddleware
-      admin_auth.py          # Admin authentication
+      admin_auth.py          # 관리자 인증
 
-    utils/                   # Utilities
-      s3.py                  # S3 presigned URLs
-      s3_private.py          # Private user data S3
-      firebase.py            # Firebase verification
-      password.py            # bcrypt hashing
-      excel.py               # Excel export
+    utils/                   # 유틸리티
+      s3.py                  # S3 presigned URL
+      s3_private.py          # 개인 사용자 데이터 S3
+      firebase.py            # Firebase 검증
+      password.py            # bcrypt 해싱
+      excel.py               # Excel 내보내기
 
-    error/                   # Custom exceptions
-      __init__.py            # AppException, NotFoundError, etc.
+    error/                   # 커스텀 예외
+      __init__.py            # AppException, NotFoundError 등
 ```
 
 ---
 
-## Common Imports Cheatsheet
+## 공통 임포트 치트시트
 
 ```python
 # FastAPI
@@ -139,60 +139,60 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlalchemy import func, desc
 from sqlalchemy.orm import selectinload
 
-# Database
+# 데이터베이스
 from backend.db.orm import get_write_session_dependency, get_read_session_dependency
 
 # Pydantic
 from pydantic import BaseModel, Field, field_validator, EmailStr
 
-# Your domain
+# 도메인
 from backend.domain.user.model import User, UserProfile
 from backend.domain.user.service import UserService
 from backend.dtos.user import UserResponse, UserCreateRequest
 from backend.error import NotFoundError, ForbiddenError, UnauthorizedError
 
-# Type hints
+# 타입 힌트
 from typing import List, Optional, Dict, Any
 
-# ID generation
+# ID 생성
 from ulid import ULID
 ```
 
 ---
 
-## Topic Guides
+## 주제별 가이드
 
-### 🏗️ Layered Architecture
+### 계층형 아키텍처
 
-**Three-Layer Pattern:**
-1. **Router Layer**: API endpoints, request validation, response formatting
-2. **Service Layer**: Business logic, orchestration, domain rules
-3. **Repository Layer**: Data access, queries, database operations
+**3계층 패턴:**
+1. **Router 레이어**: API 엔드포인트, 요청 유효성 검사, 응답 포맷팅
+2. **Service 레이어**: 비즈니스 로직, 오케스트레이션, 도메인 규칙
+3. **Repository 레이어**: 데이터 접근, 쿼리, 데이터베이스 작업
 
-**Key Concepts:**
-- Routers call Services (never Repositories directly)
-- Services orchestrate business logic
-- Repositories handle all database operations
-- Each layer has clear responsibilities
-- Async/await throughout the stack
-- Read/Write session separation
+**핵심 개념:**
+- 라우터는 서비스를 호출 (레포지토리에 직접 접근하지 않음)
+- 서비스는 비즈니스 로직을 오케스트레이션
+- 레포지토리는 모든 데이터베이스 작업 처리
+- 각 레이어는 명확한 책임을 가짐
+- 스택 전반에서 Async/await 사용
+- 읽기/쓰기 세션 분리
 
-**[📖 Complete Guide: resources/layered-architecture.md](resources/layered-architecture.md)**
+**[전체 가이드: resources/layered-architecture.md](resources/layered-architecture.md)**
 
 ---
 
-### 🛣️ API Routes & Routers
+### API 라우트 & 라우터
 
-**PRIMARY PATTERN: FastAPI Routers**
-- Create routers in `backend/api/v1/routers/`
-- Use dependency injection for sessions
-- Use `get_read_session_dependency` for GET requests
-- Use `get_write_session_dependency` for POST/PATCH/DELETE
-- Follow REST conventions
-- Use appropriate HTTP methods and status codes
-- Async route handlers
+**주요 패턴: FastAPI 라우터**
+- `backend/api/v1/routers/`에 라우터 생성
+- 세션에 의존성 주입 사용
+- GET 요청에는 `get_read_session_dependency` 사용
+- POST/PATCH/DELETE에는 `get_write_session_dependency` 사용
+- REST 관례 준수
+- 적절한 HTTP 메서드와 상태 코드 사용
+- 비동기 라우트 핸들러
 
-**Router Structure:**
+**라우터 구조:**
 ```python
 from fastapi import APIRouter, Depends
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -217,27 +217,27 @@ async def create_user(
     return await service.create_user(request)
 ```
 
-**[📖 Complete Guide: resources/api-routes.md](resources/api-routes.md)**
+**[전체 가이드: resources/api-routes.md](resources/api-routes.md)**
 
 ---
 
-### 🗄️ Database & ORM
+### 데이터베이스 & ORM
 
 **SQLModel + SQLAlchemy:**
-- SQLModel for models (combines SQLAlchemy + Pydantic)
-- Async sessions with asyncpg driver
-- Read/Write session separation with caching
-- Repository pattern for all queries
-- ULID-based ID generation with prefixes
+- 모델에 SQLModel 사용 (SQLAlchemy + Pydantic 결합)
+- asyncpg 드라이버를 사용한 비동기 세션
+- 캐싱이 있는 읽기/쓰기 세션 분리
+- 모든 쿼리에 Repository 패턴
+- 접두사를 사용한 ULID 기반 ID 생성
 
-**Model Pattern:**
+**모델 패턴:**
 ```python
 from sqlmodel import SQLModel, Field, Column, DateTime, Text
 from datetime import datetime, timezone
 from ulid import ULID
 
 def generate_user_id() -> str:
-    """Generate user ID with prefix."""
+    """접두사를 사용하여 사용자 ID 생성."""
     return f"usr_{ULID()}"
 
 class User(SQLModel, table=True):
@@ -252,13 +252,13 @@ class User(SQLModel, table=True):
     name: str = Field(sa_column=Column(Text, nullable=False))
     gender: GenderEnum = Field(sa_column=Column(Text, nullable=False))
 
-    # Soft delete pattern
+    # 소프트 삭제 패턴
     deleted_at: Optional[datetime] = Field(
         sa_column=Column(DateTime(timezone=True), nullable=True),
         default=None,
     )
 
-    # Timestamps
+    # 타임스탬프
     created_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True), nullable=False),
         default_factory=lambda: datetime.now(tz=timezone.utc),
@@ -269,42 +269,42 @@ class User(SQLModel, table=True):
     )
 ```
 
-**[📖 Complete Guide: resources/database-orm.md](resources/database-orm.md)**
+**[전체 가이드: resources/database-orm.md](resources/database-orm.md)**
 
 ---
 
-### 📦 Domain-Driven Design
+### Domain-Driven Design
 
-**Domain Organization:**
-- Each domain in `backend/domain/{name}/`
-- Contains: `model.py`, `repository.py`, `service.py`
-- Clear separation of concerns
-- Business logic in services
-- Data access in repositories
+**도메인 구성:**
+- `backend/domain/{name}/`에 각 도메인
+- 포함: `model.py`, `repository.py`, `service.py`
+- 명확한 관심사 분리
+- 서비스에 비즈니스 로직
+- 레포지토리에 데이터 접근
 
-**Your Domains:**
-- **user**: User management (User, UserProfile, UserLifestyle, UserPreference, etc.)
-- **auth**: Authentication (JWT, Firebase, Kakao OAuth)
-- **admin**: Admin dashboard, member management, consultations
-- **match**: Match weeks, history, feedback
-- **llm**: LLM-enhanced matching with Gemini
-- **shared**: BaseRepository, common utilities
+**도메인:**
+- **user**: 사용자 관리 (User, UserProfile, UserLifestyle, UserPreference 등)
+- **auth**: 인증 (JWT, Firebase, Kakao OAuth)
+- **admin**: 관리자 대시보드, 회원 관리, 상담
+- **match**: 매치 주, 이력, 피드백
+- **llm**: Gemini를 사용한 LLM 향상 매칭
+- **shared**: BaseRepository, 공통 유틸리티
 
-**[📖 Complete Guide: resources/domain-driven-design.md](resources/domain-driven-design.md)**
+**[전체 가이드: resources/domain-driven-design.md](resources/domain-driven-design.md)**
 
 ---
 
-### 🔄 Service Layer
+### 서비스 레이어
 
-**Service Pattern:**
-- Business logic orchestration
-- Domain rule enforcement
-- Calls repositories for data
-- Returns DTOs, not models directly
-- Transaction management
-- Uses asyncio.gather for parallel queries
+**서비스 패턴:**
+- 비즈니스 로직 오케스트레이션
+- 도메인 규칙 적용
+- 데이터를 위해 레포지토리 호출
+- 모델이 아닌 DTO 반환
+- 트랜잭션 관리
+- 병렬 쿼리에 asyncio.gather 사용
 
-**Service Structure:**
+**서비스 구조:**
 ```python
 class UserService:
     def __init__(self, session: AsyncSession):
@@ -314,7 +314,7 @@ class UserService:
         self._data_loader = UserDataLoader(session)
 
     async def get_user_detail(self, user_id: str) -> UserDetailResponse:
-        # Use UserDataLoader for N+1 prevention
+        # N+1 방지를 위한 UserDataLoader 사용
         user_with_relations = await self._data_loader.load_user_with_relations(
             user_id,
             load_profile=True,
@@ -325,21 +325,21 @@ class UserService:
         return self._to_detail_response(user_with_relations)
 ```
 
-**[📖 Complete Guide: resources/service-layer.md](resources/service-layer.md)**
+**[전체 가이드: resources/service-layer.md](resources/service-layer.md)**
 
 ---
 
-### 💾 Repository Pattern
+### Repository 패턴
 
-**Repository Pattern:**
-- Encapsulates data access
-- Extends BaseRepository for CRUD
-- Domain-specific queries
-- Returns domain models
-- All queries are async
-- Soft delete support
+**Repository 패턴:**
+- 데이터 접근 캡슐화
+- CRUD를 위한 BaseRepository 확장
+- 도메인 특화 쿼리
+- 도메인 모델 반환
+- 모든 쿼리는 비동기
+- 소프트 삭제 지원
 
-**Repository Structure:**
+**Repository 구조:**
 ```python
 from backend.domain.shared.base_repository import BaseRepository
 
@@ -356,7 +356,7 @@ class UserRepository(BaseRepository[User]):
         return result.scalar_one_or_none()
 ```
 
-**UserDataLoader Pattern (N+1 Prevention):**
+**UserDataLoader 패턴 (N+1 방지):**
 ```python
 @dataclass
 class UserWithRelations:
@@ -372,45 +372,45 @@ class UserDataLoader:
         load_profile: bool = False,
         load_photos: bool = False,
     ) -> Optional[UserWithRelations]:
-        # Build queries based on flags
+        # 플래그에 따라 쿼리 구성
         queries = [self._load_user(user_id)]
         if load_profile:
             queries.append(self._load_profile(user_id))
         if load_photos:
             queries.append(self._load_photos(user_id))
 
-        # Execute all queries in parallel
+        # 모든 쿼리를 병렬로 실행
         results = await asyncio.gather(*queries)
-        # ... combine results
+        # ... 결과 결합
 ```
 
-**[📖 Complete Guide: resources/repository-pattern.md](resources/repository-pattern.md)**
+**[전체 가이드: resources/repository-pattern.md](resources/repository-pattern.md)**
 
 ---
 
-### 📝 DTOs & Validation
+### DTO & 유효성 검사
 
-**Pydantic DTOs:**
-- Request/Response data transfer objects
-- Validation with Pydantic
-- Separate from domain models
-- Located in `backend/dtos/`
-- Use field_validator for enum validation
+**Pydantic DTO:**
+- 요청/응답 데이터 전송 객체
+- Pydantic을 사용한 유효성 검사
+- 도메인 모델과 분리
+- `backend/dtos/`에 위치
+- 열거형 유효성 검사에 field_validator 사용
 
-**DTO Pattern:**
+**DTO 패턴:**
 ```python
 from pydantic import BaseModel, Field, field_validator
 from backend.domain.user.enums import GenderEnum, UserStatusEnum
 
 class AdminBasicInfoUpdateRequest(BaseModel):
-    """Request DTO for updating basic user info (admin only)."""
+    """기본 사용자 정보 업데이트 요청 DTO (관리자 전용)."""
 
-    name: Optional[str] = Field(None, description="User name")
-    status: Optional[str] = Field(None, description="User status")
-    is_admin: Optional[bool] = Field(None, description="Admin flag")
-    birth_year: Optional[int] = Field(None, ge=1940, le=2010, description="Birth year")
+    name: Optional[str] = Field(None, description="사용자 이름")
+    status: Optional[str] = Field(None, description="사용자 상태")
+    is_admin: Optional[bool] = Field(None, description="관리자 플래그")
+    birth_year: Optional[int] = Field(None, ge=1940, le=2010, description="출생 연도")
 
-    model_config = {"extra": "forbid"}  # Reject unknown fields
+    model_config = {"extra": "forbid"}  # 알 수 없는 필드 거부
 
     @field_validator("status")
     @classmethod
@@ -422,24 +422,24 @@ class AdminBasicInfoUpdateRequest(BaseModel):
         return v
 ```
 
-**[📖 Complete Guide: resources/dtos-validation.md](resources/dtos-validation.md)**
+**[전체 가이드: resources/dtos-validation.md](resources/dtos-validation.md)**
 
 ---
 
-### ⚡ Async/Await Patterns
+### Async/Await 패턴
 
-**Async Best Practices:**
-- Use async/await throughout
-- Async database sessions
-- Proper session cleanup
-- Avoid blocking operations
-- Use asyncio.gather for parallel queries
+**비동기 모범 사례:**
+- 전반적으로 async/await 사용
+- 비동기 데이터베이스 세션
+- 적절한 세션 정리
+- 블로킹 작업 방지
+- 병렬 쿼리에 asyncio.gather 사용
 
-**Async Patterns:**
+**비동기 패턴:**
 ```python
-# Parallel queries with asyncio.gather
+# asyncio.gather를 사용한 병렬 쿼리
 async def get_dashboard_data(self) -> dict:
-    # Run all queries in parallel
+    # 모든 쿼리를 병렬로 실행
     total, monthly, weekly, today = await asyncio.gather(
         self._get_total_count(),
         self._get_monthly_count(),
@@ -454,19 +454,19 @@ async def get_dashboard_data(self) -> dict:
     }
 ```
 
-**[📖 Complete Guide: resources/async-patterns.md](resources/async-patterns.md)**
+**[전체 가이드: resources/async-patterns.md](resources/async-patterns.md)**
 
 ---
 
-### 🚨 Error Handling
+### 에러 처리
 
-**Error Handling Strategy:**
-- Custom exception classes in `backend/error/`
-- HTTP exception mapping via ErrorHandlerMiddleware
-- Middleware for error handling
-- Consistent error responses
+**에러 처리 전략:**
+- `backend/error/`의 커스텀 예외 클래스
+- ErrorHandlerMiddleware를 통한 HTTP 예외 매핑
+- 에러 처리를 위한 미들웨어
+- 일관된 에러 응답
 
-**Error Pattern:**
+**에러 패턴:**
 ```python
 # backend/error/__init__.py
 class AppException(Exception):
@@ -483,69 +483,69 @@ class ForbiddenError(AppException):
 class UnauthorizedError(AppException):
     pass
 
-# In service
+# 서비스에서
 if not user:
     raise NotFoundError(f"User {user_id} not found")
 
-# ErrorHandlerMiddleware handles conversion to HTTP response
-# NotFoundError → 404, ForbiddenError → 403, etc.
+# ErrorHandlerMiddleware가 HTTP 응답으로 변환을 처리
+# NotFoundError → 404, ForbiddenError → 403 등
 ```
 
-**[📖 Complete Guide: resources/error-handling.md](resources/error-handling.md)**
+**[전체 가이드: resources/error-handling.md](resources/error-handling.md)**
 
 ---
 
-### 📚 Complete Examples
+### 완전한 예시
 
-**Full working examples:**
-- Complete domain (model + repository + service + router)
-- CRUD operations with async
-- Complex queries with SQLModel
-- Firebase/Kakao authentication patterns
-- S3 presigned URL generation
-- Pagination and filtering
-- N+1 prevention with UserDataLoader
+**완전히 작동하는 예시:**
+- 완전한 도메인 (model + repository + service + router)
+- async를 사용한 CRUD 작업
+- SQLModel을 사용한 복잡한 쿼리
+- Firebase/Kakao 인증 패턴
+- S3 presigned URL 생성
+- 페이지네이션 및 필터링
+- UserDataLoader를 사용한 N+1 방지
 
-**[📖 Complete Guide: resources/complete-examples.md](resources/complete-examples.md)**
-
----
-
-## Navigation Guide
-
-| Need to... | Read this resource |
-|------------|-------------------|
-| Understand architecture | [layered-architecture.md](resources/layered-architecture.md) |
-| Create API routes | [api-routes.md](resources/api-routes.md) |
-| Work with database | [database-orm.md](resources/database-orm.md) |
-| Organize domains | [domain-driven-design.md](resources/domain-driven-design.md) |
-| Build services | [service-layer.md](resources/service-layer.md) |
-| Create repositories | [repository-pattern.md](resources/repository-pattern.md) |
-| Validate requests | [dtos-validation.md](resources/dtos-validation.md) |
-| Use async patterns | [async-patterns.md](resources/async-patterns.md) |
-| Handle errors | [error-handling.md](resources/error-handling.md) |
-| See full examples | [complete-examples.md](resources/complete-examples.md) |
+**[전체 가이드: resources/complete-examples.md](resources/complete-examples.md)**
 
 ---
 
-## Core Principles
+## 탐색 가이드
 
-1. **Layered Architecture**: Router → Service → Repository (never skip layers)
-2. **Domain-Driven Design**: Organize by domain, not by type
-3. **Async Everything**: Use async/await throughout the stack
-4. **Repository Pattern**: All data access through repositories
-5. **Service Layer**: Business logic in services, not routers or repositories
-6. **DTOs for API**: Use Pydantic DTOs for request/response
-7. **Type Hints**: Explicit types on all functions and parameters
-8. **Error Handling**: Custom exceptions, middleware for HTTP mapping
-9. **Read/Write Split**: Separate sessions for read and write operations
-10. **Dependency Injection**: Use FastAPI's Depends() for sessions
-11. **ULID IDs**: Use ULID with entity prefixes (usr_, mw_, mh_, etc.)
-12. **Soft Delete**: Use deleted_at timestamp instead of hard deletes
-13. **N+1 Prevention**: Use asyncio.gather and DataLoader patterns
+| 해야 할 일... | 이 리소스를 읽으세요 |
+|--------------|-------------------|
+| 아키텍처 이해 | [layered-architecture.md](resources/layered-architecture.md) |
+| API 라우트 생성 | [api-routes.md](resources/api-routes.md) |
+| 데이터베이스 작업 | [database-orm.md](resources/database-orm.md) |
+| 도메인 구성 | [domain-driven-design.md](resources/domain-driven-design.md) |
+| 서비스 구축 | [service-layer.md](resources/service-layer.md) |
+| 레포지토리 생성 | [repository-pattern.md](resources/repository-pattern.md) |
+| 요청 유효성 검사 | [dtos-validation.md](resources/dtos-validation.md) |
+| 비동기 패턴 사용 | [async-patterns.md](resources/async-patterns.md) |
+| 에러 처리 | [error-handling.md](resources/error-handling.md) |
+| 전체 예시 보기 | [complete-examples.md](resources/complete-examples.md) |
 
 ---
 
-## Quick Reference: New Domain Template
+## 핵심 원칙
+
+1. **계층형 아키텍처**: Router → Service → Repository (레이어 절대 건너뛰지 않음)
+2. **Domain-Driven Design**: 타입이 아닌 도메인으로 구성
+3. **전면적 비동기**: 스택 전반에서 async/await 사용
+4. **Repository 패턴**: 레포지토리를 통한 모든 데이터 접근
+5. **서비스 레이어**: 라우터나 레포지토리가 아닌 서비스에 비즈니스 로직
+6. **API용 DTO**: 요청/응답에 Pydantic DTO 사용
+7. **타입 힌트**: 모든 함수와 파라미터에 명시적 타입
+8. **에러 처리**: 커스텀 예외, HTTP 매핑을 위한 미들웨어
+9. **읽기/쓰기 분리**: 읽기와 쓰기 작업에 별도 세션
+10. **의존성 주입**: 세션에 FastAPI의 Depends() 사용
+11. **ULID ID**: 엔티티 접두사를 사용한 ULID (usr_, mw_, mh_ 등)
+12. **소프트 삭제**: 하드 삭제 대신 deleted_at 타임스탬프 사용
+13. **N+1 방지**: asyncio.gather 및 DataLoader 패턴 사용
+
+---
+
+## 빠른 참조: 새 도메인 템플릿
 
 ```python
 # backend/domain/myfeature/model.py
@@ -645,12 +645,12 @@ async def create_feature(
 
 ---
 
-## Related Skills
+## 관련 스킬
 
-- **nextjs-frontend-guidelines**: Frontend patterns that consume this API
-- **error-tracking**: Error tracking with Sentry (backend integration)
-- **pytest-backend-testing**: Testing patterns for FastAPI backends
+- **nextjs-frontend-guidelines**: 이 API를 사용하는 프론트엔드 패턴
+- **error-tracking**: Sentry를 사용한 에러 추적 (백엔드 통합)
+- **pytest-backend-testing**: FastAPI 백엔드 테스팅 패턴
 
 ---
 
-**Skill Status**: Modular structure with progressive loading for optimal context management
+**스킬 상태**: 최적의 컨텍스트 관리를 위한 점진적 로딩이 있는 모듈식 구조

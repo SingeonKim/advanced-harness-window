@@ -1,10 +1,10 @@
-# DTOs & Validation - Pydantic
+# DTO & 유효성 검사 - Pydantic
 
-## DTOs (Data Transfer Objects)
+## DTO (Data Transfer Object)
 
-DTOs define API contracts using Pydantic v2.
+DTO는 Pydantic v2를 사용하여 API 계약을 정의합니다.
 
-### Request DTO with field_validator
+### field_validator가 있는 요청 DTO
 
 ```python
 # backend/dtos/admin.py
@@ -21,13 +21,13 @@ from backend.domain.user.enums import (
 
 
 class AdminBasicInfoUpdateRequest(BaseModel):
-    """Update user basic info (admin action)"""
+    """사용자 기본 정보 수정 (관리자 액션)"""
     name: Optional[str] = Field(None, max_length=50)
     phone: Optional[str] = Field(None, max_length=15)
     status: Optional[str] = None
     gender: Optional[str] = None
 
-    # Reject unknown fields
+    # 알 수 없는 필드 거부
     model_config = {"extra": "forbid"}
 
     @field_validator("status")
@@ -52,7 +52,7 @@ class AdminBasicInfoUpdateRequest(BaseModel):
     @classmethod
     def validate_phone(cls, v: Optional[str]) -> Optional[str]:
         if v is not None:
-            # Remove non-digits and validate Korean phone format
+            # 숫자만 추출하고 한국 전화번호 형식 유효성 검사
             digits = "".join(c for c in v if c.isdigit())
             if not digits.startswith("01") or len(digits) < 10:
                 raise ValueError("Invalid phone number format")
@@ -60,7 +60,7 @@ class AdminBasicInfoUpdateRequest(BaseModel):
         return v
 ```
 
-### Response DTO with from_model
+### from_model이 있는 응답 DTO
 
 ```python
 # backend/dtos/admin.py
@@ -68,7 +68,7 @@ from datetime import datetime
 from typing import Optional, List
 
 class MemberSummaryResponse(BaseModel):
-    """Member summary for list view"""
+    """목록 보기를 위한 회원 요약"""
     id: str
     name: str
     phone: str
@@ -77,13 +77,13 @@ class MemberSummaryResponse(BaseModel):
     status: str
     created_at: datetime
 
-    # Optional profile info
+    # 선택적 프로필 정보
     height: Optional[int] = None
     education: Optional[str] = None
     job: Optional[str] = None
     district: Optional[str] = None
 
-    # Photo URL (presigned)
+    # 사진 URL (presigned)
     photo_url: Optional[str] = None
 
     @classmethod
@@ -93,7 +93,7 @@ class MemberSummaryResponse(BaseModel):
         profile: Optional[UserProfile] = None,
         photo_url: Optional[str] = None,
     ) -> "MemberSummaryResponse":
-        """Convert domain model to DTO"""
+        """도메인 모델을 DTO로 변환"""
         return cls(
             id=user.id,
             name=user.name,
@@ -113,7 +113,7 @@ class MemberSummaryResponse(BaseModel):
 
 
 class MemberListResponse(BaseModel):
-    """Paginated member list"""
+    """페이지네이션된 회원 목록"""
     members: List[MemberSummaryResponse]
     total: int
     page: int
@@ -121,12 +121,12 @@ class MemberListResponse(BaseModel):
     total_pages: int
 ```
 
-### Complex Request DTO with Profile Update
+### 프로필 수정이 있는 복잡한 요청 DTO
 
 ```python
 # backend/dtos/admin.py
 class AdminProfileUpdateRequest(BaseModel):
-    """Update user profile (admin action)"""
+    """사용자 프로필 수정 (관리자 액션)"""
     height: Optional[int] = Field(None, ge=100, le=250)
     education: Optional[str] = None
     university: Optional[str] = Field(None, max_length=100)
@@ -174,25 +174,25 @@ class AdminProfileUpdateRequest(BaseModel):
         return v
 ```
 
-## Validation Patterns
+## 유효성 검사 패턴
 
-### Field Constraints
+### 필드 제약 조건
 
 ```python
 from pydantic import Field, field_validator
 
 class UserCreateDto(BaseModel):
-    # Length constraints
+    # 길이 제약
     name: str = Field(min_length=1, max_length=50)
 
-    # Number constraints
+    # 숫자 제약
     birth_year: int = Field(ge=1950, le=2010)
     height: Optional[int] = Field(None, ge=100, le=250)
 
-    # Phone pattern (Korean mobile)
+    # 전화번호 패턴 (한국 휴대폰)
     phone: str = Field(pattern=r'^01[0-9]\d{7,8}$')
 
-    # Custom validator
+    # 커스텀 유효성 검사기
     @field_validator('name')
     @classmethod
     def validate_name(cls, v: str) -> str:
@@ -201,7 +201,7 @@ class UserCreateDto(BaseModel):
         return v.strip()
 ```
 
-### Enum Validation Pattern
+### 열거형 유효성 검사 패턴
 
 ```python
 # backend/dtos/match.py
@@ -213,7 +213,7 @@ class MatchHistoryCreateRequest(BaseModel):
     target_user_id: Optional[str] = None
     category: MatchCategoryEnum = Field(
         default=MatchCategoryEnum.INTRO,
-        description="Match category: intro or extra",
+        description="매치 카테고리: intro 또는 extra",
     )
     bidirectional: bool = Field(
         default=False,
@@ -221,7 +221,7 @@ class MatchHistoryCreateRequest(BaseModel):
     )
 ```
 
-### model_validator for Cross-Field Validation
+### 교차 필드 유효성 검사를 위한 model_validator
 
 ```python
 from pydantic import model_validator
@@ -240,12 +240,12 @@ class MatchWeekCreateRequest(BaseModel):
         return self
 ```
 
-## Nested DTOs
+## 중첩 DTO
 
 ```python
 # backend/dtos/match.py
 class MatchUserSummary(BaseModel):
-    """Nested DTO for user info in match context"""
+    """매치 컨텍스트에서 사용자 정보를 위한 중첩 DTO"""
     user_id: Optional[str] = None
     firebase_id: Optional[str] = None
     name: Optional[str] = None
@@ -254,11 +254,11 @@ class MatchUserSummary(BaseModel):
 
 
 class MatchHistoryResponse(BaseModel):
-    """Match history with nested user info"""
+    """중첩된 사용자 정보를 포함한 매치 이력"""
     id: str
     week_id: Optional[str] = None
 
-    # Nested DTOs
+    # 중첩 DTO
     candidate: MatchUserSummary
     target: MatchUserSummary
 
@@ -269,23 +269,23 @@ class MatchHistoryResponse(BaseModel):
     updated_at: datetime
 ```
 
-## Dashboard Stats DTO
+## 대시보드 통계 DTO
 
 ```python
 # backend/dtos/admin.py
 class DashboardStatsResponse(BaseModel):
-    """Dashboard statistics"""
-    total_members: int = Field(description="Total registered members")
-    monthly_signups: int = Field(description="Signups in last 30 days")
-    weekly_signups: int = Field(description="Signups in last 7 days")
-    today_signups: int = Field(description="Signups today")
-    male_count: int = Field(description="Total male members")
-    female_count: int = Field(description="Total female members")
-    pending_reviews: int = Field(description="Members pending review")
+    """대시보드 통계"""
+    total_members: int = Field(description="총 등록 회원 수")
+    monthly_signups: int = Field(description="최근 30일 가입자 수")
+    weekly_signups: int = Field(description="최근 7일 가입자 수")
+    today_signups: int = Field(description="오늘 가입자 수")
+    male_count: int = Field(description="총 남성 회원 수")
+    female_count: int = Field(description="총 여성 회원 수")
+    pending_reviews: int = Field(description="검토 대기 중인 회원 수")
 
 
 class GenderRatioResponse(BaseModel):
-    """Gender ratio for charts"""
+    """차트를 위한 성별 비율"""
     male_count: int
     female_count: int
     male_percentage: float
@@ -293,40 +293,40 @@ class GenderRatioResponse(BaseModel):
 
 
 class WeeklyTrendItem(BaseModel):
-    """Single week trend data point"""
+    """단일 주별 트렌드 데이터 포인트"""
     week_start: datetime
     week_label: str
     count: int
 
 
 class WeeklyTrendResponse(BaseModel):
-    """Weekly registration trend"""
+    """주별 등록 트렌드"""
     data: List[WeeklyTrendItem]
 ```
 
-## Usage in Routes
+## 라우트에서의 사용
 
 ```python
 @router.patch("/members/{user_id}/basic", response_model=MemberDetailResponse)
 async def update_member_basic_info(
     user_id: str,
-    dto: AdminBasicInfoUpdateRequest,  # Auto-validates request body
+    dto: AdminBasicInfoUpdateRequest,  # 요청 본문 자동 유효성 검사
     session: AsyncSession = Depends(get_write_session_dependency),
 ):
-    """Update member basic info"""
+    """회원 기본 정보 수정"""
     service = AdminService(session)
     return await service.update_member_basic_info(user_id, dto)
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **Separate Request/Response**: Different DTOs for input/output
-2. **field_validator**: Use for enum and custom validation
-3. **model_config = {"extra": "forbid"}**: Reject unknown fields
-4. **from_model method**: Convert models to response DTOs
-5. **Type hints**: Explicit types on all fields
-6. **Field descriptions**: Document with Field(description=...)
-7. **No business logic**: DTOs are data containers only
-8. **Nested DTOs**: Use for complex nested data structures
-9. **model_validator**: Use for cross-field validation
-10. **Enum types**: Use domain enums directly or validate strings
+1. **요청/응답 분리**: 입출력에 다른 DTO 사용
+2. **field_validator**: 열거형 및 커스텀 유효성 검사에 사용
+3. **model_config = {"extra": "forbid"}**: 알 수 없는 필드 거부
+4. **from_model 메서드**: 모델을 응답 DTO로 변환
+5. **타입 힌트**: 모든 필드에 명시적 타입
+6. **필드 설명**: Field(description=...)로 문서화
+7. **비즈니스 로직 없음**: DTO는 데이터 컨테이너만
+8. **중첩 DTO**: 복잡한 중첩 데이터 구조에 사용
+9. **model_validator**: 교차 필드 유효성 검사에 사용
+10. **열거형 타입**: 도메인 열거형을 직접 사용하거나 문자열 유효성 검사

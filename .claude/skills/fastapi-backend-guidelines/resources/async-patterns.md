@@ -1,10 +1,10 @@
-# Async/Await Patterns - FastAPI
+# Async/Await 패턴 - FastAPI
 
-## Async Basics
+## 비동기 기초
 
-FastAPI is async-first. All database operations should be async.
+FastAPI는 비동기 우선입니다. 모든 데이터베이스 작업은 async여야 합니다.
 
-### Async Route Handler
+### 비동기 라우트 핸들러
 
 ```python
 # backend/api/v1/routers/admin.py
@@ -13,18 +13,18 @@ async def get_member(
     user_id: str,
     session: AsyncSession = Depends(get_read_session_dependency),
 ):
-    """Get member detail"""
+    """회원 상세 조회"""
     service = AdminService(session)
-    return await service.get_member_detail(user_id)  # await async method
+    return await service.get_member_detail(user_id)  # 비동기 메서드 await
 ```
 
-### Async Service Method
+### 비동기 서비스 메서드
 
 ```python
 # backend/domain/admin/service.py
 class AdminService:
     async def get_member_detail(self, user_id: str) -> MemberDetailResponse:
-        """Get full member detail with all relations"""
+        """모든 관계를 포함한 회원 전체 상세 조회"""
         user_with_relations = await self._data_loader.load_user_with_relations(
             user_id,
             load_profile=True,
@@ -37,7 +37,7 @@ class AdminService:
         return MemberDetailResponse.from_user_with_relations(user_with_relations)
 ```
 
-### Async Repository Query
+### 비동기 레포지토리 쿼리
 
 ```python
 # backend/domain/user/repository.py
@@ -47,14 +47,14 @@ class UserRepository:
             User.id == id,
             User.deleted_at.is_(None)
         )
-        # Await database query
+        # 데이터베이스 쿼리 await
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 ```
 
-## Concurrent Operations with asyncio.gather
+## asyncio.gather를 사용한 동시 작업
 
-### Parallel Dashboard Queries
+### 병렬 대시보드 쿼리
 
 ```python
 # backend/domain/admin/service.py
@@ -62,12 +62,12 @@ import asyncio
 
 class AdminService:
     async def get_dashboard_stats(self) -> DashboardStatsResponse:
-        """Get dashboard statistics with parallel queries"""
+        """병렬 쿼리로 대시보드 통계 조회"""
         now = datetime.utcnow()
         week_ago = now - timedelta(days=7)
         month_ago = now - timedelta(days=30)
 
-        # Run all stat queries in parallel using asyncio.gather
+        # asyncio.gather를 사용하여 모든 통계 쿼리를 병렬로 실행
         (
             total_count,
             monthly_count,
@@ -97,7 +97,7 @@ class AdminService:
         )
 ```
 
-### UserDataLoader with Parallel Relation Loading
+### 병렬 관계 로딩이 있는 UserDataLoader
 
 ```python
 # backend/domain/user/repository.py
@@ -112,12 +112,12 @@ class UserDataLoader:
         load_photos: bool = False,
         load_documents: bool = False,
     ) -> Optional[UserWithRelations]:
-        """Load user with optional relations in parallel"""
+        """선택적 관계를 병렬로 사용자 로드"""
 
         queries = []
         query_names = []
 
-        # Always load user
+        # 항상 사용자 로드
         async def load_user():
             stmt = select(User).where(User.id == user_id, User.deleted_at.is_(None))
             result = await self.session.execute(stmt)
@@ -145,10 +145,10 @@ class UserDataLoader:
             queries.append(load_photos_fn())
             query_names.append("photos")
 
-        # Execute all queries in parallel
+        # 모든 쿼리를 병렬로 실행
         results = await asyncio.gather(*queries)
 
-        # Map results
+        # 결과 매핑
         result_dict = dict(zip(query_names, results))
         user = result_dict.get("user")
         if not user:
@@ -161,7 +161,7 @@ class UserDataLoader:
         )
 ```
 
-### Parallel S3 Presigned URL Generation
+### 병렬 S3 Presigned URL 생성
 
 ```python
 # backend/domain/admin/service.py
@@ -169,7 +169,7 @@ import asyncio
 
 class AdminService:
     async def get_member_detail(self, user_id: str) -> MemberDetailResponse:
-        """Get member detail with parallel photo URL generation"""
+        """병렬 사진 URL 생성을 포함한 회원 상세 조회"""
         user_with_relations = await self._data_loader.load_user_with_relations(
             user_id,
             load_profile=True,
@@ -179,7 +179,7 @@ class AdminService:
         if not user_with_relations:
             raise NotFoundError(f"User {user_id} not found")
 
-        # Generate presigned URLs in parallel
+        # presigned URL을 병렬로 생성
         if user_with_relations.photos:
             photo_urls = await asyncio.gather(*[
                 generate_presigned_url(photo.s3_key)
@@ -194,21 +194,21 @@ class AdminService:
         )
 ```
 
-## Sequential Dependencies
+## 순차적 의존성
 
 ```python
 async def create_user_with_profile(self, dto: UserCreateDto) -> UserResponseDto:
-    """Create user and profile sequentially (profile needs user.id)"""
-    # Must run sequentially (profile depends on user.id)
+    """사용자와 프로필을 순차적으로 생성 (프로필에 user.id 필요)"""
+    # 순차적으로 실행해야 함 (프로필이 user.id에 의존)
     user = User(
         phone=dto.phone,
         name=dto.name,
         gender=dto.gender,
         birth_year=dto.birth_year,
     )
-    await self._repository.create(user)  # Get user.id
+    await self._repository.create(user)  # user.id 획득
 
-    # Now create profile with user.id
+    # 이제 user.id로 프로필 생성
     profile = UserProfile(
         id=user.id,
         user_id=user.id,
@@ -220,26 +220,26 @@ async def create_user_with_profile(self, dto: UserCreateDto) -> UserResponseDto:
     return UserResponseDto.from_model(user)
 ```
 
-## Session Management
+## 세션 관리
 
-### AsyncSession Context
+### AsyncSession 컨텍스트
 
 ```python
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-# Session provided by dependency injection
+# 의존성 주입으로 제공되는 세션
 async def route_handler(
     session: AsyncSession = Depends(get_write_session_dependency),
 ):
-    # Session automatically managed (commit/rollback)
+    # 세션 자동 관리 (commit/rollback)
     service = Service(session)
     return await service.do_work()
 ```
 
-### Read/Write Session Split
+### 읽기/쓰기 세션 분리
 
 ```python
-# Read operations (SELECT)
+# 읽기 작업 (SELECT)
 @router.get("/members")
 async def list_members(
     session: AsyncSession = Depends(get_read_session_dependency),
@@ -247,7 +247,7 @@ async def list_members(
     service = AdminService(session)
     return await service.list_members()
 
-# Write operations (INSERT, UPDATE, DELETE)
+# 쓰기 작업 (INSERT, UPDATE, DELETE)
 @router.patch("/members/{user_id}")
 async def update_member(
     user_id: str,
@@ -258,47 +258,47 @@ async def update_member(
     return await service.update_member(user_id, dto)
 ```
 
-## Common Pitfalls
+## 자주 발생하는 문제
 
-### ❌ Blocking Operations
+### 블로킹 작업
 
 ```python
-# ❌ Don't use blocking I/O in async functions
+# async 함수에서 블로킹 I/O를 사용하지 마세요
 async def bad_handler():
-    time.sleep(1)  # Blocks event loop!
+    time.sleep(1)  # 이벤트 루프를 블로킹합니다!
     return "done"
 
-# ✅ Use async alternatives
+# 비동기 대안 사용
 async def good_handler():
-    await asyncio.sleep(1)  # Non-blocking
+    await asyncio.sleep(1)  # 논블로킹
     return "done"
 ```
 
-### ❌ Missing await
+### await 누락
 
 ```python
-# ❌ Forgot await - returns coroutine, not result
+# await 누락 - 결과가 아닌 코루틴 반환
 async def bad_service():
-    item = self._repository.get_by_id(id)  # Missing await!
-    return item  # This is a coroutine object, not User
+    item = self._repository.get_by_id(id)  # await 누락!
+    return item  # 이것은 User 객체가 아닌 코루틴 객체입니다
 
-# ✅ Always await async calls
+# 항상 비동기 호출에 await 사용
 async def good_service():
     item = await self._repository.get_by_id(id)
-    return item  # This is User object
+    return item  # User 객체입니다
 ```
 
-### ❌ Sequential when Parallel is Possible
+### 병렬 가능 시 순차적 실행
 
 ```python
-# ❌ Sequential queries - slower
+# 순차적 쿼리 - 느림
 async def bad_dashboard():
     total = await self._repo.count_all()
     male = await self._repo.count_by_gender("male")
     female = await self._repo.count_by_gender("female")
     return {"total": total, "male": male, "female": female}
 
-# ✅ Parallel queries - faster
+# 병렬 쿼리 - 빠름
 async def good_dashboard():
     total, male, female = await asyncio.gather(
         self._repo.count_all(),
@@ -308,14 +308,14 @@ async def good_dashboard():
     return {"total": total, "male": male, "female": female}
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **Async all the way**: Route → Service → Repository
-2. **await async calls**: Never forget await
-3. **No blocking I/O**: Use async libraries
-4. **Parallel when possible**: Use `asyncio.gather()` for independent queries
-5. **Session per request**: Dependency injection
-6. **Error handling**: try/except works with async
-7. **Read/Write split**: Use correct session dependency
-8. **UserDataLoader**: For loading user with multiple relations
-9. **Sequential only when needed**: Dependencies between operations
+1. **전면적 비동기**: Route → Service → Repository
+2. **async 호출에 await**: await 절대 잊지 말기
+3. **블로킹 I/O 없음**: 비동기 라이브러리 사용
+4. **가능하면 병렬**: 독립적인 쿼리에 `asyncio.gather()` 사용
+5. **요청당 세션**: 의존성 주입
+6. **에러 처리**: try/except는 async에서도 동작
+7. **읽기/쓰기 분리**: 올바른 세션 의존성 사용
+8. **UserDataLoader**: 사용자와 여러 관계를 로드할 때
+9. **필요한 경우만 순차적**: 작업 간 의존성이 있을 때

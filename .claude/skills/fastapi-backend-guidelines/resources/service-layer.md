@@ -1,10 +1,10 @@
-# Service Layer - FastAPI
+# Service 레이어 - FastAPI
 
-## Service Pattern
+## Service 패턴
 
-Services contain business logic and orchestrate repositories.
+Service는 비즈니스 로직을 포함하고 Repository를 오케스트레이션합니다.
 
-### UserService Example
+### UserService 예시
 
 ```python
 # backend/domain/user/service.py
@@ -30,22 +30,22 @@ class UserService:
         self._data_loader = UserDataLoader(session)
 
     async def get_user(self, user_id: str) -> UserResponseDto:
-        """Get user by ID"""
+        """ID로 사용자 조회"""
         user = await self._repository.get_by_id(user_id)
         if not user:
             raise NotFoundError(f"User {user_id} not found")
         return UserResponseDto.from_model(user)
 
     async def get_user_by_phone(self, phone: str) -> Optional[UserResponseDto]:
-        """Get user by phone number"""
+        """전화번호로 사용자 조회"""
         user = await self._repository.find_by_phone(phone)
         if not user:
             return None
         return UserResponseDto.from_model(user)
 
     async def create_user(self, dto: UserCreateDto) -> UserResponseDto:
-        """Create new user with business validation"""
-        # Business rule: Phone must be unique
+        """비즈니스 유효성 검사와 함께 사용자 생성"""
+        # 비즈니스 규칙: 전화번호 중복 불가
         existing = await self._repository.find_by_phone(dto.phone)
         if existing:
             raise ConflictError("Phone number already registered")
@@ -55,7 +55,7 @@ class UserService:
         return UserResponseDto.from_model(created)
 ```
 
-### AdminService with Complex Logic
+### 복잡한 로직이 있는 AdminService
 
 ```python
 # backend/domain/admin/service.py
@@ -83,12 +83,12 @@ class AdminService:
         self._data_loader = UserDataLoader(session)
 
     async def get_dashboard_stats(self) -> DashboardStatsResponse:
-        """Get dashboard statistics with parallel queries"""
+        """병렬 쿼리로 대시보드 통계 조회"""
         now = datetime.utcnow()
         week_ago = now - timedelta(days=7)
         month_ago = now - timedelta(days=30)
 
-        # Run all stat queries in parallel
+        # 모든 통계 쿼리를 병렬로 실행
         (
             total_count,
             monthly_count,
@@ -118,8 +118,8 @@ class AdminService:
         )
 
     async def get_member_detail(self, user_id: str) -> MemberDetailResponse:
-        """Get full member detail with all relations"""
-        # Use data loader for parallel relation loading
+        """관계를 포함한 회원 전체 상세 조회"""
+        # 병렬 관계 로딩을 위한 데이터 로더 사용
         user_with_relations = await self._data_loader.load_user_with_relations(
             user_id,
             load_profile=True,
@@ -133,7 +133,7 @@ class AdminService:
         if not user_with_relations:
             raise NotFoundError(f"User {user_id} not found")
 
-        # Generate presigned URLs for photos
+        # 사진의 presigned URL 생성
         photo_urls = []
         for photo in user_with_relations.photos:
             url = await generate_presigned_url(photo.s3_key)
@@ -149,12 +149,12 @@ class AdminService:
         user_id: str,
         dto: AdminBasicInfoUpdateRequest,
     ) -> MemberDetailResponse:
-        """Update member basic info (admin action)"""
+        """회원 기본 정보 수정 (관리자 액션)"""
         user = await self._user_repository.get_by_id(user_id)
         if not user:
             raise NotFoundError(f"User {user_id} not found")
 
-        # Apply updates from DTO (only non-None fields)
+        # DTO에서 업데이트 적용 (None이 아닌 필드만)
         update_data = dto.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             if hasattr(user, field):
@@ -166,16 +166,16 @@ class AdminService:
         return await self.get_member_detail(user_id)
 ```
 
-## Service Responsibilities
+## Service 책임
 
-1. **Business Logic**: Implement domain rules
-2. **Validation**: Business-level validation (beyond DTO)
-3. **Orchestration**: Coordinate multiple repositories
-4. **Transformation**: Model ↔ DTO conversion
-5. **Error Handling**: Raise domain exceptions
-6. **Presigned URLs**: Generate S3 URLs for photos/documents
+1. **비즈니스 로직**: 도메인 규칙 구현
+2. **유효성 검사**: 비즈니스 수준 유효성 검사 (DTO 이상)
+3. **오케스트레이션**: 여러 Repository 조율
+4. **변환**: Model ↔ DTO 변환
+5. **에러 처리**: 도메인 예외 발생
+6. **Presigned URL**: 사진/문서를 위한 S3 URL 생성
 
-## AuthService with Firebase & Kakao
+## Firebase & Kakao를 사용하는 AuthService
 
 ```python
 # backend/domain/auth/service.py
@@ -203,7 +203,7 @@ class AuthService:
         self._user_repository = UserRepository(session)
 
     async def login_with_phone(self, dto: LoginRequest) -> LoginResponse:
-        """Login with phone and password"""
+        """전화번호와 비밀번호로 로그인"""
         user = await self._user_repository.find_by_phone(dto.phone)
         if not user:
             raise UnauthorizedError("Invalid credentials")
@@ -215,15 +215,15 @@ class AuthService:
         return LoginResponse(**tokens, user=UserResponseDto.from_model(user))
 
     async def login_with_firebase(self, dto: FirebaseLoginRequest) -> LoginResponse:
-        """Login with Firebase ID token"""
-        # Verify Firebase token
+        """Firebase ID 토큰으로 로그인"""
+        # Firebase 토큰 검증
         decoded = await verify_firebase_token(dto.id_token)
         firebase_id = decoded["uid"]
 
-        # Find user by Firebase ID
+        # Firebase ID로 사용자 조회
         user = await self._user_repository.find_by_firebase_id(firebase_id)
         if not user:
-            # Signup required - raise special exception with Firebase info
+            # 회원가입 필요 - Firebase 정보와 함께 특수 예외 발생
             raise UserNotFoundSignupRequiredError(
                 message="User not found, signup required",
                 firebase_id=firebase_id,
@@ -234,12 +234,12 @@ class AuthService:
         return LoginResponse(**tokens, user=UserResponseDto.from_model(user))
 
     async def login_with_kakao(self, dto: KakaoLoginRequest) -> LoginResponse:
-        """Login with Kakao access token"""
-        # Validate Kakao token and get user info
+        """Kakao 액세스 토큰으로 로그인"""
+        # Kakao 토큰 검증 및 사용자 정보 조회
         kakao_user = await self._validate_kakao_token(dto.access_token)
         kakao_id = str(kakao_user["id"])
 
-        # Find user by Kakao ID
+        # Kakao ID로 사용자 조회
         user = await self._user_repository.find_by_kakao_id(kakao_id)
         if not user:
             raise UserNotFoundSignupRequiredError(
@@ -247,7 +247,7 @@ class AuthService:
                 kakao_id=kakao_id,
             )
 
-        # Create Firebase custom token for client
+        # 클라이언트를 위한 Firebase custom token 생성
         firebase_token = await create_custom_token(user.firebase_id)
 
         tokens = self._generate_tokens(user)
@@ -258,7 +258,7 @@ class AuthService:
         )
 
     def _generate_tokens(self, user: User) -> dict:
-        """Generate JWT access and refresh tokens"""
+        """JWT 액세스 및 리프레시 토큰 생성"""
         now = datetime.utcnow()
 
         access_payload = {
@@ -280,7 +280,7 @@ class AuthService:
         }
 ```
 
-## Multi-Repository Service Pattern
+## 다중 Repository Service 패턴
 
 ```python
 class MatchService:
@@ -294,38 +294,38 @@ class MatchService:
         self,
         dto: MatchHistoryCreateRequest
     ) -> MatchHistoryResponse:
-        """Create match with cross-domain validation"""
-        # Verify week exists
+        """도메인 간 유효성 검사와 함께 매치 생성"""
+        # 주차 존재 확인
         week = await self._week_repository.get_by_id(dto.week_id)
         if not week:
             raise NotFoundError("Match week not found")
 
-        # Verify candidate user exists
+        # 후보 사용자 존재 확인
         if dto.candidate_user_id:
             candidate = await self._user_repository.get_by_id(dto.candidate_user_id)
             if not candidate:
                 raise NotFoundError("Candidate user not found")
 
-        # Verify target user exists
+        # 대상 사용자 존재 확인
         if dto.target_user_id:
             target = await self._user_repository.get_by_id(dto.target_user_id)
             if not target:
                 raise NotFoundError("Target user not found")
 
-        # Create match
+        # 매치 생성
         match = MatchHistory(**dto.model_dump())
         created = await self._match_repository.create(match)
 
         return MatchHistoryResponse.from_model(created)
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **One service per domain**: UserService for user domain
-2. **Inject session**: Accept AsyncSession in constructor
-3. **Return DTOs**: Never return models directly to router
-4. **Raise exceptions**: Use domain exceptions for errors
-5. **Business rules**: Enforce in service, not repository
-6. **Parallel queries**: Use `asyncio.gather()` for independent queries
-7. **Data loader**: Use UserDataLoader for loading user relations
-8. **Presigned URLs**: Generate S3 URLs in service, not repository
+1. **도메인당 하나의 서비스**: user 도메인에 UserService
+2. **세션 주입**: 생성자에서 AsyncSession 수용
+3. **DTO 반환**: 라우터에 모델을 직접 반환하지 않음
+4. **예외 발생**: 에러에 도메인 예외 사용
+5. **비즈니스 규칙**: Repository가 아닌 Service에서 적용
+6. **병렬 쿼리**: 독립적인 쿼리에 `asyncio.gather()` 사용
+7. **데이터 로더**: 사용자 관계 로딩에 UserDataLoader 사용
+8. **Presigned URL**: Repository가 아닌 Service에서 S3 URL 생성

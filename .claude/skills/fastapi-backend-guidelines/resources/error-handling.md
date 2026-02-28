@@ -1,14 +1,14 @@
-# Error Handling - FastAPI
+# 에러 처리 - FastAPI
 
-## Custom Exceptions
+## 커스텀 예외
 
-YGS defines domain-specific exceptions:
+YGS는 도메인 특화 예외를 정의합니다:
 
 ```python
 # backend/error/__init__.py
 
 class AppException(Exception):
-    """Base exception for all application errors"""
+    """모든 애플리케이션 에러의 기반 예외"""
     def __init__(self, message: str, status_code: int = 400):
         self.message = message
         self.status_code = status_code
@@ -16,37 +16,37 @@ class AppException(Exception):
 
 
 class NotFoundError(AppException):
-    """Resource not found (HTTP 404)"""
+    """리소스를 찾을 수 없음 (HTTP 404)"""
     def __init__(self, message: str = "Resource not found"):
         super().__init__(message, status_code=404)
 
 
 class ValidationError(AppException):
-    """Validation failed (HTTP 400)"""
+    """유효성 검사 실패 (HTTP 400)"""
     def __init__(self, message: str = "Validation failed"):
         super().__init__(message, status_code=400)
 
 
 class UnauthorizedError(AppException):
-    """Unauthorized access (HTTP 401)"""
+    """인증되지 않은 접근 (HTTP 401)"""
     def __init__(self, message: str = "Unauthorized"):
         super().__init__(message, status_code=401)
 
 
 class ForbiddenError(AppException):
-    """Forbidden access (HTTP 403)"""
+    """금지된 접근 (HTTP 403)"""
     def __init__(self, message: str = "Forbidden"):
         super().__init__(message, status_code=403)
 
 
 class ConflictError(AppException):
-    """Resource conflict (HTTP 409)"""
+    """리소스 충돌 (HTTP 409)"""
     def __init__(self, message: str = "Conflict"):
         super().__init__(message, status_code=409)
 
 
 class UserNotFoundSignupRequiredError(AppException):
-    """Special exception for OAuth flows requiring signup"""
+    """회원가입이 필요한 OAuth 흐름을 위한 특수 예외"""
     def __init__(
         self,
         message: str = "User not found, signup required",
@@ -60,7 +60,7 @@ class UserNotFoundSignupRequiredError(AppException):
         self.email = email
 ```
 
-## Using Exceptions in Services
+## 서비스에서 예외 사용
 
 ```python
 # backend/domain/user/service.py
@@ -68,23 +68,23 @@ from backend.error import NotFoundError, ValidationError, ConflictError
 
 class UserService:
     async def get_user(self, user_id: str) -> UserResponseDto:
-        """Get user by ID"""
+        """ID로 사용자 조회"""
         user = await self._repository.get_by_id(user_id)
 
-        # Raise domain exception
+        # 도메인 예외 발생
         if not user:
             raise NotFoundError(f"User {user_id} not found")
 
         return UserResponseDto.from_model(user)
 
     async def create_user(self, dto: UserCreateDto) -> UserResponseDto:
-        """Create user with business validation"""
-        # Check for duplicate phone
+        """비즈니스 유효성 검사와 함께 사용자 생성"""
+        # 중복 전화번호 확인
         existing = await self._repository.find_by_phone(dto.phone)
         if existing:
             raise ConflictError("Phone number already registered")
 
-        # Business validation
+        # 비즈니스 유효성 검사
         if dto.birth_year > 2010:
             raise ValidationError("User must be at least 14 years old")
 
@@ -97,13 +97,13 @@ from backend.error import UnauthorizedError, UserNotFoundSignupRequiredError
 
 class AuthService:
     async def login_with_firebase(self, dto: FirebaseLoginRequest) -> LoginResponse:
-        """Firebase login with signup redirect"""
+        """회원가입 리다이렉트가 있는 Firebase 로그인"""
         decoded = await verify_firebase_token(dto.id_token)
         firebase_id = decoded["uid"]
 
         user = await self._user_repository.find_by_firebase_id(firebase_id)
         if not user:
-            # Special exception carries OAuth info for signup
+            # 특수 예외가 회원가입을 위한 OAuth 정보를 전달
             raise UserNotFoundSignupRequiredError(
                 message="User not found, signup required",
                 firebase_id=firebase_id,
@@ -113,7 +113,7 @@ class AuthService:
         return self._generate_login_response(user)
 
     async def verify_token(self, token: str) -> User:
-        """Verify JWT token"""
+        """JWT 토큰 검증"""
         try:
             payload = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=["HS256"])
         except jwt.ExpiredSignatureError:
@@ -128,11 +128,11 @@ class AuthService:
         return user
 ```
 
-## Exception Handlers (Recommended)
+## 예외 핸들러 (권장)
 
-> **WARNING**: Do NOT use `BaseHTTPMiddleware` for error handling. It conflicts with
-> FastAPI's dependency injection and causes `IllegalStateChangeError` with SQLAlchemy
-> async sessions. Use `@app.exception_handler` decorators instead.
+> **경고**: 에러 처리에 `BaseHTTPMiddleware`를 사용하지 마세요. FastAPI의 의존성 주입과 충돌하여
+> SQLAlchemy 비동기 세션과 함께 `IllegalStateChangeError`를 일으킵니다.
+> 대신 `@app.exception_handler` 데코레이터를 사용하세요.
 
 ```python
 # backend/middleware/error_handler.py
@@ -156,7 +156,7 @@ logger = logging.getLogger(__name__)
 
 
 def register_exception_handlers(app: FastAPI) -> None:
-    """Register all exception handlers to the FastAPI app."""
+    """FastAPI 앱에 모든 예외 핸들러를 등록합니다."""
 
     @app.exception_handler(NotFoundError)
     async def not_found_handler(request: Request, exc: NotFoundError) -> JSONResponse:
@@ -271,7 +271,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 ```
 
-## Registering Exception Handlers
+## 예외 핸들러 등록
 
 ```python
 # backend/main.py
@@ -281,9 +281,9 @@ from backend.middleware.error_handler import register_exception_handlers
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
+    # 시작
     yield
-    # Shutdown
+    # 종료
 
 def create_application() -> FastAPI:
     app = FastAPI(
@@ -291,10 +291,10 @@ def create_application() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # Register exception handlers (NOT middleware!)
+    # 예외 핸들러 등록 (미들웨어 대신!)
     register_exception_handlers(app)
 
-    # Register routers
+    # 라우터 등록
     app.include_router(auth_router)
     app.include_router(user_router)
     app.include_router(admin_router)
@@ -305,17 +305,17 @@ def create_application() -> FastAPI:
 app = create_application()
 ```
 
-## Why NOT BaseHTTPMiddleware?
+## BaseHTTPMiddleware를 사용하지 않는 이유
 
-`BaseHTTPMiddleware` uses an internal streaming pattern that conflicts with
-FastAPI's dependency injection lifecycle. When using SQLAlchemy async sessions:
+`BaseHTTPMiddleware`는 FastAPI의 의존성 주입 라이프사이클과 충돌하는 내부 스트리밍 패턴을 사용합니다.
+SQLAlchemy 비동기 세션을 사용할 때:
 
 ```
-# This causes IllegalStateChangeError:
+# 이것은 IllegalStateChangeError를 일으킵니다:
 # Method 'close()' can't be called here; method '_connection_for_bind()'
 # is already in progress
 
-class ErrorHandlerMiddleware(BaseHTTPMiddleware):  # DON'T DO THIS
+class ErrorHandlerMiddleware(BaseHTTPMiddleware):  # 이렇게 하지 마세요
     async def dispatch(self, request, call_next):
         try:
             return await call_next(request)
@@ -323,17 +323,16 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):  # DON'T DO THIS
             return JSONResponse(...)
 ```
 
-The problem occurs because:
-1. `call_next()` uses internal streams to process the request
-2. When an exception occurs during dependency cleanup (session.close())
-3. The middleware tries to handle it while the session is still in an intermediate state
+문제는 다음과 같이 발생합니다:
+1. `call_next()`는 요청 처리에 내부 스트림을 사용
+2. 의존성 정리 (session.close()) 중 예외가 발생할 때
+3. 미들웨어가 세션이 아직 중간 상태에 있는 동안 처리하려고 시도
 
-**Solution**: Use `@app.exception_handler` decorators which integrate properly with
-FastAPI's request lifecycle.
+**해결책**: FastAPI의 요청 라이프사이클과 올바르게 통합되는 `@app.exception_handler` 데코레이터를 사용하세요.
 
-## FastAPI HTTPException (For Simple Cases)
+## FastAPI HTTPException (간단한 경우)
 
-For simple cases in routers, you can use HTTPException directly:
+라우터의 간단한 경우에는 HTTPException을 직접 사용할 수 있습니다:
 
 ```python
 from fastapi import HTTPException, status
@@ -349,9 +348,9 @@ async def get_item(id: str):
     return item
 ```
 
-However, **prefer domain exceptions** in services for consistency.
+그러나 일관성을 위해 **서비스에서는 도메인 예외를 선호하세요**.
 
-## Router-Level Exception Handling
+## 라우터 수준 예외 처리
 
 ```python
 # backend/api/v1/routers/admin.py
@@ -365,7 +364,7 @@ async def get_member(
     user_id: str,
     session: AsyncSession = Depends(get_read_session_dependency),
 ):
-    """Get member detail"""
+    """회원 상세 조회"""
     service = AdminService(session)
     try:
         return await service.get_member_detail(user_id)
@@ -375,9 +374,9 @@ async def get_member(
         raise HTTPException(status_code=403, detail=str(e))
 ```
 
-## Validation Errors (Pydantic)
+## 유효성 검사 에러 (Pydantic)
 
-Pydantic automatically handles validation and returns 422:
+Pydantic은 유효성 검사를 자동으로 처리하고 422를 반환합니다:
 
 ```python
 from pydantic import BaseModel, field_validator
@@ -386,7 +385,7 @@ from backend.domain.user.enums import UserStatusEnum
 class AdminBasicInfoUpdateRequest(BaseModel):
     status: Optional[str] = None
 
-    model_config = {"extra": "forbid"}  # Reject unknown fields
+    model_config = {"extra": "forbid"}  # 알 수 없는 필드 거부
 
     @field_validator("status")
     @classmethod
@@ -398,7 +397,7 @@ class AdminBasicInfoUpdateRequest(BaseModel):
         return v
 ```
 
-When validation fails, FastAPI returns:
+유효성 검사 실패 시 FastAPI가 반환하는 응답:
 ```json
 {
   "detail": [
@@ -411,15 +410,15 @@ When validation fails, FastAPI returns:
 }
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **Exception handlers**: Use `@app.exception_handler` (NOT `BaseHTTPMiddleware`)
-2. **Domain exceptions**: Use custom exceptions in services
-3. **Specific errors**: NotFoundError, ValidationError, ConflictError, etc.
-4. **HTTP mapping**: Handlers convert to HTTP responses
-5. **Logging**: Log unexpected errors with context
-6. **Consistent format**: Same error response structure
-7. **Special exceptions**: Use UserNotFoundSignupRequiredError for OAuth flows
-8. **Pydantic validation**: Let Pydantic handle DTO validation
-9. **Extra forbid**: Use `model_config = {"extra": "forbid"}` to reject unknown fields
-10. **Avoid middleware**: Never use `BaseHTTPMiddleware` with async DB sessions
+1. **예외 핸들러**: `@app.exception_handler` 사용 (`BaseHTTPMiddleware` 대신)
+2. **도메인 예외**: 서비스에서 커스텀 예외 사용
+3. **구체적인 에러**: NotFoundError, ValidationError, ConflictError 등
+4. **HTTP 매핑**: 핸들러가 HTTP 응답으로 변환
+5. **로깅**: 컨텍스트와 함께 예상치 못한 에러 로그
+6. **일관된 형식**: 같은 에러 응답 구조
+7. **특수 예외**: OAuth 흐름에 UserNotFoundSignupRequiredError 사용
+8. **Pydantic 유효성 검사**: Pydantic이 DTO 유효성 검사 처리하도록
+9. **Extra forbid**: 알 수 없는 필드 거부에 `model_config = {"extra": "forbid"}` 사용
+10. **미들웨어 회피**: 비동기 DB 세션과 함께 `BaseHTTPMiddleware` 절대 사용하지 않음

@@ -1,34 +1,34 @@
 # Domain-Driven Design - FastAPI
 
-## Domain Organization
+## 도메인 구성
 
-Each domain follows this structure:
+각 도메인은 이 구조를 따릅니다:
 
 ```
 backend/domain/{domain}/
   __init__.py
-  model.py         # SQLModel database models
-  repository.py    # Data access layer
-  service.py       # Business logic layer
-  enums.py         # Domain-specific enums (if needed)
+  model.py         # SQLModel 데이터베이스 모델
+  repository.py    # 데이터 접근 레이어
+  service.py       # 비즈니스 로직 레이어
+  enums.py         # 도메인 특화 열거형 (필요한 경우)
 ```
 
-## YGS Domains
+## YGS 도메인
 
-Current domains in the YGS project:
+YGS 프로젝트의 현재 도메인:
 
-| Domain | Description | Key Models |
-|--------|-------------|------------|
-| **user** | User management | User, UserProfile, UserLifestyle, UserPreference, UserDocument, UserPhoto, UserSubscription, UserAccessAudit |
-| **auth** | Authentication | JWT tokens, Firebase social auth, Kakao OAuth |
-| **admin** | Admin dashboard | ConsultSchedule, statistics, member management |
-| **match** | Matching system | MatchWeek, MatchHistory, MatchFeedback |
-| **llm** | LLM integration | Gemini-enhanced compatibility analysis |
-| **shared** | Shared utilities | BaseRepository, common helpers |
+| 도메인 | 설명 | 주요 모델 |
+|--------|------|-----------|
+| **user** | 사용자 관리 | User, UserProfile, UserLifestyle, UserPreference, UserDocument, UserPhoto, UserSubscription, UserAccessAudit |
+| **auth** | 인증 | JWT 토큰, Firebase 소셜 인증, Kakao OAuth |
+| **admin** | 관리자 대시보드 | ConsultSchedule, 통계, 회원 관리 |
+| **match** | 매칭 시스템 | MatchWeek, MatchHistory, MatchFeedback |
+| **llm** | LLM 통합 | Gemini 향상 호환성 분석 |
+| **shared** | 공유 유틸리티 | BaseRepository, 공통 헬퍼 |
 
-## Domain Structure Example
+## 도메인 구조 예시
 
-### User Domain
+### User 도메인
 
 ```
 backend/domain/user/
@@ -37,10 +37,10 @@ backend/domain/user/
                    # UserDocument, UserPhoto, UserSubscription, UserAccessAudit
   repository.py    # UserRepository, UserDataLoader
   service.py       # UserService
-  enums.py         # GenderEnum, UserStatusEnum, EducationEnum, etc.
+  enums.py         # GenderEnum, UserStatusEnum, EducationEnum 등
 ```
 
-### Match Domain
+### Match 도메인
 
 ```
 backend/domain/match/
@@ -50,7 +50,7 @@ backend/domain/match/
   service.py       # MatchService
 ```
 
-### Admin Domain
+### Admin 도메인
 
 ```
 backend/domain/admin/
@@ -58,14 +58,14 @@ backend/domain/admin/
   model.py         # ConsultSchedule
   repository.py    # ConsultScheduleRepository
   service.py       # AdminService
-  matching_service.py  # Compatibility scoring
+  matching_service.py  # 호환성 점수 계산
 ```
 
-## Creating a New Domain
+## 새 도메인 만들기
 
-1. **Create directory**: `backend/domain/newdomain/`
+1. **디렉토리 생성**: `backend/domain/newdomain/`
 
-2. **Create model.py**: Database models with ULID IDs
+2. **model.py 생성**: ULID ID가 있는 데이터베이스 모델
 ```python
 # backend/domain/newdomain/model.py
 from sqlmodel import SQLModel, Field
@@ -73,19 +73,19 @@ from datetime import datetime
 from ulid import ULID
 
 def generate_newdomain_id() -> str:
-    return f"nd_{ULID()}"  # Use appropriate prefix
+    return f"nd_{ULID()}"  # 적절한 접두사 사용
 
 class NewEntity(SQLModel, table=True):
     __tablename__ = "new_entities"
 
     id: str = Field(default_factory=generate_newdomain_id, primary_key=True)
-    # fields...
+    # 필드들...
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = None
-    deleted_at: Optional[datetime] = None  # Soft delete
+    deleted_at: Optional[datetime] = None  # 소프트 삭제
 ```
 
-3. **Create repository.py**: Data access
+3. **repository.py 생성**: 데이터 접근
 ```python
 # backend/domain/newdomain/repository.py
 from backend.domain.shared.base_repository import BaseRepository
@@ -95,10 +95,10 @@ class NewEntityRepository(BaseRepository[NewEntity]):
     def __init__(self, session: AsyncSession):
         super().__init__(session, NewEntity)
 
-    # Domain-specific queries...
+    # 도메인 특화 쿼리...
 ```
 
-4. **Create service.py**: Business logic
+4. **service.py 생성**: 비즈니스 로직
 ```python
 # backend/domain/newdomain/service.py
 from backend.domain.newdomain.repository import NewEntityRepository
@@ -117,25 +117,25 @@ class NewEntityService:
         return NewEntityResponseDto.from_model(entity)
 ```
 
-5. **Create DTOs**: `backend/dtos/newdomain.py`
+5. **DTO 생성**: `backend/dtos/newdomain.py`
 ```python
 # backend/dtos/newdomain.py
 from pydantic import BaseModel, Field, field_validator
 
 class NewEntityCreateDto(BaseModel):
-    # request fields...
+    # 요청 필드들...
     model_config = {"extra": "forbid"}
 
 class NewEntityResponseDto(BaseModel):
     id: str
-    # response fields...
+    # 응답 필드들...
 
     @classmethod
     def from_model(cls, model) -> "NewEntityResponseDto":
         return cls(id=model.id, ...)
 ```
 
-6. **Create router**: `backend/api/v1/routers/newdomain.py`
+6. **라우터 생성**: `backend/api/v1/routers/newdomain.py`
 ```python
 # backend/api/v1/routers/newdomain.py
 from fastapi import APIRouter, Depends
@@ -152,7 +152,7 @@ async def get_entity(
     return await service.get_entity(entity_id)
 ```
 
-7. **Register router**: Add to `main.py`
+7. **라우터 등록**: `main.py`에 추가
 ```python
 # backend/main.py
 from backend.api.v1.routers.newdomain import router as newdomain_router
@@ -160,16 +160,16 @@ from backend.api.v1.routers.newdomain import router as newdomain_router
 app.include_router(newdomain_router)
 ```
 
-## Domain Independence
+## 도메인 독립성
 
-- Domains should be as independent as possible
-- Share common code through `shared` domain
-- Avoid circular dependencies
-- Use DTOs for inter-domain communication
+- 도메인은 가능한 한 독립적이어야 함
+- `shared` 도메인을 통해 공통 코드 공유
+- 순환 의존성 방지
+- 도메인 간 통신에 DTO 사용
 
-## Cross-Domain Communication
+## 도메인 간 통신
 
-When one service needs data from another domain:
+한 서비스가 다른 도메인의 데이터가 필요한 경우:
 
 ```python
 # backend/domain/match/service.py
@@ -177,27 +177,27 @@ class MatchService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self._match_repository = MatchHistoryRepository(session)
-        self._user_repository = UserRepository(session)  # From user domain
+        self._user_repository = UserRepository(session)  # user 도메인에서
 
     async def create_match(self, dto: MatchCreateDto) -> MatchResponse:
-        # Validate user exists (cross-domain check)
+        # 사용자 존재 확인 (도메인 간 확인)
         user = await self._user_repository.get_by_id(dto.user_id)
         if not user:
             raise NotFoundError("User not found")
 
-        # Create match in this domain
+        # 이 도메인에서 매치 생성
         match = MatchHistory(**dto.model_dump())
         return await self._match_repository.create(match)
 ```
 
-## Shared Domain
+## Shared 도메인
 
-The `shared` domain contains:
+`shared` 도메인의 내용:
 
 ```
 backend/domain/shared/
   __init__.py
-  base_repository.py  # Generic BaseRepository[T]
+  base_repository.py  # 제네릭 BaseRepository[T]
 ```
 
 ```python
@@ -241,7 +241,7 @@ class BaseRepository(Generic[T]):
         return entity
 ```
 
-## Enums Pattern
+## 열거형 패턴
 
 ```python
 # backend/domain/user/enums.py
@@ -268,15 +268,15 @@ class MatchCategoryEnum(str, Enum):
     EXTRA = "extra"
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **Single responsibility**: Each domain has one clear purpose
-2. **Encapsulation**: Hide implementation details
-3. **Consistent structure**: All domains follow same pattern
-4. **Shared utilities**: Use `shared` domain for common code
-5. **Clear boundaries**: Minimize cross-domain dependencies
-6. **ULID IDs**: Use entity-specific prefixes
-7. **Soft delete**: Use `deleted_at` timestamp
-8. **Enums**: Define in domain's `enums.py`
-9. **DTOs**: Keep in `backend/dtos/{domain}.py`
-10. **Routers**: Keep in `backend/api/v1/routers/{domain}.py`
+1. **단일 책임**: 각 도메인은 하나의 명확한 목적을 가짐
+2. **캡슐화**: 구현 세부사항 숨기기
+3. **일관된 구조**: 모든 도메인은 같은 패턴을 따름
+4. **공유 유틸리티**: 공통 코드에 `shared` 도메인 사용
+5. **명확한 경계**: 도메인 간 의존성 최소화
+6. **ULID ID**: 엔티티 특화 접두사 사용
+7. **소프트 삭제**: `deleted_at` 타임스탬프 사용
+8. **열거형**: 도메인의 `enums.py`에 정의
+9. **DTO**: `backend/dtos/{domain}.py`에 유지
+10. **라우터**: `backend/api/v1/routers/{domain}.py`에 유지

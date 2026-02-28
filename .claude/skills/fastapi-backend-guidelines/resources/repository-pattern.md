@@ -1,12 +1,12 @@
-# Repository Pattern - FastAPI
+# Repository 패턴 - FastAPI
 
-## Repository Pattern
+## Repository 패턴
 
-Repositories encapsulate all database access for a domain.
+Repository는 도메인의 모든 데이터베이스 접근을 캡슐화합니다.
 
 ### BaseRepository
 
-YGS has a generic BaseRepository:
+YGS는 제네릭 BaseRepository를 사용합니다:
 
 ```python
 # backend/domain/shared/base_repository.py
@@ -23,7 +23,7 @@ class BaseRepository(Generic[T]):
         self.model_class = model_class
 
     async def get_by_id(self, id: str) -> Optional[T]:
-        """Get by ID, excluding soft-deleted"""
+        """ID로 조회 (소프트 삭제된 것 제외)"""
         stmt = select(self.model_class).where(
             self.model_class.id == id,
             self.model_class.deleted_at.is_(None)
@@ -32,14 +32,14 @@ class BaseRepository(Generic[T]):
         return result.scalar_one_or_none()
 
     async def create(self, entity: T) -> T:
-        """Create new entity"""
+        """새 엔티티 생성"""
         self.session.add(entity)
         await self.session.flush()
         await self.session.refresh(entity)
         return entity
 
     async def update(self, entity: T) -> T:
-        """Update entity"""
+        """엔티티 수정"""
         entity.updated_at = datetime.utcnow()
         self.session.add(entity)
         await self.session.flush()
@@ -47,14 +47,14 @@ class BaseRepository(Generic[T]):
         return entity
 
     async def soft_delete(self, entity: T) -> T:
-        """Soft delete entity (set deleted_at)"""
+        """엔티티 소프트 삭제 (deleted_at 설정)"""
         entity.deleted_at = datetime.utcnow()
         self.session.add(entity)
         await self.session.flush()
         return entity
 ```
 
-### UserRepository with Domain-Specific Methods
+### 도메인 특화 메서드가 있는 UserRepository
 
 ```python
 # backend/domain/user/repository.py
@@ -71,7 +71,7 @@ class UserRepository(BaseRepository[User]):
         super().__init__(session, User)
 
     async def find_by_phone(self, phone: str) -> Optional[User]:
-        """Find user by phone number"""
+        """전화번호로 사용자 조회"""
         stmt = select(User).where(
             User.phone == phone,
             User.deleted_at.is_(None)
@@ -80,7 +80,7 @@ class UserRepository(BaseRepository[User]):
         return result.scalar_one_or_none()
 
     async def find_by_firebase_id(self, firebase_id: str) -> Optional[User]:
-        """Find user by Firebase ID"""
+        """Firebase ID로 사용자 조회"""
         stmt = select(User).where(
             User.firebase_id == firebase_id,
             User.deleted_at.is_(None)
@@ -89,7 +89,7 @@ class UserRepository(BaseRepository[User]):
         return result.scalar_one_or_none()
 
     async def find_by_kakao_id(self, kakao_id: str) -> Optional[User]:
-        """Find user by Kakao ID"""
+        """Kakao ID로 사용자 조회"""
         stmt = select(User).where(
             User.kakao_id == kakao_id,
             User.deleted_at.is_(None)
@@ -105,11 +105,11 @@ class UserRepository(BaseRepository[User]):
         limit: int = 20,
         offset: int = 0
     ) -> Tuple[List[User], int]:
-        """Search members with filters and pagination"""
-        # Build base query
+        """필터와 페이지네이션으로 회원 검색"""
+        # 기본 쿼리 구성
         stmt = select(User).where(User.deleted_at.is_(None))
 
-        # Apply filters
+        # 필터 적용
         if keyword:
             stmt = stmt.where(
                 or_(
@@ -122,12 +122,12 @@ class UserRepository(BaseRepository[User]):
         if gender:
             stmt = stmt.where(User.gender == gender)
 
-        # Count total
+        # 전체 개수
         count_stmt = select(func.count()).select_from(stmt.subquery())
         count_result = await self.session.execute(count_stmt)
         total = count_result.scalar()
 
-        # Apply pagination
+        # 페이지네이션 적용
         stmt = stmt.order_by(User.created_at.desc()).offset(offset).limit(limit)
         result = await self.session.execute(stmt)
         users = list(result.scalars().all())
@@ -135,9 +135,9 @@ class UserRepository(BaseRepository[User]):
         return users, total
 ```
 
-## UserDataLoader for N+1 Prevention
+## N+1 방지를 위한 UserDataLoader
 
-YGS uses UserDataLoader pattern with `asyncio.gather` to prevent N+1 queries:
+YGS는 N+1 쿼리 방지를 위해 `asyncio.gather`와 함께 UserDataLoader 패턴을 사용합니다:
 
 ```python
 # backend/domain/user/repository.py
@@ -147,7 +147,7 @@ from dataclasses import dataclass
 
 @dataclass
 class UserWithRelations:
-    """Container for user with loaded relations"""
+    """관계가 로드된 사용자 컨테이너"""
     user: User
     profile: Optional[UserProfile] = None
     lifestyle: Optional[UserLifestyle] = None
@@ -157,7 +157,7 @@ class UserWithRelations:
     documents: List[UserDocument] = None
 
 class UserDataLoader:
-    """Parallel loader to prevent N+1 queries"""
+    """N+1 쿼리 방지를 위한 병렬 로더"""
 
     def __init__(self, session: AsyncSession):
         self.session = session
@@ -172,13 +172,13 @@ class UserDataLoader:
         load_photos: bool = False,
         load_documents: bool = False,
     ) -> Optional[UserWithRelations]:
-        """Load user with optional relations in parallel"""
+        """선택적 관계를 병렬로 사용자와 함께 로드"""
 
-        # Build list of queries to run in parallel
+        # 병렬로 실행할 쿼리 목록 구성
         queries = []
         query_names = []
 
-        # Always load user
+        # 항상 사용자 로드
         async def load_user():
             stmt = select(User).where(
                 User.id == user_id,
@@ -247,13 +247,13 @@ class UserDataLoader:
             queries.append(load_documents_fn())
             query_names.append("documents")
 
-        # Execute all queries in parallel
+        # 모든 쿼리 병렬 실행
         results = await asyncio.gather(*queries)
 
-        # Map results to named dict
+        # 결과를 이름 딕셔너리에 매핑
         result_dict = dict(zip(query_names, results))
 
-        # Check if user exists
+        # 사용자 존재 확인
         user = result_dict.get("user")
         if not user:
             return None
@@ -269,7 +269,7 @@ class UserDataLoader:
         )
 ```
 
-### Using UserDataLoader in Service
+### 서비스에서 UserDataLoader 사용
 
 ```python
 # backend/domain/user/service.py
@@ -280,8 +280,8 @@ class UserService:
         self._data_loader = UserDataLoader(session)
 
     async def get_member_detail(self, user_id: str) -> MemberDetailResponse:
-        """Get full member detail with all relations"""
-        # Single call loads everything in parallel
+        """관계를 포함한 회원 전체 상세 조회"""
+        # 단일 호출로 모든 것을 병렬로 로드
         user_with_relations = await self._data_loader.load_user_with_relations(
             user_id,
             load_profile=True,
@@ -298,22 +298,22 @@ class UserService:
         return MemberDetailResponse.from_user_with_relations(user_with_relations)
 ```
 
-## Repository Responsibilities
+## Repository 책임
 
-1. **Database queries**: All SELECT/INSERT/UPDATE/DELETE
-2. **Query optimization**: Efficient queries with indexes
-3. **Return models**: Always return domain models
-4. **No business logic**: Pure data access only
-5. **No DTOs**: Work with models only
-6. **Soft delete awareness**: Always filter `deleted_at.is_(None)`
+1. **데이터베이스 쿼리**: 모든 SELECT/INSERT/UPDATE/DELETE
+2. **쿼리 최적화**: 인덱스를 활용한 효율적인 쿼리
+3. **모델 반환**: 항상 도메인 모델 반환
+4. **비즈니스 로직 없음**: 순수 데이터 접근만
+5. **DTO 없음**: 모델만 사용
+6. **소프트 삭제 인식**: 항상 `deleted_at.is_(None)` 필터링
 
-## Best Practices
+## 모범 사례
 
-1. **Extend BaseRepository**: Reuse common CRUD operations
-2. **Domain-specific methods**: Add methods for domain queries
-3. **Return models**: Never return DTOs
-4. **Async queries**: All methods async
-5. **Type hints**: Explicit return types
-6. **No transactions**: Repository doesn't commit/rollback
-7. **Use UserDataLoader**: For loading multiple relations in parallel
-8. **Soft delete filter**: Include `deleted_at.is_(None)` in all queries
+1. **BaseRepository 확장**: 공통 CRUD 작업 재사용
+2. **도메인 특화 메서드**: 도메인 쿼리를 위한 메서드 추가
+3. **모델 반환**: DTO는 절대 반환하지 않음
+4. **비동기 쿼리**: 모든 메서드 async
+5. **타입 힌트**: 명시적 반환 타입
+6. **트랜잭션 없음**: Repository는 commit/rollback하지 않음
+7. **UserDataLoader 사용**: 여러 관계를 병렬로 로드할 때
+8. **소프트 삭제 필터**: 모든 쿼리에 `deleted_at.is_(None)` 포함

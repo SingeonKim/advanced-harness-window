@@ -1,12 +1,12 @@
-# Database & ORM - SQLModel + SQLAlchemy
+# 데이터베이스 & ORM - SQLModel + SQLAlchemy
 
-## YGS Database Setup
+## YGS 데이터베이스 설정
 
-YGS uses SQLModel with SQLAlchemy ORM and asyncpg for PostgreSQL async access.
+YGS는 PostgreSQL 비동기 접근을 위해 asyncpg를 사용한 SQLAlchemy ORM과 SQLModel을 사용합니다.
 
-### ID Generation with ULID
+### ULID를 사용한 ID 생성
 
-All entities use ULID with entity prefixes for readable, sortable IDs:
+모든 엔티티는 읽기 쉽고 정렬 가능한 ID를 위해 엔티티 접두사가 있는 ULID를 사용합니다:
 
 ```python
 # backend/domain/user/model.py
@@ -21,7 +21,7 @@ def generate_document_id() -> str:
 def generate_photo_id() -> str:
     return f"pho_{ULID()}"  # pho_01HQ5K3NXYZ...
 
-# Entity Prefixes:
+# 엔티티 접두사:
 # usr_ - User
 # doc_ - UserDocument
 # pho_ - UserPhoto
@@ -33,7 +33,7 @@ def generate_photo_id() -> str:
 # cs_  - ConsultSchedule
 ```
 
-### User Model (SQLModel)
+### 사용자 모델 (SQLModel)
 
 ```python
 # backend/domain/user/model.py
@@ -50,34 +50,34 @@ class User(SQLModel, table=True):
     email: Optional[str] = Field(default=None, index=True)
     phone: str = Field(unique=True, index=True)
     name: str = Field(max_length=50)
-    gender: str = Field(index=True)  # GenderEnum value
+    gender: str = Field(index=True)  # GenderEnum 값
     birth_year: int
     status: str = Field(default="pending", index=True)  # UserStatusEnum
     is_admin: bool = Field(default=False)
 
-    # Soft delete
+    # 소프트 삭제
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: Optional[datetime] = None
-    deleted_at: Optional[datetime] = None  # Soft delete marker
+    deleted_at: Optional[datetime] = None  # 소프트 삭제 마커
 
-    # Relationships (one-to-one)
+    # 관계 (일대일)
     profile: Optional["UserProfile"] = Relationship(back_populates="user")
     lifestyle: Optional["UserLifestyle"] = Relationship(back_populates="user")
     preference: Optional["UserPreference"] = Relationship(back_populates="user")
     subscription: Optional["UserSubscription"] = Relationship(back_populates="user")
 
-    # Relationships (one-to-many)
+    # 관계 (일대다)
     photos: List["UserPhoto"] = Relationship(back_populates="user")
     documents: List["UserDocument"] = Relationship(back_populates="user")
 ```
 
-### Related Models
+### 관련 모델
 
 ```python
 class UserProfile(SQLModel, table=True):
     __tablename__ = "user_profiles"
 
-    id: str = Field(primary_key=True)  # Same as user_id
+    id: str = Field(primary_key=True)  # user_id와 동일
     user_id: str = Field(foreign_key="users.id", unique=True)
     height: Optional[int] = None
     education: Optional[str] = None  # EducationEnum
@@ -97,7 +97,7 @@ class UserPhoto(SQLModel, table=True):
 
     id: str = Field(default_factory=generate_photo_id, primary_key=True)
     user_id: str = Field(foreign_key="users.id", index=True)
-    s3_key: str  # S3 key only, never URL
+    s3_key: str  # S3 키만 저장, URL 저장 금지
     thumbnail_s3_key: Optional[str] = None
     display_order: int = Field(default=0)
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -106,9 +106,9 @@ class UserPhoto(SQLModel, table=True):
     user: Optional[User] = Relationship(back_populates="photos")
 ```
 
-## Read/Write Session Separation
+## 읽기/쓰기 세션 분리
 
-YGS uses separate database connections for read and write operations:
+YGS는 읽기와 쓰기 작업에 별도의 데이터베이스 연결을 사용합니다:
 
 ```python
 # backend/db/orm.py
@@ -118,7 +118,7 @@ from contextlib import asynccontextmanager
 from weakref import WeakKeyDictionary
 import asyncio
 
-# Cache engines per event loop (for notebook/multi-loop support)
+# 이벤트 루프별 엔진 캐싱 (노트북/멀티 루프 지원)
 _read_engines: WeakKeyDictionary = WeakKeyDictionary()
 _write_engines: WeakKeyDictionary = WeakKeyDictionary()
 
@@ -146,21 +146,21 @@ def get_write_engine():
 
 @asynccontextmanager
 async def get_read_session():
-    """Read session for SELECT queries (for manual use with async with)"""
+    """SELECT 쿼리를 위한 읽기 세션 (async with를 사용한 수동 사용)"""
     Session = get_read_sessionmaker()
     async with Session() as session:
         yield session
 
 @asynccontextmanager
 async def get_write_session():
-    """Write session for INSERT/UPDATE/DELETE (for manual use with async with)"""
+    """INSERT/UPDATE/DELETE를 위한 쓰기 세션 (async with를 사용한 수동 사용)"""
     Session = get_write_sessionmaker()
     async with Session() as session:
         yield session
 
-# FastAPI Dependencies
-# NOTE: Using try/finally with safe close to avoid IllegalStateChangeError
-# when client disconnects during request processing
+# FastAPI 의존성
+# 참고: 클라이언트가 요청 처리 중 연결을 끊을 때 IllegalStateChangeError를 피하기 위해
+# try/finally와 안전한 close를 사용
 async def get_read_session_dependency():
     Session = get_read_sessionmaker()
     session = Session()
@@ -170,7 +170,7 @@ async def get_read_session_dependency():
         try:
             await session.close()
         except Exception as e:
-            # Log but don't raise - session may be in invalid state if client disconnected
+            # 로그는 하되 발생시키지 않음 - 클라이언트가 연결을 끊으면 세션이 유효하지 않은 상태일 수 있음
             logger.debug(f"Session close failed (likely client disconnect): {e}")
 
 async def get_write_session_dependency():
@@ -182,36 +182,35 @@ async def get_write_session_dependency():
         try:
             await session.close()
         except Exception as e:
-            # Log but don't raise - session may be in invalid state if client disconnected
+            # 로그는 하되 발생시키지 않음 - 클라이언트가 연결을 끊으면 세션이 유효하지 않은 상태일 수 있음
             logger.debug(f"Session close failed (likely client disconnect): {e}")
 ```
 
-> **WARNING**: Do NOT use `async with Session() as sess: yield sess` in FastAPI
-> dependency functions. This pattern causes `IllegalStateChangeError` when clients
-> disconnect mid-request because the session's `close()` is called while still
-> in an intermediate state.
+> **경고**: FastAPI 의존성 함수에서 `async with Session() as sess: yield sess` 패턴을 사용하지 마세요.
+> 이 패턴은 클라이언트가 요청 중간에 연결을 끊을 때 `IllegalStateChangeError`를 일으킵니다.
+> 세션의 `close()`가 아직 중간 상태에 있는 동안 호출되기 때문입니다.
 
-## Queries with SQLModel
+## SQLModel을 사용한 쿼리
 
-### Basic Queries with Soft Delete
+### 소프트 삭제가 있는 기본 쿼리
 
 ```python
 from sqlmodel import select
 
-# Get by ID (excluding soft-deleted)
+# ID로 조회 (소프트 삭제된 것 제외)
 stmt = select(User).where(
     User.id == user_id,
-    User.deleted_at.is_(None)  # Exclude soft-deleted
+    User.deleted_at.is_(None)  # 소프트 삭제된 것 제외
 )
 result = await session.execute(stmt)
 user = result.scalar_one_or_none()
 
-# Get all active users
+# 모든 활성 사용자 조회
 stmt = select(User).where(User.deleted_at.is_(None))
 result = await session.execute(stmt)
 users = result.scalars().all()
 
-# Filter by status
+# 상태로 필터
 stmt = select(User).where(
     User.status == "approved",
     User.deleted_at.is_(None)
@@ -220,13 +219,13 @@ result = await session.execute(stmt)
 approved = result.scalars().all()
 ```
 
-### Complex Queries
+### 복잡한 쿼리
 
 ```python
 from sqlmodel import select, or_, and_
 from sqlalchemy import func
 
-# Multiple conditions
+# 다중 조건
 stmt = select(User).where(
     and_(
         User.status == "approved",
@@ -235,7 +234,7 @@ stmt = select(User).where(
     )
 )
 
-# OR conditions with search
+# 검색이 있는 OR 조건
 stmt = select(User).where(
     and_(
         or_(
@@ -246,22 +245,22 @@ stmt = select(User).where(
     )
 )
 
-# Ordering
+# 정렬
 stmt = select(User).order_by(User.created_at.desc())
 
-# Pagination
+# 페이지네이션
 stmt = select(User).offset(offset).limit(limit)
 
-# Count
+# 카운트
 stmt = select(func.count(User.id)).where(User.deleted_at.is_(None))
 result = await session.execute(stmt)
 count = result.scalar()
 ```
 
-### Joins with Related Tables
+### 관련 테이블과의 조인
 
 ```python
-# Join User with Profile
+# User와 Profile 조인
 from sqlalchemy.orm import selectinload
 
 stmt = (
@@ -271,9 +270,9 @@ stmt = (
 )
 result = await session.execute(stmt)
 user = result.scalar_one_or_none()
-# Access: user.profile.height, user.profile.education
+# 접근: user.profile.height, user.profile.education
 
-# Load multiple relationships
+# 여러 관계 로드
 stmt = (
     select(User)
     .options(
@@ -285,9 +284,9 @@ stmt = (
 )
 ```
 
-## CRUD Operations
+## CRUD 작업
 
-### Create with ULID
+### ULID로 생성
 
 ```python
 user = User(
@@ -297,13 +296,13 @@ user = User(
     birth_year=1990,
     status="pending"
 )
-# id automatically generated: usr_01HQ5K3NXYZ...
+# id 자동 생성: usr_01HQ5K3NXYZ...
 session.add(user)
 await session.commit()
 await session.refresh(user)
 ```
 
-### Read with Soft Delete Check
+### 소프트 삭제 확인이 있는 읽기
 
 ```python
 stmt = select(User).where(
@@ -314,7 +313,7 @@ result = await session.execute(stmt)
 user = result.scalar_one_or_none()
 ```
 
-### Update
+### 수정
 
 ```python
 stmt = select(User).where(User.id == user_id)
@@ -329,10 +328,10 @@ if user:
     await session.refresh(user)
 ```
 
-### Soft Delete
+### 소프트 삭제
 
 ```python
-# YGS uses soft delete - set deleted_at instead of actual deletion
+# YGS는 소프트 삭제를 사용 - 실제 삭제 대신 deleted_at 설정
 stmt = select(User).where(User.id == user_id)
 result = await session.execute(stmt)
 user = result.scalar_one_or_none()
@@ -343,11 +342,11 @@ if user:
     await session.commit()
 ```
 
-## Transactions
+## 트랜잭션
 
 ```python
 async def create_user_with_profile(session: AsyncSession, dto: UserCreateDto):
-    # All operations in same session = same transaction
+    # 같은 세션의 모든 작업 = 같은 트랜잭션
     user = User(
         phone=dto.phone,
         name=dto.name,
@@ -355,7 +354,7 @@ async def create_user_with_profile(session: AsyncSession, dto: UserCreateDto):
         birth_year=dto.birth_year
     )
     session.add(user)
-    await session.flush()  # Get user.id without committing
+    await session.flush()  # 커밋하지 않고 user.id 획득
 
     profile = UserProfile(
         id=user.id,
@@ -365,18 +364,18 @@ async def create_user_with_profile(session: AsyncSession, dto: UserCreateDto):
     )
     session.add(profile)
 
-    await session.commit()  # Commits all changes atomically
+    await session.commit()  # 모든 변경사항을 원자적으로 커밋
     return user
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **ULID IDs**: Use entity prefixes for readable IDs
-2. **Soft Delete**: Always check `deleted_at.is_(None)` in queries
-3. **Read/Write Split**: Use correct session dependency
-4. **Async all the way**: Use AsyncSession, await all queries
-5. **Refresh after commit**: Get DB-generated values
-6. **Index frequently queried columns**: `index=True`
-7. **Unique constraints**: `unique=True` for phone, email
-8. **Flush before using IDs**: Use `flush()` to get generated IDs
-9. **S3 Keys Only**: Store S3 keys, not URLs (generate presigned URLs on demand)
+1. **ULID ID**: 읽기 쉬운 ID를 위한 엔티티 접두사 사용
+2. **소프트 삭제**: 모든 쿼리에서 항상 `deleted_at.is_(None)` 확인
+3. **읽기/쓰기 분리**: 올바른 세션 의존성 사용
+4. **전면적 비동기**: AsyncSession 사용, 모든 쿼리 await
+5. **커밋 후 refresh**: DB가 생성한 값 가져오기
+6. **자주 쿼리되는 컬럼 인덱싱**: `index=True`
+7. **유니크 제약**: 전화번호, 이메일에 `unique=True`
+8. **ID 사용 전 flush**: 생성된 ID를 가져오려면 `flush()` 사용
+9. **S3 키만 저장**: S3 키만 저장하고 URL은 저장하지 않음 (필요할 때 presigned URL 생성)
