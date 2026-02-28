@@ -1,105 +1,105 @@
-# Backend Testing Guide
+# 백엔드 테스팅 가이드
 
-**Last Updated**: 2025-11-03
+**마지막 업데이트**: 2025-11-03
 
-This guide explains how to write and run tests for the backend services.
-
----
-
-## Table of Contents
-
-1. [Quick Start](#quick-start)
-2. [Running Tests](#running-tests)
-3. [Writing Service Tests](#writing-service-tests)
-4. [Test Data Factories](#test-data-factories)
-5. [Mocking Strategies](#mocking-strategies)
-6. [Coverage Guidelines](#coverage-guidelines)
-7. [Troubleshooting](#troubleshooting)
+이 가이드는 백엔드 서비스의 테스트 작성 및 실행 방법을 설명합니다.
 
 ---
 
-## Quick Start
+## 목차
+
+1. [빠른 시작](#빠른-시작)
+2. [테스트 실행](#테스트-실행)
+3. [서비스 테스트 작성](#서비스-테스트-작성)
+4. [테스트 데이터 팩토리](#테스트-데이터-팩토리)
+5. [모킹 전략](#모킹-전략)
+6. [커버리지 가이드라인](#커버리지-가이드라인)
+7. [문제 해결](#문제-해결)
+
+---
+
+## 빠른 시작
 
 ```bash
-# Activate virtual environment
+# 가상 환경 활성화
 source .venv/bin/activate
 
-# Run all tests
+# 모든 테스트 실행
 pytest
 
-# Run tests with coverage report
+# 커버리지 보고서와 함께 테스트 실행
 pytest --cov=backend --cov-report=html
-open htmlcov/index.html  # View coverage report
+open htmlcov/index.html  # 커버리지 보고서 보기
 
-# Run specific test file
+# 특정 테스트 파일 실행
 pytest tests/unit/domain/user/test_service.py -v
 
-# Run specific test method
+# 특정 테스트 메서드 실행
 pytest tests/unit/domain/user/test_service.py::TestUserService::test_is_admin_user -v
 ```
 
 ---
 
-## Running Tests
+## 테스트 실행
 
-### Run All Tests
+### 모든 테스트 실행
 
 ```bash
 pytest
 ```
 
-### Run Specific Test Directory
+### 특정 테스트 디렉토리 실행
 
 ```bash
-# All service tests
+# 모든 서비스 테스트
 pytest tests/unit/domain/*/test_service.py
 
-# Specific domain
+# 특정 도메인
 pytest tests/unit/domain/artist/
 
-# All unit tests
+# 모든 단위 테스트
 pytest tests/unit/
 ```
 
-### Run with Coverage
+### 커버리지와 함께 실행
 
 ```bash
-# Terminal report
+# 터미널 보고서
 pytest --cov=backend --cov-report=term-missing
 
-# HTML report (opens in browser)
+# HTML 보고서 (브라우저에서 열림)
 pytest --cov=backend --cov-report=html
 open htmlcov/index.html
 ```
 
-### Run Failed Tests Only
+### 실패한 테스트만 실행
 
 ```bash
-# Re-run only failed tests from last run
+# 마지막 실행에서 실패한 테스트만 재실행
 pytest --lf
 
-# Run failed tests first, then others
+# 실패한 테스트를 먼저 실행 후 나머지
 pytest --ff
 ```
 
-### Verbose Output
+### 상세 출력
 
 ```bash
-# Show test names
+# 테스트 이름 표시
 pytest -v
 
-# Show print statements
+# print 구문 표시
 pytest -s
 
-# Both
+# 둘 다
 pytest -vs
 ```
 
 ---
 
-## Writing Service Tests
+## 서비스 테스트 작성
 
-### Basic Test Structure
+### 기본 테스트 구조
 
 ```python
 # tests/unit/domain/user/test_service.py
@@ -113,7 +113,7 @@ from tests.factories import UserFactory
 
 @pytest.mark.asyncio
 class TestUserService:
-    """Test suite for UserService."""
+    """UserService 테스트 스위트."""
 
     @patch('backend.domain.user.service.UserRepository')
     async def test_is_admin_user_returns_true_for_admin(
@@ -122,12 +122,12 @@ class TestUserService:
         mock_session,
         mock_user_repository,
     ):
-        """Test that is_admin_user returns True for admin users."""
-        # Arrange: Configure mock to return our fixture
+        """is_admin_user가 관리자 사용자에게 True를 반환하는지 테스트."""
+        # Arrange: 픽스처를 반환하도록 mock 설정
         mock_user_repo_class.return_value = mock_user_repository
         mock_user_repository.get_async.return_value = UserFactory.create_admin()
 
-        # Create service (uses mocked repository automatically)
+        # 서비스 생성 (자동으로 mock된 레포지토리 사용)
         service = UserService(mock_session)
 
         # Act
@@ -138,86 +138,86 @@ class TestUserService:
         mock_user_repository.get_async.assert_called_once_with(id="user-1")
 ```
 
-### Key Patterns
+### 주요 패턴
 
-#### 1. Use @patch Decorator for Repository Mocking
+#### 1. 레포지토리 모킹에 @patch 데코레이터 사용
 
-**DO**:
+**권장**:
 ```python
 @patch('backend.domain.artist.service.ArtistRepository')
 async def test_update_artist(mock_repo_class, mock_session, mock_artist_repository):
     mock_repo_class.return_value = mock_artist_repository
-    service = ArtistService(mock_session)  # Auto-uses mock
+    service = ArtistService(mock_session)  # 자동으로 mock 사용
 ```
 
-**DON'T**:
+**비권장**:
 ```python
-# ❌ Manual injection doesn't work properly
+# ❌ 수동 주입은 올바르게 작동하지 않음
 service = ArtistService(mock_session)
-service._artist_repository = mock_artist_repository  # Too late!
+service._artist_repository = mock_artist_repository  # 너무 늦음!
 ```
 
-#### 2. Patch at Import Location, Not Definition
+#### 2. 정의 위치가 아닌 import 위치에서 Patch
 
-**DO**:
+**권장**:
 ```python
-# Mock where it's IMPORTED (in the service module)
+# IMPORT된 곳(서비스 모듈)에서 Mock
 @patch('backend.domain.artwork.service.PDFGenerator')
 ```
 
-**DON'T**:
+**비권장**:
 ```python
-# ❌ Wrong: patches definition, not usage
+# ❌ 잘못됨: 사용 위치가 아닌 정의를 patch함
 @patch('backend.utils.pdf.PDFGenerator')
 ```
 
-#### 3. Use AsyncMock for Async Methods
+#### 3. 비동기 메서드에 AsyncMock 사용
 
-**DO**:
+**권장**:
 ```python
 mock_repo.get_async = AsyncMock(return_value=artist)
 result = await service.get_artist(artist_id="123")
 ```
 
-**DON'T**:
+**비권장**:
 ```python
-# ❌ Regular Mock doesn't work with await
+# ❌ 일반 Mock은 await와 함께 작동하지 않음
 mock_repo.get_async = MagicMock(return_value=artist)
 ```
 
 ---
 
-## Test Data Factories
+## 테스트 데이터 팩토리
 
-Factories provide realistic test data with sensible defaults.
+팩토리는 합리적인 기본값으로 실제적인 테스트 데이터를 제공합니다.
 
-### Using Factories
+### 팩토리 사용
 
 ```python
 from tests.factories import ArtistFactory, UserFactory, ArtworkFactory
 
-# Create with defaults
+# 기본값으로 생성
 artist_dto = ArtistFactory.create_request_dto()
 user = UserFactory.create_model()
 
-# Override specific fields
+# 특정 필드 재정의
 artist_dto = ArtistFactory.create_request_dto(
     name_ko="커스텀 작가",
     host_name="custom-artist",
 )
 
-# Create admin user
+# 관리자 사용자 생성
 admin = UserFactory.create_admin(email="admin@example.com")
 ```
 
-### Available Factories
+### 사용 가능한 팩토리
 
 - `ArtistFactory`: `create_request_dto()`, `create_response_dto()`, `create_model()`
 - `ArtworkFactory`: `create_request_dto()`, `create_response_dto()`, `create_model()`
 - `ExhibitionFactory`: `create_info_dto()`
 - `UserFactory`: `create_model()`, `create_admin()`
 
-### Creating New Factories
+### 새 팩토리 생성
 
 ```python
 # tests/factories.py
@@ -227,7 +227,7 @@ class MyEntityFactory:
         defaults = {
             "id": "entity_123",
             "name": "Default Name",
-            # ... all required fields with defaults
+            # ... 기본값이 있는 모든 필수 필드
         }
         defaults.update(overrides)
         return MyEntity(**defaults)
@@ -235,55 +235,55 @@ class MyEntityFactory:
 
 ---
 
-## Mocking Strategies
+## 모킹 전략
 
-### Mock Repository Methods
+### 레포지토리 메서드 Mock
 
 ```python
-# Configure return value
+# 반환값 설정
 mock_artist_repository.get_async.return_value = artist
 
-# Configure multiple calls with different return values
+# 다른 반환값으로 여러 호출 설정
 mock_artist_repository.get_async.side_effect = [artist1, artist2, None]
 
-# Verify method was called
+# 메서드가 호출됐는지 검증
 mock_artist_repository.get_async.assert_called_once_with(id="artist-1")
 
-# Verify method was NOT called
+# 메서드가 호출되지 않았는지 검증
 mock_artist_repository.create_async.assert_not_called()
 ```
 
-### Mock External Utilities
+### 외부 유틸리티 Mock
 
-For module-level imports (PDFGenerator, S3 functions):
+모듈 레벨 import(PDFGenerator, S3 함수)의 경우:
 
 ```python
 @patch('backend.domain.artwork.service.PDFGenerator')
 @patch('backend.domain.artwork.service.push_outputs')
 @pytest.mark.asyncio
 async def test_generate_pdf(mock_push, mock_pdf_class):
-    # Configure PDF generator mock
+    # PDF 생성기 mock 설정
     mock_pdf_instance = MagicMock()
     mock_pdf_instance.generate_portfolio_pdf = AsyncMock(
         return_value=b'fake pdf bytes'
     )
     mock_pdf_class.return_value = mock_pdf_instance
 
-    # Configure S3 mock
+    # S3 mock 설정
     mock_push.return_value = ['https://s3.url/file.pdf']
 
-    # Test service method
+    # 서비스 메서드 테스트
     service = ArtworkService(mock_session)
     result = await service.generate_portfolio_to_pdf(...)
 
-    # Verify
+    # 검증
     mock_pdf_instance.generate_portfolio_pdf.assert_called_once()
     mock_push.assert_called_once()
 ```
 
-### Using Shared Fixtures
+### 공유 픽스처 사용
 
-All domain tests have access to these fixtures (from `tests/unit/domain/conftest.py`):
+모든 도메인 테스트는 다음 픽스처에 접근 가능합니다 (`tests/unit/domain/conftest.py`에서):
 
 - `mock_session`: Mock AsyncSession
 - `mock_artist_repository`
@@ -296,28 +296,28 @@ All domain tests have access to these fixtures (from `tests/unit/domain/conftest
 
 ---
 
-## Coverage Guidelines
+## 커버리지 가이드라인
 
-### Target Coverage
+### 목표 커버리지
 
-- **Overall**: 80%+ for all service files
-- **Simple Services** (User, Subscription): Aim for 90-100%
-- **Complex Services** (Artist, Artwork): 80%+ acceptable
+- **전체**: 모든 서비스 파일에서 80% 이상
+- **단순 서비스** (User, Subscription): 90-100% 목표
+- **복잡한 서비스** (Artist, Artwork): 80% 이상 허용
 
-### Checking Coverage
+### 커버리지 확인
 
 ```bash
-# Run tests with coverage
+# 커버리지와 함께 테스트 실행
 pytest --cov=backend/domain --cov-report=term-missing
 
-# Generate HTML report
+# HTML 보고서 생성
 pytest --cov=backend/domain --cov-report=html
 open htmlcov/index.html
 ```
 
-### Coverage Exclusions
+### 커버리지 제외 항목
 
-These are automatically excluded (configured in `pyproject.toml`):
+다음은 자동으로 제외됩니다 (`pyproject.toml`에 설정):
 
 - `*/__init__.py`
 - `*/tests/*`
@@ -326,86 +326,86 @@ These are automatically excluded (configured in `pyproject.toml`):
 - `raise NotImplementedError`
 - `def __repr__`
 
-### What to Test
+### 테스트해야 할 것
 
-**DO Test**:
-- ✅ Business logic (validation, calculations)
-- ✅ Error handling (NotFoundError, ValueError)
-- ✅ Edge cases (empty lists, None values)
-- ✅ Method interactions (service → repository)
+**테스트 해야 함**:
+- ✅ 비즈니스 로직 (유효성 검사, 계산)
+- ✅ 에러 처리 (NotFoundError, ValueError)
+- ✅ 엣지 케이스 (빈 리스트, None 값)
+- ✅ 메서드 상호작용 (서비스 → 레포지토리)
 
-**DON'T Test**:
-- ❌ Pydantic model validation (tested by Pydantic)
-- ❌ SQLModel ORM behavior (tested by SQLModel)
-- ❌ Simple getters/setters with no logic
-- ❌ Third-party library behavior
+**테스트하지 않아도 됨**:
+- ❌ Pydantic 모델 유효성 검사 (Pydantic이 테스트)
+- ❌ SQLModel ORM 동작 (SQLModel이 테스트)
+- ❌ 로직 없는 단순 getter/setter
+- ❌ 서드파티 라이브러리 동작
 
 ---
 
-## Troubleshooting
+## 문제 해결
 
-### Import Errors
+### Import 에러
 
-**Problem**: `ModuleNotFoundError: No module named 'backend'`
+**문제**: `ModuleNotFoundError: No module named 'backend'`
 
-**Solution**: Make sure you're in the backend virtual environment:
+**해결**: 백엔드 가상 환경에 있는지 확인:
 ```bash
 cd backend
 source .venv/bin/activate
 uv sync --group dev
 ```
 
-### AsyncMock Issues
+### AsyncMock 문제
 
-**Problem**: `TypeError: object MagicMock can't be used in 'await' expression`
+**문제**: `TypeError: object MagicMock can't be used in 'await' expression`
 
-**Solution**: Use `AsyncMock` for async methods:
+**해결**: 비동기 메서드에 `AsyncMock` 사용:
 ```python
-# ✅ Correct
+# ✅ 올바름
 mock_repo.get_async = AsyncMock(return_value=value)
 
-# ❌ Wrong
+# ❌ 잘못됨
 mock_repo.get_async = MagicMock(return_value=value)
 ```
 
-### Patch Not Working
+### Patch가 작동하지 않는 경우
 
-**Problem**: Mock not being used in service
+**문제**: 서비스에서 Mock이 사용되지 않음
 
-**Solution**: Patch where it's imported, not where it's defined:
+**해결**: 정의된 위치가 아닌 import된 위치에서 Patch:
 ```python
-# ✅ Correct: Patch in service module
+# ✅ 올바름: 서비스 모듈에서 Patch
 @patch('backend.domain.artist.service.ArtistRepository')
 
-# ❌ Wrong: Patches definition
+# ❌ 잘못됨: 정의를 Patch함
 @patch('backend.domain.artist.repository.ArtistRepository')
 ```
 
-### Fixture Not Found
+### 픽스처를 찾을 수 없는 경우
 
-**Problem**: `fixture 'mock_artist_repository' not found`
+**문제**: `fixture 'mock_artist_repository' not found`
 
-**Solution**: Make sure you're in the correct test directory structure:
+**해결**: 올바른 테스트 디렉토리 구조인지 확인:
 ```
 tests/
 └── unit/
     └── domain/
-        ├── conftest.py        # ← Fixtures defined here
+        ├── conftest.py        # ← 픽스처가 정의된 곳
         └── artist/
-            └── test_service.py  # ← Can use fixtures
+            └── test_service.py  # ← 픽스처를 사용할 수 있는 곳
 ```
 
-### Coverage Too Low
+### 커버리지가 낮은 경우
 
-**Problem**: Coverage is below 80%
+**문제**: 커버리지가 80% 미만
 
-**Solution**:
-1. Check which lines are not covered:
+**해결**:
+1. 커버되지 않은 라인 확인:
    ```bash
    pytest --cov=backend/domain --cov-report=term-missing
    ```
-2. Add tests for uncovered lines
-3. Or mark code as excluded if it's truly untestable:
+2. 커버되지 않은 라인에 테스트 추가
+3. 또는 정말 테스트 불가능한 경우 코드를 제외로 표시:
    ```python
    if condition:  # pragma: no cover
        raise NotImplementedError("Future feature")
@@ -413,26 +413,26 @@ tests/
 
 ---
 
-## Best Practices
+## 모범 사례
 
-1. **One Test Per Behavior**: Each test should verify one specific behavior
-2. **Arrange-Act-Assert**: Structure tests with clear setup, execution, verification
-3. **Descriptive Names**: Test names should describe what they test
+1. **동작당 하나의 테스트**: 각 테스트는 하나의 특정 동작을 검증해야 함
+2. **Arrange-Act-Assert**: 명확한 설정, 실행, 검증으로 테스트 구조화
+3. **설명적인 이름**: 테스트 이름이 테스트 내용을 설명해야 함
    - ✅ `test_update_artist_raises_error_when_host_name_exists`
    - ❌ `test_update_artist_2`
-4. **Use Factories**: Don't create test data manually
-5. **Async Everything**: All service methods are async, tests must be too
-6. **Clean Mocks**: Reset mocks between tests (pytest does this automatically with fixtures)
+4. **팩토리 사용**: 테스트 데이터를 수동으로 생성하지 말 것
+5. **모두 비동기**: 모든 서비스 메서드는 비동기이므로 테스트도 마찬가지
+6. **깔끔한 Mock**: 테스트 간 mock 초기화 (pytest가 픽스처로 자동 처리)
 
 ---
 
-## Examples
+## 예시
 
-See these files for examples:
-- `tests/test_factories.py` - Factory usage examples
-- `tests/unit/domain/test_fixtures.py` - Fixture usage examples
-- `dev/active/backend-service-testing/backend-service-testing-context.md` - Detailed patterns
+다음 파일에서 예시 확인:
+- `tests/test_factories.py` - 팩토리 사용 예시
+- `tests/unit/domain/test_fixtures.py` - 픽스처 사용 예시
+- `dev/active/backend-service-testing/backend-service-testing-context.md` - 상세 패턴
 
 ---
 
-**Questions?** Check the plan at `dev/active/backend-service-testing/` or ask the team!
+**질문이 있으신가요?** `dev/active/backend-service-testing/`의 계획을 확인하거나 팀에 문의하세요!
