@@ -3,65 +3,65 @@ name: pytest-backend-testing
 description: Comprehensive pytest testing guide for FastAPI backends. Covers unit testing, integration testing, async patterns, mocking, fixtures, coverage, and FastAPI-specific testing with TestClient. Use when writing or updating test code for backend services, repositories, or API routes.
 ---
 
-# Pytest Backend Testing Guidelines
+# Pytest 백엔드 테스팅 가이드라인
 
-## Purpose
+## 목적
 
-Complete guide for writing comprehensive tests for FastAPI backend applications using pytest, pytest-asyncio, and FastAPI TestClient. Emphasizes async testing, proper mocking, layered testing (repository → service → router), and achieving high test coverage.
+pytest, pytest-asyncio, FastAPI TestClient를 사용하여 FastAPI 백엔드 애플리케이션의 포괄적인 테스트를 작성하기 위한 완전한 가이드. async 테스팅, 적절한 모킹, 계층적 테스팅(repository → service → router), 높은 테스트 커버리지 달성을 강조합니다.
 
-## When to Use This Skill
+## 이 스킬을 사용하는 경우
 
-- Writing new test files for backend code
-- Testing repositories, services, or API routes
-- Setting up test fixtures and mocks
-- Debugging failing tests
-- Improving test coverage
-- Writing async tests with pytest-asyncio
-- Testing database operations
-- Using FastAPI TestClient for route testing
-
----
-
-## Quick Start
-
-### New Test File Checklist
-
-Creating tests for new code? Follow this checklist:
-
-- [ ] Create test file: `tests/unit/{domain}/test_{module}.py`
-- [ ] Import pytest and pytest-asyncio
-- [ ] Set up necessary fixtures (session, client, etc.)
-- [ ] Use `@pytest.mark.asyncio` for async tests
-- [ ] Follow AAA pattern: Arrange, Act, Assert
-- [ ] Mock external dependencies
-- [ ] Test both success and error cases
-- [ ] Verify coverage meets 80% threshold
-- [ ] Use descriptive test names: `test_<what>_<when>_<expected>`
-
-### Test Coverage Checklist
-
-Ensuring good coverage? Check these:
-
-- [ ] Test all public methods/functions
-- [ ] Test error handling and exceptions
-- [ ] Test edge cases and boundary conditions
-- [ ] Test validation logic
-- [ ] Mock external dependencies (database, APIs)
-- [ ] Verify async/await behavior
-- [ ] Run `pytest --cov=backend --cov-report=term-missing`
-- [ ] Check coverage report for gaps
-- [ ] Aim for 80%+ coverage
+- 백엔드 코드의 새 테스트 파일 작성
+- repository, service, API route 테스팅
+- 테스트 fixture 및 mock 설정
+- 실패하는 테스트 디버깅
+- 테스트 커버리지 개선
+- pytest-asyncio를 사용한 async 테스트 작성
+- 데이터베이스 작업 테스팅
+- route 테스팅을 위한 FastAPI TestClient 사용
 
 ---
 
-## Project Testing Structure
+## 빠른 시작
 
-Your qwarty backend testing structure:
+### 새 테스트 파일 체크리스트
+
+새 코드에 대한 테스트 작성 시 이 체크리스트를 따르세요:
+
+- [ ] 테스트 파일 생성: `tests/unit/{domain}/test_{module}.py`
+- [ ] pytest 및 pytest-asyncio import
+- [ ] 필요한 fixture 설정 (session, client 등)
+- [ ] async 테스트에 `@pytest.mark.asyncio` 사용
+- [ ] AAA 패턴 따르기: Arrange, Act, Assert
+- [ ] 외부 의존성 모킹
+- [ ] 성공 케이스와 에러 케이스 모두 테스트
+- [ ] 커버리지가 80% 임계값을 충족하는지 확인
+- [ ] 설명적인 테스트 이름 사용: `test_<what>_<when>_<expected>`
+
+### 테스트 커버리지 체크리스트
+
+좋은 커버리지 확보를 위해 다음을 확인하세요:
+
+- [ ] 모든 public 메서드/함수 테스트
+- [ ] 에러 처리 및 예외 테스트
+- [ ] 엣지 케이스와 경계 조건 테스트
+- [ ] 유효성 검사 로직 테스트
+- [ ] 외부 의존성 모킹 (데이터베이스, API)
+- [ ] async/await 동작 확인
+- [ ] `pytest --cov=backend --cov-report=term-missing` 실행
+- [ ] 커버리지 보고서에서 누락 부분 확인
+- [ ] 80%+ 커버리지 목표
+
+---
+
+## 프로젝트 테스팅 구조
+
+qwarty 백엔드 테스팅 구조:
 
 ```
 backend/
   tests/
-    conftest.py              # Global fixtures
+    conftest.py              # 전역 fixture
     unit/
       domain/
         artist/
@@ -74,16 +74,16 @@ backend/
         test_error_handler.py
       utils/
         test_utils.py
-    integration/             # End-to-end tests
+    integration/             # 엔드-투-엔드 테스트
       test_artist_api.py
       test_auth_flow.py
 ```
 
 ---
 
-## Common Test Patterns Quick Reference
+## 공통 테스트 패턴 빠른 참조
 
-### Basic Async Test
+### 기본 Async 테스트
 
 ```python
 import pytest
@@ -102,7 +102,7 @@ async def test_get_artist_by_id(db_session: AsyncSession):
     assert result.id == artist_id
 ```
 
-### Mocking Database Session
+### 데이터베이스 세션 모킹
 
 ```python
 from unittest.mock import AsyncMock, MagicMock
@@ -122,7 +122,7 @@ async def test_create_artist_success():
     assert mock_session.commit.called
 ```
 
-### Testing FastAPI Routes
+### FastAPI Route 테스팅
 
 ```python
 from fastapi.testclient import TestClient
@@ -144,113 +144,113 @@ def test_get_artist_endpoint(client):
 
 ---
 
-## Test Organization Principles
+## 테스트 구성 원칙
 
-### Test Structure (AAA Pattern)
+### 테스트 구조 (AAA 패턴)
 
-1. **Arrange**: Set up test data, mocks, fixtures
-2. **Act**: Execute the code under test
-3. **Assert**: Verify the expected outcome
+1. **Arrange**: 테스트 데이터, mock, fixture 설정
+2. **Act**: 테스트할 코드 실행
+3. **Assert**: 예상 결과 확인
 
-### Test Naming Convention
+### 테스트 네이밍 컨벤션
 
 ```python
-# Pattern: test_<what>_<when>_<expected>
+# 패턴: test_<what>_<when>_<expected>
 def test_create_artist_with_valid_data_returns_artist()
 def test_get_artist_when_not_found_raises_not_found_error()
 def test_update_artist_with_duplicate_name_raises_conflict_error()
 ```
 
-### Test Organization
+### 테스트 조직화
 
-- **Unit tests**: Test individual functions/methods in isolation
-- **Integration tests**: Test multiple components working together
-- **Group related tests**: Use test classes for related functionality
-
----
-
-## Topic Guides
-
-### 🏗️ Testing Architecture
-
-**Three-Layer Testing Strategy:**
-1. **Repository Layer**: Test database queries, CRUD operations
-2. **Service Layer**: Test business logic, orchestration
-3. **Router Layer**: Test API endpoints, request/response handling
-
-**Key Concepts:**
-- Mock dependencies at layer boundaries
-- Test each layer independently
-- Use integration tests for end-to-end flows
-- Maintain test isolation
-
-**[📖 Complete Guide: resources/testing-architecture.md](resources/testing-architecture.md)**
+- **Unit 테스트**: 격리된 상태에서 개별 함수/메서드 테스트
+- **Integration 테스트**: 여러 컴포넌트가 함께 동작하는 것 테스트
+- **관련 테스트 그룹화**: 관련 기능에 테스트 클래스 사용
 
 ---
 
-### 🧪 Unit Testing
+## 주제별 가이드
 
-**Unit Test Best Practices:**
-- Test single responsibility
-- Mock external dependencies
-- Fast execution (no database, no network)
-- Independent and isolated
-- Test both success and failure paths
+### 테스팅 아키텍처
 
-**Unit Test Pattern:**
+**3계층 테스팅 전략:**
+1. **Repository 계층**: 데이터베이스 쿼리, CRUD 작업 테스트
+2. **Service 계층**: 비즈니스 로직, 오케스트레이션 테스트
+3. **Router 계층**: API 엔드포인트, 요청/응답 처리 테스트
+
+**핵심 개념:**
+- 계층 경계에서 의존성 모킹
+- 각 계층 독립적으로 테스트
+- 엔드-투-엔드 플로우에 integration 테스트 사용
+- 테스트 격리 유지
+
+**[완전한 가이드: resources/testing-architecture.md](resources/testing-architecture.md)**
+
+---
+
+### Unit 테스팅
+
+**Unit 테스트 모범 사례:**
+- 단일 책임 테스트
+- 외부 의존성 모킹
+- 빠른 실행 (데이터베이스, 네트워크 없음)
+- 독립적이고 격리됨
+- 성공 경로와 실패 경로 모두 테스트
+
+**Unit 테스트 패턴:**
 ```python
 @pytest.mark.asyncio
 async def test_artist_service_create():
-    # Mock repository
+    # repository 모킹
     mock_repo = AsyncMock()
     mock_repo.create = AsyncMock(return_value=artist_model)
 
-    # Test service logic
+    # service 로직 테스트
     service = ArtistService(mock_repo)
     result = await service.create_artist(data)
 
     assert result.name == data.name
 ```
 
-**[📖 Complete Guide: resources/unit-testing.md](resources/unit-testing.md)**
+**[완전한 가이드: resources/unit-testing.md](resources/unit-testing.md)**
 
 ---
 
-### 🔗 Integration Testing
+### Integration 테스팅
 
-**Integration Test Focus:**
-- Test multiple components together
-- Use real database (test database)
-- Verify end-to-end workflows
-- Test API contracts
+**Integration 테스트 초점:**
+- 여러 컴포넌트 함께 테스트
+- 실제 데이터베이스 사용 (테스트 데이터베이스)
+- 엔드-투-엔드 워크플로우 확인
+- API 계약 테스트
 
-**Integration Test Pattern:**
+**Integration 테스트 패턴:**
 ```python
 @pytest.mark.asyncio
 async def test_create_artist_flow(db_session, client):
-    # Full flow: API → Service → Repository → DB
+    # 전체 플로우: API → Service → Repository → DB
     response = client.post("/api/v1/artists", json=artist_data)
     assert response.status_code == 201
 
-    # Verify in database
+    # 데이터베이스에서 확인
     artist = await db_session.get(Artist, response.json()["id"])
     assert artist is not None
 ```
 
-**[📖 Complete Guide: resources/integration-testing.md](resources/integration-testing.md)**
+**[완전한 가이드: resources/integration-testing.md](resources/integration-testing.md)**
 
 ---
 
-### ⚡ Async Testing
+### Async 테스팅
 
-**Async Test Patterns:**
-- Use `@pytest.mark.asyncio` decorator
-- Configure pytest-asyncio in conftest.py
-- Mock async functions with AsyncMock
-- Test async context managers
-- Handle async exceptions
+**Async 테스트 패턴:**
+- `@pytest.mark.asyncio` 데코레이터 사용
+- conftest.py에서 pytest-asyncio 설정
+- AsyncMock으로 async 함수 모킹
+- async context manager 테스트
+- async 예외 처리
 
-**Async Mock Pattern:**
+**Async Mock 패턴:**
 ```python
 from unittest.mock import AsyncMock
 
@@ -262,19 +262,19 @@ async def test_async_function():
     mock_func.assert_awaited_once()
 ```
 
-**[📖 Complete Guide: resources/async-testing.md](resources/async-testing.md)**
+**[완전한 가이드: resources/async-testing.md](resources/async-testing.md)**
 
 ---
 
-### 🎭 Mocking & Fixtures
+### Mocking & Fixtures
 
-**Mocking Strategy:**
-- Mock external dependencies (database, APIs, S3)
-- Use pytest fixtures for reusable test data
-- Mock at layer boundaries
-- Use MagicMock for sync, AsyncMock for async
+**모킹 전략:**
+- 외부 의존성 모킹 (데이터베이스, API, S3)
+- 재사용 가능한 테스트 데이터에 pytest fixture 사용
+- 계층 경계에서 모킹
+- 동기에는 MagicMock, 비동기에는 AsyncMock 사용
 
-**Fixture Pattern:**
+**Fixture 패턴:**
 ```python
 import pytest
 
@@ -288,51 +288,51 @@ def sample_artist():
 
 @pytest.fixture
 async def db_session():
-    # Setup test database session
+    # 테스트 데이터베이스 세션 설정
     async with get_test_session() as session:
         yield session
         await session.rollback()
 ```
 
-**[📖 Complete Guide: resources/mocking-fixtures.md](resources/mocking-fixtures.md)**
+**[완전한 가이드: resources/mocking-fixtures.md](resources/mocking-fixtures.md)**
 
 ---
 
-### 📊 Coverage Best Practices
+### 커버리지 모범 사례
 
-**Coverage Strategy:**
-- Aim for 80%+ coverage (project requirement)
-- Focus on critical business logic
-- Test error paths and edge cases
-- Use coverage reports to find gaps
-- Exclude non-testable code (config, main.py)
+**커버리지 전략:**
+- 80%+ 커버리지 목표 (프로젝트 요구사항)
+- 핵심 비즈니스 로직에 집중
+- 에러 경로와 엣지 케이스 테스트
+- 커버리지 보고서로 누락 부분 찾기
+- 테스트 불가 코드 제외 (config, main.py)
 
-**Coverage Commands:**
+**커버리지 명령어:**
 ```bash
-# Run tests with coverage
+# 커버리지와 함께 테스트 실행
 pytest --cov=backend --cov-report=term-missing
 
-# Generate HTML report
+# HTML 보고서 생성
 pytest --cov=backend --cov-report=html
 
-# Check coverage threshold
+# 커버리지 임계값 확인
 pytest --cov=backend --cov-fail-under=80
 ```
 
-**[📖 Complete Guide: resources/coverage-best-practices.md](resources/coverage-best-practices.md)**
+**[완전한 가이드: resources/coverage-best-practices.md](resources/coverage-best-practices.md)**
 
 ---
 
-### 🚀 FastAPI Testing
+### FastAPI 테스팅
 
-**FastAPI Test Patterns:**
-- Use TestClient for route testing
-- Test request validation
-- Test response serialization
-- Test authentication/authorization
-- Test error handling middleware
+**FastAPI 테스트 패턴:**
+- route 테스팅에 TestClient 사용
+- 요청 유효성 검사 테스트
+- 응답 직렬화 테스트
+- 인증/권한 테스트
+- 에러 처리 미들웨어 테스트
 
-**TestClient Pattern:**
+**TestClient 패턴:**
 ```python
 from fastapi.testclient import TestClient
 
@@ -346,43 +346,43 @@ def test_create_artist_endpoint(client: TestClient):
     assert data["name"] == "Artist"
 ```
 
-**[📖 Complete Guide: resources/fastapi-testing.md](resources/fastapi-testing.md)**
+**[완전한 가이드: resources/fastapi-testing.md](resources/fastapi-testing.md)**
 
 ---
 
-## Navigation Guide
+## 네비게이션 가이드
 
-| Need to... | Read this resource |
-|------------|-------------------|
-| Understand test structure | [testing-architecture.md](resources/testing-architecture.md) |
-| Write unit tests | [unit-testing.md](resources/unit-testing.md) |
-| Write integration tests | [integration-testing.md](resources/integration-testing.md) |
-| Test async code | [async-testing.md](resources/async-testing.md) |
-| Use mocks and fixtures | [mocking-fixtures.md](resources/mocking-fixtures.md) |
-| Improve coverage | [coverage-best-practices.md](resources/coverage-best-practices.md) |
-| Test FastAPI routes | [fastapi-testing.md](resources/fastapi-testing.md) |
-
----
-
-## Core Principles
-
-1. **Test Isolation**: Each test runs independently, no shared state
-2. **AAA Pattern**: Arrange, Act, Assert for clear test structure
-3. **Async Testing**: Use pytest-asyncio for async code
-4. **Mock Dependencies**: Mock external systems (database, APIs)
-5. **Layered Testing**: Test each layer (repository, service, router) separately
-6. **Coverage Goals**: Aim for 80%+ coverage, focus on business logic
-7. **Descriptive Names**: Clear test names explain what, when, expected
-8. **Error Testing**: Test both success and failure paths
-9. **Fast Tests**: Unit tests should be fast (no real database)
-10. **Fixtures**: Use fixtures for reusable test data and setup
+| 필요한 작업 | 읽을 리소스 |
+|------------|-----------|
+| 테스트 구조 이해 | [testing-architecture.md](resources/testing-architecture.md) |
+| Unit 테스트 작성 | [unit-testing.md](resources/unit-testing.md) |
+| Integration 테스트 작성 | [integration-testing.md](resources/integration-testing.md) |
+| Async 코드 테스트 | [async-testing.md](resources/async-testing.md) |
+| Mock 및 fixture 사용 | [mocking-fixtures.md](resources/mocking-fixtures.md) |
+| 커버리지 개선 | [coverage-best-practices.md](resources/coverage-best-practices.md) |
+| FastAPI route 테스트 | [fastapi-testing.md](resources/fastapi-testing.md) |
 
 ---
 
-## Quick Reference: Test Template
+## 핵심 원칙
+
+1. **테스트 격리**: 각 테스트는 독립적으로 실행, 공유 상태 없음
+2. **AAA 패턴**: 명확한 테스트 구조를 위한 Arrange, Act, Assert
+3. **Async 테스팅**: async 코드에 pytest-asyncio 사용
+4. **의존성 모킹**: 외부 시스템 모킹 (데이터베이스, API)
+5. **계층별 테스팅**: 각 계층 (repository, service, router) 별도 테스트
+6. **커버리지 목표**: 80%+ 커버리지 목표, 비즈니스 로직에 집중
+7. **설명적인 이름**: 명확한 테스트 이름으로 무엇, 언제, 예상 결과 설명
+8. **에러 테스팅**: 성공 경로와 실패 경로 모두 테스트
+9. **빠른 테스트**: Unit 테스트는 빨라야 함 (실제 데이터베이스 없음)
+10. **Fixture**: 재사용 가능한 테스트 데이터와 설정에 fixture 사용
+
+---
+
+## 빠른 참조: 테스트 템플릿
 
 ```python
-"""Tests for Artist domain."""
+"""Artist 도메인 테스트."""
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -396,7 +396,7 @@ from backend.error import NotFoundError
 
 @pytest.fixture
 def sample_artist():
-    """Fixture for sample artist data."""
+    """샘플 아티스트 데이터 fixture."""
     return Artist(
         id="test-artist-id",
         name="Test Artist",
@@ -406,16 +406,16 @@ def sample_artist():
 
 @pytest.fixture
 def mock_session():
-    """Fixture for mocked database session."""
+    """모킹된 데이터베이스 세션 fixture."""
     return AsyncMock(spec=AsyncSession)
 
 
 class TestArtistRepository:
-    """Test suite for ArtistRepository."""
+    """ArtistRepository 테스트 스위트."""
 
     @pytest.mark.asyncio
     async def test_get_by_id_success(self, mock_session, sample_artist):
-        """Test get_by_id returns artist when found."""
+        """get_by_id가 아티스트를 찾으면 반환하는지 테스트."""
         # Arrange
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_artist
@@ -433,7 +433,7 @@ class TestArtistRepository:
 
     @pytest.mark.asyncio
     async def test_get_by_id_not_found(self, mock_session):
-        """Test get_by_id returns None when not found."""
+        """get_by_id가 찾지 못하면 None을 반환하는지 테스트."""
         # Arrange
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = None
@@ -449,11 +449,11 @@ class TestArtistRepository:
 
 
 class TestArtistService:
-    """Test suite for ArtistService."""
+    """ArtistService 테스트 스위트."""
 
     @pytest.mark.asyncio
     async def test_create_artist_success(self, mock_session, sample_artist):
-        """Test create_artist creates and returns artist."""
+        """create_artist가 아티스트를 생성하고 반환하는지 테스트."""
         # Arrange
         mock_repo = AsyncMock()
         mock_repo.create = AsyncMock(return_value=sample_artist)
@@ -476,11 +476,11 @@ class TestArtistService:
 
 ---
 
-## Current Project Configuration
+## 현재 프로젝트 설정
 
-Your qwarty backend test setup:
+qwarty 백엔드 테스트 설정:
 
-**pytest.ini (in pyproject.toml):**
+**pytest.ini (pyproject.toml 내):**
 ```toml
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -497,24 +497,24 @@ addopts = [
 ]
 ```
 
-**Test Dependencies:**
+**테스트 의존성:**
 - pytest 8.4.2+
 - pytest-asyncio 0.24.0+
 - pytest-cov 6.0.0+
 
-**Coverage Exclusions:**
-- Tests themselves (`tests/*`)
-- `__init__.py` files
-- Main application entry (`backend/main.py`)
-- Some routers and specific domains (see pyproject.toml)
+**커버리지 제외 항목:**
+- 테스트 파일 자체 (`tests/*`)
+- `__init__.py` 파일
+- 메인 애플리케이션 진입점 (`backend/main.py`)
+- 일부 router 및 특정 도메인 (pyproject.toml 참조)
 
 ---
 
-## Related Skills
+## 관련 스킬
 
-- **fastapi-backend-guidelines**: Backend development patterns (what you're testing)
-- **error-tracking**: Error handling patterns to test
+- **fastapi-backend-guidelines**: 테스팅 대상인 백엔드 개발 패턴
+- **error-tracking**: 테스트할 에러 처리 패턴
 
 ---
 
-**Skill Status**: Modular structure with progressive loading for optimal context management
+**스킬 상태**: 최적의 컨텍스트 관리를 위한 점진적 로딩을 갖춘 모듈식 구조

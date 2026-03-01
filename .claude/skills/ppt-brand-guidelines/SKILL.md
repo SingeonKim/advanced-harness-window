@@ -3,64 +3,64 @@ name: ppt-brand-guidelines
 description: PPT brand guidelines for VRL presentations. Use when creating slides, decks, or any presentation materials. Provides color palette, logo usage, and minimal design principles.
 ---
 
-# VRL PPT Brand Guidelines
+# VRL PPT 브랜드 가이드라인
 
-Modern, clean brand guidelines for VRL presentations featuring the lime green logo.
+라임 그린 로고가 특징인 VRL 프레젠테이션을 위한 현대적이고 깔끔한 브랜드 가이드라인.
 
-## Brand Identity
+## 브랜드 아이덴티티
 
-**Logo**: Lime green rounded square with dark lightning bolt icon
-**Style**: Modern, tech-forward, bold yet clean
+**로고**: 어두운 번개 아이콘이 있는 라임 그린 둥근 사각형
+**스타일**: 현대적이고 기술 중심적이며, 강렬하면서도 깔끔함
 
-## Brand Colors
+## 브랜드 색상
 
-### Primary Palette
+### 주요 팔레트
 
-| Color | Hex | Role |
-|-------|-----|------|
-| **Lime Green** | `#BDFF00` | Brand color (from logo) |
-| **Dark Navy** | `#1E293B` | Primary dark, backgrounds, text |
-| **White** | `#FFFFFF` | Light backgrounds, text on dark |
+| 색상 | Hex | 역할 |
+|------|-----|------|
+| **라임 그린** | `#BDFF00` | 브랜드 색상 (로고에서) |
+| **다크 네이비** | `#1E293B` | 기본 어두운 색, 배경, 텍스트 |
+| **흰색** | `#FFFFFF` | 밝은 배경, 어두운 배경의 텍스트 |
 
-### Supporting Colors
+### 보조 색상
 
-| Color | Hex | Role |
-|-------|-----|------|
-| **Slate Gray** | `#64748B` | Secondary text, muted elements |
-| **Light Slate** | `#94A3B8` | Tertiary text, captions |
-| **Off White** | `#F8FAFC` | Card backgrounds on white |
+| 색상 | Hex | 역할 |
+|------|-----|------|
+| **슬레이트 그레이** | `#64748B` | 보조 텍스트, 약화된 요소 |
+| **라이트 슬레이트** | `#94A3B8` | 3차 텍스트, 캡션 |
+| **오프 화이트** | `#F8FAFC` | 흰색 배경의 카드 배경 |
 
-## Logo Usage
+## 로고 사용
 
-### CRITICAL RULES
-- **NEVER apply CSS filters** to the logo (no brightness, invert, etc.)
-- Logo is self-contained with lime green background - use AS-IS
-- Logo works on both dark and light backgrounds without modification
+### 핵심 규칙
+- **절대 CSS 필터를 적용하지 마세요** (brightness, invert 등)
+- 로고는 라임 그린 배경이 포함되어 있음 - 있는 그대로 사용
+- 로고는 수정 없이 어두운 배경과 밝은 배경 모두에서 작동
 
-### Placement
-- **Title slide**: Centered, 70-80pt, above title
-- **Closing slide**: Centered, 80pt
-- **Content slides**: Optional, bottom-right, 24pt
+### 배치
+- **타이틀 슬라이드**: 중앙, 70-80pt, 타이틀 위
+- **클로징 슬라이드**: 중앙, 80pt
+- **콘텐츠 슬라이드**: 선택사항, 오른쪽 하단, 24pt
 
-## Typography
+## 타이포그래피
 
-### Font
-- **Primary**: Arial, Helvetica, sans-serif
-- **Weights**: Bold for headers, Regular for body
+### 폰트
+- **기본**: Arial, Helvetica, sans-serif
+- **굵기**: 헤더에 Bold, 본문에 Regular
 
-### Scale
-| Element | Size | Weight | Color |
-|---------|------|--------|-------|
-| Hero Title | 42-48pt | Bold | White |
-| Section Title | 24-28pt | Bold | Dark Navy |
-| Subtitle | 14-16pt | Regular | Light Slate |
-| Body | 11-13pt | Regular | Dark Navy or Slate |
-| Caption | 9-10pt | Regular | Slate Gray |
+### 크기 체계
+| 요소 | 크기 | 굵기 | 색상 |
+|------|------|------|------|
+| Hero 타이틀 | 42-48pt | Bold | 흰색 |
+| 섹션 타이틀 | 24-28pt | Bold | 다크 네이비 |
+| 부제목 | 14-16pt | Regular | 라이트 슬레이트 |
+| 본문 | 11-13pt | Regular | 다크 네이비 또는 슬레이트 |
+| 캡션 | 9-10pt | Regular | 슬레이트 그레이 |
 
-## Slide Layouts
+## 슬라이드 레이아웃
 
-### 1. Title Slide (Hero)
-**Background**: Dark Navy (#1E293B)
+### 1. 타이틀 슬라이드 (Hero)
+**배경**: 다크 네이비 (#1E293B)
 
 ```
 ┌─────────────────────────────────────┐
@@ -75,14 +75,14 @@ Modern, clean brand guidelines for VRL presentations featuring the lime green lo
 └─────────────────────────────────────┘
 ```
 
-**IMPORTANT**:
-- NO CSS filters on logo
-- NO accent lines between title elements
-- Simple, clean vertical stack
-- Generous spacing between elements
+**중요**:
+- 로고에 CSS 필터 없음
+- 타이틀 요소 사이에 강조선 없음
+- 단순하고 깔끔한 수직 배치
+- 요소 사이에 여유로운 여백
 
-### 2. Content Slide
-**Background**: White (#FFFFFF)
+### 2. 콘텐츠 슬라이드
+**배경**: 흰색 (#FFFFFF)
 
 ```
 ┌─────────────────────────────────────┐
@@ -94,52 +94,52 @@ Modern, clean brand guidelines for VRL presentations featuring the lime green lo
 └─────────────────────────────────────┘
 ```
 
-- Header: Dark Navy, bold, left-aligned
-- NO underlines or accent lines under headers
-- Cards: Off White (#F8FAFC) with 8pt radius
+- 헤더: 다크 네이비, 굵게, 왼쪽 정렬
+- 헤더 아래 밑줄이나 강조선 없음
+- 카드: 오프 화이트 (#F8FAFC), 8pt 반경
 
-### 3. Data/Stats Slide
-- Large numbers: Lime Green (#BDFF00) or Dark Navy
-- Labels: Slate Gray (#64748B)
-- Clean grid layout
+### 3. 데이터/통계 슬라이드
+- 큰 숫자: 라임 그린 (#BDFF00) 또는 다크 네이비
+- 레이블: 슬레이트 그레이 (#64748B)
+- 깔끔한 그리드 레이아웃
 
-### 4. Table Slide
-- Header: Dark Navy background, white text
-- Body: Alternating white/#F8FAFC rows
-- Highlight: Lime Green background for emphasis column
+### 4. 테이블 슬라이드
+- 헤더: 다크 네이비 배경, 흰색 텍스트
+- 본문: 흰색/#F8FAFC 행 교대
+- 강조: 강조 열에 라임 그린 배경
 
-### 5. Closing Slide
-**Background**: Dark Navy (#1E293B)
-- Logo centered (as-is, no filters)
-- Tagline in white
-- Summary stats in Lime Green
+### 5. 클로징 슬라이드
+**배경**: 다크 네이비 (#1E293B)
+- 로고 중앙 (있는 그대로, 필터 없음)
+- 흰색 태그라인
+- 라임 그린 요약 통계
 
-## Design Rules
+## 디자인 규칙
 
-### DO
-- Use logo AS-IS without any CSS filters
-- Dark Navy (#1E293B) for hero/closing slides
-- White for content slides
-- Lime Green for key stats and highlights only
-- Clean, simple layouts
-- Generous whitespace (40%+)
+### 해야 할 것
+- 로고를 CSS 필터 없이 있는 그대로 사용
+- Hero/클로징 슬라이드에 다크 네이비 (#1E293B) 사용
+- 콘텐츠 슬라이드에 흰색 사용
+- 핵심 통계와 강조에만 라임 그린 사용
+- 깔끔하고 단순한 레이아웃
+- 여유로운 여백 (40%+)
 
-### DON'T
-- Apply brightness/invert filters to logo
-- Use accent lines that overlap text
-- Add decorative elements
-- Use circular badges or icons
-- Mix too many colors
-- Add borders or frames
+### 하지 말아야 할 것
+- 로고에 brightness/invert 필터 적용
+- 텍스트와 겹치는 강조선 사용
+- 장식 요소 추가
+- 원형 배지나 아이콘 사용
+- 너무 많은 색상 혼합
+- 테두리나 프레임 추가
 
-## CSS Guidelines
+## CSS 가이드라인
 
-### Logo in HTML (Title/Closing slides)
+### HTML에서 로고 (타이틀/클로징 슬라이드)
 ```css
 .logo {
   width: 70pt;
   height: 70pt;
-  /* NO FILTER - use logo as-is */
+  /* 필터 없음 - 로고 있는 그대로 사용 */
 }
 .logo img {
   width: 100%;
@@ -148,7 +148,7 @@ Modern, clean brand guidelines for VRL presentations featuring the lime green lo
 }
 ```
 
-### Title Slide Body
+### 타이틀 슬라이드 Body
 ```css
 body {
   background: #1E293B;
@@ -159,7 +159,7 @@ body {
 }
 ```
 
-### Card Styling
+### 카드 스타일링
 ```css
 .card {
   background: #F8FAFC;
@@ -168,7 +168,7 @@ body {
 }
 ```
 
-### Highlighted Card
+### 강조 카드
 ```css
 .card.highlight {
   background: #BDFF00;
@@ -176,22 +176,22 @@ body {
 }
 ```
 
-## Example Slide Specs
+## 슬라이드 예시 스펙
 
-### Title Slide
-- Background: #1E293B
-- Logo: 70pt, centered, NO FILTER
-- Title: white, 42pt, bold
-- Subtitle: #94A3B8, 14pt
-- Date: #64748B, 10pt
-- Spacing: 25pt between elements
+### 타이틀 슬라이드
+- 배경: #1E293B
+- 로고: 70pt, 중앙, 필터 없음
+- 타이틀: 흰색, 42pt, 굵게
+- 부제목: #94A3B8, 14pt
+- 날짜: #64748B, 10pt
+- 간격: 요소 사이 25pt
 
-### Content Slide
-- Background: #FFFFFF
-- Header: #1E293B, 24pt, bold
-- Cards: #F8FAFC, 8pt radius, 18pt padding
-- Body text: #1E293B, 11pt
+### 콘텐츠 슬라이드
+- 배경: #FFFFFF
+- 헤더: #1E293B, 24pt, 굵게
+- 카드: #F8FAFC, 8pt 반경, 18pt 패딩
+- 본문 텍스트: #1E293B, 11pt
 
-## Assets
+## 에셋
 
-Logo file: `assets/logo.png` (lime green with lightning bolt - use as-is)
+로고 파일: `assets/logo.png` (번개 아이콘이 있는 라임 그린 - 있는 그대로 사용)

@@ -1,20 +1,20 @@
-# Office Open XML Technical Reference for PowerPoint
+# PowerPoint용 Office Open XML 기술 참조
 
-**Important: Read this entire document before starting.** Critical XML schema rules and formatting requirements are covered throughout. Incorrect implementation can create invalid PPTX files that PowerPoint cannot open.
+**중요: 시작하기 전에 이 문서 전체를 읽으세요.** 중요한 XML 스키마 규칙과 포맷팅 요구사항이 전체에 걸쳐 설명됩니다. 잘못된 구현은 PowerPoint가 열 수 없는 유효하지 않은 PPTX 파일을 만들 수 있습니다.
 
-## Technical Guidelines
+## 기술 가이드라인
 
-### Schema Compliance
-- **Element ordering in `<p:txBody>`**: `<a:bodyPr>`, `<a:lstStyle>`, `<a:p>`
-- **Whitespace**: Add `xml:space='preserve'` to `<a:t>` elements with leading/trailing spaces
-- **Unicode**: Escape characters in ASCII content: `"` becomes `&#8220;`
-- **Images**: Add to `ppt/media/`, reference in slide XML, set dimensions to fit slide bounds
-- **Relationships**: Update `ppt/slides/_rels/slideN.xml.rels` for each slide's resources
-- **Dirty attribute**: Add `dirty="0"` to `<a:rPr>` and `<a:endParaRPr>` elements to indicate clean state
+### 스키마 준수
+- **`<p:txBody>`의 요소 순서**: `<a:bodyPr>`, `<a:lstStyle>`, `<a:p>`
+- **공백**: 앞/뒤에 공백이 있는 `<a:t>` 요소에 `xml:space='preserve'` 추가
+- **Unicode**: ASCII 콘텐츠에서 문자 이스케이프: `"` → `&#8220;`
+- **이미지**: `ppt/media/`에 추가하고 슬라이드 XML에서 참조, 치수를 슬라이드 범위에 맞게 설정
+- **관계**: 각 슬라이드의 리소스에 대해 `ppt/slides/_rels/slideN.xml.rels` 업데이트
+- **dirty 속성**: 깨끗한 상태를 나타내기 위해 `<a:rPr>` 및 `<a:endParaRPr>` 요소에 `dirty="0"` 추가
 
-## Presentation Structure
+## 프레젠테이션 구조
 
-### Basic Slide Structure
+### 기본 슬라이드 구조
 ```xml
 <!-- ppt/slides/slide1.xml -->
 <p:sld>
@@ -22,13 +22,13 @@
     <p:spTree>
       <p:nvGrpSpPr>...</p:nvGrpSpPr>
       <p:grpSpPr>...</p:grpSpPr>
-      <!-- Shapes go here -->
+      <!-- 도형이 여기에 위치 -->
     </p:spTree>
   </p:cSld>
 </p:sld>
 ```
 
-### Text Box / Shape with Text
+### 텍스트가 있는 텍스트 박스 / 도형
 ```xml
 <p:sp>
   <p:nvSpPr>
@@ -58,27 +58,27 @@
 </p:sp>
 ```
 
-### Text Formatting
+### 텍스트 포맷팅
 ```xml
-<!-- Bold -->
+<!-- 굵게 -->
 <a:r>
   <a:rPr b="1"/>
   <a:t>Bold Text</a:t>
 </a:r>
 
-<!-- Italic -->
+<!-- 기울임 -->
 <a:r>
   <a:rPr i="1"/>
   <a:t>Italic Text</a:t>
 </a:r>
 
-<!-- Underline -->
+<!-- 밑줄 -->
 <a:r>
   <a:rPr u="sng"/>
   <a:t>Underlined</a:t>
 </a:r>
 
-<!-- Highlight -->
+<!-- 하이라이트 -->
 <a:r>
   <a:rPr>
     <a:highlight>
@@ -88,7 +88,7 @@
   <a:t>Highlighted Text</a:t>
 </a:r>
 
-<!-- Font and Size -->
+<!-- 폰트 및 크기 -->
 <a:r>
   <a:rPr sz="2400" typeface="Arial">
     <a:solidFill>
@@ -98,7 +98,7 @@
   <a:t>Colored Arial 24pt</a:t>
 </a:r>
 
-<!-- Complete formatting example -->
+<!-- 완전한 포맷팅 예시 -->
 <a:r>
   <a:rPr lang="en-US" sz="1400" b="1" dirty="0">
     <a:solidFill>
@@ -109,9 +109,9 @@
 </a:r>
 ```
 
-### Lists
+### 목록
 ```xml
-<!-- Bullet list -->
+<!-- 불릿 목록 -->
 <a:p>
   <a:pPr lvl="0">
     <a:buChar char="•"/>
@@ -121,7 +121,7 @@
   </a:r>
 </a:p>
 
-<!-- Numbered list -->
+<!-- 번호 목록 -->
 <a:p>
   <a:pPr lvl="0">
     <a:buAutoNum type="arabicPeriod"/>
@@ -131,7 +131,7 @@
   </a:r>
 </a:p>
 
-<!-- Second level indent -->
+<!-- 두 번째 수준 들여쓰기 -->
 <a:p>
   <a:pPr lvl="1">
     <a:buChar char="•"/>
@@ -142,9 +142,9 @@
 </a:p>
 ```
 
-### Shapes
+### 도형
 ```xml
-<!-- Rectangle -->
+<!-- 사각형 -->
 <p:sp>
   <p:nvSpPr>
     <p:cNvPr id="3" name="Rectangle"/>
@@ -170,7 +170,7 @@
   </p:spPr>
 </p:sp>
 
-<!-- Rounded Rectangle -->
+<!-- 둥근 사각형 -->
 <p:sp>
   <p:spPr>
     <a:prstGeom prst="roundRect">
@@ -179,7 +179,7 @@
   </p:spPr>
 </p:sp>
 
-<!-- Circle/Ellipse -->
+<!-- 원/타원 -->
 <p:sp>
   <p:spPr>
     <a:prstGeom prst="ellipse">
@@ -189,7 +189,7 @@
 </p:sp>
 ```
 
-### Images
+### 이미지
 ```xml
 <p:pic>
   <p:nvPicPr>
@@ -219,7 +219,7 @@
 </p:pic>
 ```
 
-### Tables
+### 테이블
 ```xml
 <p:graphicFrame>
   <p:nvGraphicFramePr>
@@ -270,17 +270,17 @@
 </p:graphicFrame>
 ```
 
-### Slide Layouts
+### 슬라이드 레이아웃
 
 ```xml
-<!-- Title Slide Layout -->
+<!-- 타이틀 슬라이드 레이아웃 -->
 <p:sp>
   <p:nvSpPr>
     <p:nvPr>
       <p:ph type="ctrTitle"/>
     </p:nvPr>
   </p:nvSpPr>
-  <!-- Title content -->
+  <!-- 타이틀 콘텐츠 -->
 </p:sp>
 
 <p:sp>
@@ -289,17 +289,17 @@
       <p:ph type="subTitle" idx="1"/>
     </p:nvPr>
   </p:nvSpPr>
-  <!-- Subtitle content -->
+  <!-- 부제목 콘텐츠 -->
 </p:sp>
 
-<!-- Content Slide Layout -->
+<!-- 콘텐츠 슬라이드 레이아웃 -->
 <p:sp>
   <p:nvSpPr>
     <p:nvPr>
       <p:ph type="title"/>
     </p:nvPr>
   </p:nvSpPr>
-  <!-- Slide title -->
+  <!-- 슬라이드 타이틀 -->
 </p:sp>
 
 <p:sp>
@@ -308,13 +308,13 @@
       <p:ph type="body" idx="1"/>
     </p:nvPr>
   </p:nvSpPr>
-  <!-- Content body -->
+  <!-- 콘텐츠 본문 -->
 </p:sp>
 ```
 
-## File Updates
+## 파일 업데이트
 
-When adding content, update these files:
+콘텐츠 추가 시 다음 파일들을 업데이트합니다:
 
 **`ppt/_rels/presentation.xml.rels`:**
 ```xml
@@ -343,47 +343,47 @@ When adding content, update these files:
 </p:sldIdLst>
 ```
 
-**`docProps/app.xml`:** Update slide count and statistics
+**`docProps/app.xml`:** 슬라이드 수 및 통계 업데이트
 ```xml
 <Slides>2</Slides>
 <Paragraphs>10</Paragraphs>
 <Words>50</Words>
 ```
 
-## Slide Operations
+## 슬라이드 작업
 
-### Adding a New Slide
-When adding a slide to the end of the presentation:
+### 새 슬라이드 추가
+프레젠테이션 끝에 슬라이드를 추가할 때:
 
-1. **Create the slide file** (`ppt/slides/slideN.xml`)
-2. **Update `[Content_Types].xml`**: Add Override for the new slide
-3. **Update `ppt/_rels/presentation.xml.rels`**: Add relationship for the new slide
-4. **Update `ppt/presentation.xml`**: Add slide ID to `<p:sldIdLst>`
-5. **Create slide relationships** (`ppt/slides/_rels/slideN.xml.rels`) if needed
-6. **Update `docProps/app.xml`**: Increment slide count and update statistics (if present)
+1. **슬라이드 파일 생성** (`ppt/slides/slideN.xml`)
+2. **`[Content_Types].xml` 업데이트**: 새 슬라이드에 대한 Override 추가
+3. **`ppt/_rels/presentation.xml.rels` 업데이트**: 새 슬라이드에 대한 관계 추가
+4. **`ppt/presentation.xml` 업데이트**: `<p:sldIdLst>`에 슬라이드 ID 추가
+5. **슬라이드 관계 생성** (`ppt/slides/_rels/slideN.xml.rels`) 필요한 경우
+6. **`docProps/app.xml` 업데이트**: 슬라이드 수 증가 및 통계 업데이트 (있는 경우)
 
-### Duplicating a Slide
-1. Copy the source slide XML file with a new name
-2. Update all IDs in the new slide to be unique
-3. Follow the "Adding a New Slide" steps above
-4. **CRITICAL**: Remove or update any notes slide references in `_rels` files
-5. Remove references to unused media files
+### 슬라이드 복제
+1. 원본 슬라이드 XML 파일을 새 이름으로 복사
+2. 새 슬라이드의 모든 ID를 고유하게 업데이트
+3. 위의 "새 슬라이드 추가" 단계 따르기
+4. **중요**: `_rels` 파일에서 노트 슬라이드 참조 제거 또는 업데이트
+5. 사용하지 않는 미디어 파일 참조 제거
 
-### Reordering Slides
-1. **Update `ppt/presentation.xml`**: Reorder `<p:sldId>` elements in `<p:sldIdLst>`
-2. The order of `<p:sldId>` elements determines slide order
-3. Keep slide IDs and relationship IDs unchanged
+### 슬라이드 재정렬
+1. **`ppt/presentation.xml` 업데이트**: `<p:sldIdLst>`의 `<p:sldId>` 요소 재정렬
+2. `<p:sldId>` 요소의 순서가 슬라이드 순서를 결정
+3. 슬라이드 ID와 관계 ID는 변경하지 않음
 
-Example:
+예시:
 ```xml
-<!-- Original order -->
+<!-- 원래 순서 -->
 <p:sldIdLst>
   <p:sldId id="256" r:id="rId2"/>
   <p:sldId id="257" r:id="rId3"/>
   <p:sldId id="258" r:id="rId4"/>
 </p:sldIdLst>
 
-<!-- After moving slide 3 to position 2 -->
+<!-- 슬라이드 3을 위치 2로 이동 후 -->
 <p:sldIdLst>
   <p:sldId id="256" r:id="rId2"/>
   <p:sldId id="258" r:id="rId4"/>
@@ -391,37 +391,37 @@ Example:
 </p:sldIdLst>
 ```
 
-### Deleting a Slide
-1. **Remove from `ppt/presentation.xml`**: Delete the `<p:sldId>` entry
-2. **Remove from `ppt/_rels/presentation.xml.rels`**: Delete the relationship
-3. **Remove from `[Content_Types].xml`**: Delete the Override entry
-4. **Delete files**: Remove `ppt/slides/slideN.xml` and `ppt/slides/_rels/slideN.xml.rels`
-5. **Update `docProps/app.xml`**: Decrement slide count and update statistics
-6. **Clean up unused media**: Remove orphaned images from `ppt/media/`
+### 슬라이드 삭제
+1. **`ppt/presentation.xml`에서 제거**: `<p:sldId>` 항목 삭제
+2. **`ppt/_rels/presentation.xml.rels`에서 제거**: 관계 삭제
+3. **`[Content_Types].xml`에서 제거**: Override 항목 삭제
+4. **파일 삭제**: `ppt/slides/slideN.xml` 및 `ppt/slides/_rels/slideN.xml.rels` 제거
+5. **`docProps/app.xml` 업데이트**: 슬라이드 수 감소 및 통계 업데이트
+6. **사용하지 않는 미디어 정리**: `ppt/media/`에서 고아 이미지 제거
 
-Note: Don't renumber remaining slides - keep their original IDs and filenames.
+참고: 나머지 슬라이드의 번호를 다시 매기지 말 것 - 원래 ID와 파일명 유지.
 
 
-## Common Errors to Avoid
+## 피해야 할 일반적인 오류
 
-- **Encodings**: Escape unicode characters in ASCII content: `"` becomes `&#8220;`
-- **Images**: Add to `ppt/media/` and update relationship files
-- **Lists**: Omit bullets from list headers
-- **IDs**: Use valid hexadecimal values for UUIDs
-- **Themes**: Check all themes in `theme` directory for colors
+- **인코딩**: ASCII 콘텐츠에서 유니코드 문자 이스케이프: `"` → `&#8220;`
+- **이미지**: `ppt/media/`에 추가하고 관계 파일 업데이트
+- **목록**: 목록 헤더에서 불릿 제외
+- **ID**: UUID에 유효한 16진수 값 사용
+- **테마**: 색상에 대해 `theme` 디렉토리의 모든 테마 확인
 
-## Validation Checklist for Template-Based Presentations
+## 템플릿 기반 프레젠테이션 검증 체크리스트
 
-### Before Packing, Always:
-- **Clean unused resources**: Remove unreferenced media, fonts, and notes directories
-- **Fix Content_Types.xml**: Declare ALL slides, layouts, and themes present in the package
-- **Fix relationship IDs**: 
-   - Remove font embed references if not using embedded fonts
-- **Remove broken references**: Check all `_rels` files for references to deleted resources
+### 패킹 전 항상 확인:
+- **사용하지 않는 리소스 정리**: 참조되지 않는 미디어, 폰트, 노트 디렉토리 제거
+- **Content_Types.xml 수정**: 패키지에 있는 모든 슬라이드, 레이아웃, 테마 선언
+- **관계 ID 수정**:
+   - 내장 폰트를 사용하지 않는 경우 폰트 임베드 참조 제거
+- **깨진 참조 제거**: 삭제된 리소스에 대한 참조를 위해 모든 `_rels` 파일 확인
 
-### Common Template Duplication Pitfalls:
-- Multiple slides referencing the same notes slide after duplication
-- Image/media references from template slides that no longer exist
-- Font embedding references when fonts aren't included
-- Missing slideLayout declarations for layouts 12-25
-- docProps directory may not unpack - this is optional
+### 일반적인 템플릿 복제 함정:
+- 복제 후 여러 슬라이드가 같은 노트 슬라이드 참조
+- 더 이상 존재하지 않는 템플릿 슬라이드의 이미지/미디어 참조
+- 폰트가 포함되지 않은 경우의 폰트 임베딩 참조
+- 레이아웃 12-25에 대한 slideLayout 선언 누락
+- docProps 디렉토리가 압축 해제되지 않을 수 있음 - 선택 사항

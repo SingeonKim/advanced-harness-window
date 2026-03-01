@@ -1,12 +1,12 @@
-# FastAPI Testing
+# FastAPI 테스팅
 
-## Overview
+## 개요
 
-FastAPI provides excellent testing support through the TestClient class and dependency injection system. This guide covers FastAPI-specific testing patterns, request/response testing, and dependency overrides.
+FastAPI는 TestClient 클래스와 의존성 주입 시스템을 통해 뛰어난 테스팅 지원을 제공합니다. 이 가이드는 FastAPI 특화 테스팅 패턴, 요청/응답 테스팅, 그리고 의존성 재정의를 다룹니다.
 
-## TestClient Basics
+## TestClient 기본
 
-### Setting Up TestClient
+### TestClient 설정
 
 ```python
 from fastapi.testclient import TestClient
@@ -14,11 +14,11 @@ from backend.main import create_application
 
 @pytest.fixture
 def client():
-    """FastAPI test client."""
+    """FastAPI 테스트 클라이언트."""
     app = create_application()
     return TestClient(app)
 
-# Use in tests
+# 테스트에서 사용
 def test_health_endpoint(client):
     response = client.get("/health")
     assert response.status_code == 200
@@ -26,29 +26,29 @@ def test_health_endpoint(client):
 
 ### TestClient vs httpx
 
-TestClient is synchronous (wraps httpx) - perfect for testing:
+TestClient는 동기 방식 (httpx를 래핑) - 테스팅에 이상적:
 
 ```python
-# ✅ GOOD - Sync test with TestClient
+# TestClient로 동기 테스트 (올바른 방법)
 def test_endpoint(client):
     response = client.get("/api/v1/artists")
     assert response.status_code == 200
 
-# ❌ DON'T - No need for async with TestClient
+# TestClient에서 async는 불필요 (잘못된 방법)
 @pytest.mark.asyncio
-async def test_endpoint(client):  # Unnecessary async
+async def test_endpoint(client):  # 불필요한 async
     response = client.get("/api/v1/artists")
 ```
 
 ---
 
-## Testing HTTP Methods
+## HTTP 메서드 테스팅
 
-### GET Requests
+### GET 요청
 
 ```python
 def test_get_artist(client):
-    # Simple GET
+    # 단순 GET
     response = client.get("/api/v1/artists/123")
 
     assert response.status_code == 200
@@ -56,7 +56,7 @@ def test_get_artist(client):
     assert data["id"] == "123"
 
 def test_get_with_query_params(client):
-    # GET with query parameters
+    # 쿼리 파라미터가 있는 GET
     response = client.get(
         "/api/v1/artists",
         params={"page": 1, "limit": 10, "sort": "name"}
@@ -67,11 +67,11 @@ def test_get_with_query_params(client):
     assert len(data["items"]) <= 10
 ```
 
-### POST Requests
+### POST 요청
 
 ```python
 def test_create_artist(client):
-    # POST with JSON body
+    # JSON 바디가 있는 POST
     response = client.post(
         "/api/v1/artists",
         json={"name": "New Artist", "bio": "Artist bio"}
@@ -83,7 +83,7 @@ def test_create_artist(client):
     assert "id" in data
 
 def test_create_with_headers(client):
-    # POST with custom headers
+    # 커스텀 헤더가 있는 POST
     response = client.post(
         "/api/v1/artists",
         json={"name": "Artist", "bio": "Bio"},
@@ -93,11 +93,11 @@ def test_create_with_headers(client):
     assert response.status_code == 201
 ```
 
-### PUT and PATCH Requests
+### PUT 및 PATCH 요청
 
 ```python
 def test_update_artist_put(client):
-    # PUT (full update)
+    # PUT (전체 업데이트)
     response = client.put(
         "/api/v1/artists/123",
         json={"name": "Updated", "bio": "New bio"}
@@ -107,7 +107,7 @@ def test_update_artist_put(client):
     assert response.json()["name"] == "Updated"
 
 def test_update_artist_patch(client):
-    # PATCH (partial update)
+    # PATCH (부분 업데이트)
     response = client.patch(
         "/api/v1/artists/123",
         json={"bio": "Updated bio only"}
@@ -116,7 +116,7 @@ def test_update_artist_patch(client):
     assert response.status_code == 200
 ```
 
-### DELETE Requests
+### DELETE 요청
 
 ```python
 def test_delete_artist(client):
@@ -133,19 +133,19 @@ def test_delete_nonexistent(client):
 
 ---
 
-## Testing Request Validation
+## 요청 유효성 검사 테스팅
 
-### Pydantic Validation Errors
+### Pydantic 유효성 검사 에러
 
 ```python
 def test_create_artist_invalid_data(client):
-    # Empty name (should fail validation)
+    # 빈 이름 (유효성 검사 실패해야 함)
     response = client.post(
         "/api/v1/artists",
         json={"name": "", "bio": "Bio"}
     )
 
-    assert response.status_code == 422  # Unprocessable Entity
+    assert response.status_code == 422  # 처리 불가 엔티티
     data = response.json()
     assert "detail" in data
     assert any(
@@ -154,10 +154,10 @@ def test_create_artist_invalid_data(client):
     )
 
 def test_create_artist_missing_required_field(client):
-    # Missing required field
+    # 필수 필드 누락
     response = client.post(
         "/api/v1/artists",
-        json={"bio": "Bio"}  # Missing 'name'
+        json={"bio": "Bio"}  # 'name' 누락
     )
 
     assert response.status_code == 422
@@ -168,11 +168,11 @@ def test_create_artist_missing_required_field(client):
     )
 ```
 
-### Custom Validation
+### 커스텀 유효성 검사
 
 ```python
 def test_artist_name_length_validation(client):
-    # Name too long
+    # 이름이 너무 긴 경우
     long_name = "a" * 256
     response = client.post(
         "/api/v1/artists",
@@ -182,7 +182,7 @@ def test_artist_name_length_validation(client):
     assert response.status_code == 422
 
 def test_artist_email_format_validation(client):
-    # Invalid email format
+    # 이메일 형식이 잘못된 경우
     response = client.post(
         "/api/v1/artists",
         json={
@@ -197,21 +197,21 @@ def test_artist_email_format_validation(client):
 
 ---
 
-## Testing Response Formats
+## 응답 형식 테스팅
 
-### JSON Responses
+### JSON 응답
 
 ```python
 def test_response_format(client):
     response = client.get("/api/v1/artists/123")
 
-    # Status
+    # 상태 코드
     assert response.status_code == 200
 
-    # Content type
+    # Content-Type
     assert response.headers["content-type"] == "application/json"
 
-    # JSON data
+    # JSON 데이터
     data = response.json()
     assert isinstance(data, dict)
     assert "id" in data
@@ -226,7 +226,7 @@ def test_list_response_format(client):
     assert all(isinstance(item, dict) for item in data)
 ```
 
-### Pagination Responses
+### 페이지네이션 응답
 
 ```python
 def test_paginated_response(client):
@@ -235,7 +235,7 @@ def test_paginated_response(client):
     assert response.status_code == 200
     data = response.json()
 
-    # Check pagination structure
+    # 페이지네이션 구조 확인
     assert "items" in data
     assert "total" in data
     assert "page" in data
@@ -245,9 +245,9 @@ def test_paginated_response(client):
 
 ---
 
-## Dependency Override
+## 의존성 재정의
 
-### Overriding Database Session
+### 데이터베이스 세션 재정의
 
 ```python
 from fastapi import FastAPI
@@ -255,10 +255,10 @@ from backend.db.orm import get_read_session_dependency
 
 @pytest.fixture
 def client_with_test_db(test_db):
-    """Client with overridden database dependency."""
+    """데이터베이스 의존성이 재정의된 클라이언트."""
     app = create_application()
 
-    # Override dependency
+    # 의존성 재정의
     async def override_get_db():
         yield test_db
 
@@ -268,30 +268,30 @@ def client_with_test_db(test_db):
 
     yield client
 
-    # Clear overrides
+    # 재정의 초기화
     app.dependency_overrides.clear()
 
-# Use in tests
+# 테스트에서 사용
 def test_with_test_db(client_with_test_db):
-    # This uses test database instead of real database
+    # 실제 데이터베이스 대신 테스트 데이터베이스 사용
     response = client_with_test_db.get("/api/v1/artists")
     assert response.status_code == 200
 ```
 
-### Overriding Authentication
+### 인증 재정의
 
 ```python
 from backend.api.dependencies import get_current_user
 
 @pytest.fixture
 def authenticated_client():
-    """Client with authentication bypassed."""
+    """인증이 우회된 클라이언트."""
     app = create_application()
 
-    # Mock user
+    # mock 사용자
     mock_user = User(id="test-user", email="test@test.com")
 
-    # Override auth dependency
+    # 인증 의존성 재정의
     async def override_auth():
         return mock_user
 
@@ -304,22 +304,22 @@ def authenticated_client():
     app.dependency_overrides.clear()
 
 def test_protected_route(authenticated_client):
-    # This bypasses authentication
+    # 인증 우회
     response = authenticated_client.get("/api/v1/protected")
     assert response.status_code == 200
 ```
 
-### Overriding External Services
+### 외부 서비스 재정의
 
 ```python
 from backend.services.s3 import get_s3_client
 
 @pytest.fixture
 def client_with_mock_s3():
-    """Client with mocked S3 service."""
+    """S3 서비스가 모킹된 클라이언트."""
     app = create_application()
 
-    # Mock S3 client
+    # S3 클라이언트 모킹
     mock_s3 = MagicMock()
     mock_s3.upload_file.return_value = "https://example.com/file.jpg"
 
@@ -335,7 +335,7 @@ def client_with_mock_s3():
     app.dependency_overrides.clear()
 
 def test_file_upload(client_with_mock_s3):
-    # S3 is mocked
+    # S3가 모킹됨
     response = client_with_mock_s3.post(
         "/api/v1/upload",
         files={"file": ("test.jpg", b"content", "image/jpeg")}
@@ -345,9 +345,9 @@ def test_file_upload(client_with_mock_s3):
 
 ---
 
-## Testing Authentication
+## 인증 테스팅
 
-### JWT Token Authentication
+### JWT 토큰 인증
 
 ```python
 import jwt
@@ -355,7 +355,7 @@ from datetime import datetime, timedelta
 
 @pytest.fixture
 def auth_token():
-    """Generate valid JWT token for testing."""
+    """테스팅용 유효한 JWT 토큰 생성."""
     payload = {
         "sub": "test-user-id",
         "email": "test@test.com",
@@ -376,10 +376,10 @@ def test_protected_endpoint_with_token(client, auth_token):
     assert response.status_code == 200
 
 def test_expired_token(client):
-    # Create expired token
+    # 만료된 토큰 생성
     payload = {
         "sub": "user-id",
-        "exp": datetime.utcnow() - timedelta(hours=1)  # Expired
+        "exp": datetime.utcnow() - timedelta(hours=1)  # 만료됨
     }
     expired_token = jwt.encode(payload, "secret-key", algorithm="HS256")
 
@@ -390,11 +390,11 @@ def test_expired_token(client):
     assert response.status_code == 401
 ```
 
-### Cookie-Based Authentication
+### 쿠키 기반 인증
 
 ```python
 def test_login_sets_cookie(client):
-    # Login
+    # 로그인
     response = client.post(
         "/api/v1/auth/login",
         json={"email": "test@test.com", "password": "password"}
@@ -402,17 +402,17 @@ def test_login_sets_cookie(client):
 
     assert response.status_code == 200
 
-    # Check cookie was set
+    # 쿠키가 설정되었는지 확인
     assert "session" in response.cookies
 
 def test_authenticated_request_with_cookie(client):
-    # Login first
+    # 먼저 로그인
     login_response = client.post(
         "/api/v1/auth/login",
         json={"email": "test@test.com", "password": "password"}
     )
 
-    # Use cookie for subsequent request
+    # 이후 요청에 쿠키 사용
     response = client.get(
         "/api/v1/protected",
         cookies=login_response.cookies
@@ -423,7 +423,7 @@ def test_authenticated_request_with_cookie(client):
 
 ---
 
-## Testing Error Handling
+## 에러 처리 테스팅
 
 ### 404 Not Found
 
@@ -441,13 +441,13 @@ def test_get_nonexistent_artist(client):
 
 ```python
 def test_create_duplicate_artist(client):
-    # Create first artist
+    # 첫 번째 아티스트 생성
     client.post(
         "/api/v1/artists",
         json={"name": "Artist", "email": "test@test.com"}
     )
 
-    # Try to create duplicate
+    # 중복 생성 시도
     response = client.post(
         "/api/v1/artists",
         json={"name": "Artist 2", "email": "test@test.com"}
@@ -461,7 +461,7 @@ def test_create_duplicate_artist(client):
 
 ```python
 def test_internal_server_error_handling(client, mocker):
-    # Mock service to raise exception
+    # 예외를 발생시키도록 service 모킹
     mocker.patch(
         "backend.domain.artist.service.ArtistService.get_artist",
         side_effect=Exception("Database error")
@@ -476,13 +476,13 @@ def test_internal_server_error_handling(client, mocker):
 
 ---
 
-## Testing File Uploads
+## 파일 업로드 테스팅
 
-### Single File Upload
+### 단일 파일 업로드
 
 ```python
 def test_upload_file(client):
-    # Create test file
+    # 테스트 파일 생성
     file_content = b"fake image content"
 
     response = client.post(
@@ -495,7 +495,7 @@ def test_upload_file(client):
     assert "url" in data
 ```
 
-### Multiple File Upload
+### 다중 파일 업로드
 
 ```python
 def test_upload_multiple_files(client):
@@ -511,11 +511,11 @@ def test_upload_multiple_files(client):
     assert len(data["urls"]) == 2
 ```
 
-### File Size Validation
+### 파일 크기 유효성 검사
 
 ```python
 def test_upload_file_too_large(client):
-    # Create file larger than limit (e.g., 10MB)
+    # 제한보다 큰 파일 생성 (예: 10MB)
     large_file = b"x" * (11 * 1024 * 1024)
 
     response = client.post(
@@ -528,9 +528,9 @@ def test_upload_file_too_large(client):
 
 ---
 
-## Testing Background Tasks
+## 백그라운드 태스크 테스팅
 
-### Verifying Background Task Execution
+### 백그라운드 태스크 실행 검증
 
 ```python
 from unittest.mock import MagicMock, patch
@@ -544,14 +544,14 @@ def test_endpoint_triggers_background_task(client):
 
         assert response.status_code == 201
 
-        # Verify background task was called
+        # 백그라운드 태스크가 호출되었는지 확인
         mock_send_email.assert_called_once()
         assert mock_send_email.call_args[0][0] == "test@test.com"
 ```
 
 ---
 
-## Testing Streaming Responses
+## 스트리밍 응답 테스팅
 
 ### Server-Sent Events (SSE)
 
@@ -561,7 +561,7 @@ def test_sse_endpoint(client):
         assert response.status_code == 200
         assert response.headers["content-type"] == "text/event-stream"
 
-        # Read events
+        # 이벤트 읽기
         events = []
         for line in response.iter_lines():
             if line.startswith("data:"):
@@ -572,27 +572,27 @@ def test_sse_endpoint(client):
 
 ---
 
-## Testing WebSocket Endpoints
+## WebSocket 엔드포인트 테스팅
 
-### WebSocket Testing
+### WebSocket 테스팅
 
 ```python
 def test_websocket(client):
     with client.websocket_connect("/ws") as websocket:
-        # Send message
+        # 메시지 전송
         websocket.send_text("Hello")
 
-        # Receive response
+        # 응답 수신
         data = websocket.receive_text()
 
         assert data == "Hello back"
 
 def test_websocket_json(client):
     with client.websocket_connect("/ws/json") as websocket:
-        # Send JSON
+        # JSON 전송
         websocket.send_json({"type": "ping"})
 
-        # Receive JSON
+        # JSON 수신
         data = websocket.receive_json()
 
         assert data["type"] == "pong"
@@ -600,9 +600,9 @@ def test_websocket_json(client):
 
 ---
 
-## Performance Testing
+## 성능 테스팅
 
-### Response Time
+### 응답 시간
 
 ```python
 import time
@@ -615,36 +615,36 @@ def test_response_time(client):
     duration = time.time() - start
 
     assert response.status_code == 200
-    assert duration < 0.1  # Should respond in < 100ms
+    assert duration < 0.1  # 100ms 이내에 응답해야 함
 ```
 
-### Load Testing (Simplified)
+### 부하 테스팅 (단순화)
 
 ```python
 @pytest.mark.performance
 def test_endpoint_under_load(client):
-    """Test endpoint handles multiple requests."""
+    """엔드포인트가 여러 요청을 처리하는지 테스트."""
     results = []
 
-    # Send 100 requests
+    # 100개 요청 전송
     for _ in range(100):
         response = client.get("/api/v1/artists")
         results.append(response.status_code)
 
-    # All should succeed
+    # 모두 성공해야 함
     assert all(status == 200 for status in results)
 ```
 
 ---
 
-## Best Practices
+## 모범 사례
 
-### 1. Use Fixtures for Common Setup
+### 1. 공통 설정에 Fixture 사용
 
 ```python
 @pytest.fixture
 def sample_artist(client):
-    """Create sample artist for testing."""
+    """테스팅용 샘플 아티스트 생성."""
     response = client.post(
         "/api/v1/artists",
         json={"name": "Test Artist", "bio": "Bio"}
@@ -662,7 +662,7 @@ def test_update_artist(client, sample_artist):
     assert response.status_code == 200
 ```
 
-### 2. Test Both Success and Error Cases
+### 2. 성공과 에러 케이스 모두 테스트
 
 ```python
 def test_create_artist_success(client):
@@ -680,10 +680,10 @@ def test_create_artist_validation_error(client):
     assert response.status_code == 422
 
 def test_create_artist_duplicate_error(client):
-    # Create first
+    # 첫 번째 생성
     client.post("/api/v1/artists", json={"name": "Artist", "bio": "Bio"})
 
-    # Try duplicate
+    # 중복 시도
     response = client.post(
         "/api/v1/artists",
         json={"name": "Artist", "bio": "Bio"}
@@ -691,7 +691,7 @@ def test_create_artist_duplicate_error(client):
     assert response.status_code == 409
 ```
 
-### 3. Verify Response Structure
+### 3. 응답 구조 검증
 
 ```python
 def test_artist_response_structure(client):
@@ -699,40 +699,40 @@ def test_artist_response_structure(client):
 
     data = response.json()
 
-    # Verify all required fields present
+    # 모든 필수 필드가 있는지 확인
     assert "id" in data
     assert "name" in data
     assert "bio" in data
     assert "created_at" in data
 
-    # Verify types
+    # 타입 검증
     assert isinstance(data["id"], str)
     assert isinstance(data["name"], str)
 ```
 
 ---
 
-## Summary Checklist
+## 체크리스트
 
-When testing FastAPI endpoints:
+FastAPI 엔드포인트 테스팅 시:
 
-- [ ] Use TestClient for HTTP testing
-- [ ] Test all HTTP methods (GET, POST, PUT, PATCH, DELETE)
-- [ ] Verify status codes
-- [ ] Test request validation (422 errors)
-- [ ] Test authentication and authorization
-- [ ] Use dependency overrides for mocking
-- [ ] Test error responses (404, 409, 500)
-- [ ] Verify response structure and types
-- [ ] Test file uploads if applicable
-- [ ] Test pagination if applicable
-- [ ] Mock external services
-- [ ] Test both success and failure paths
+- [ ] HTTP 테스팅에 TestClient 사용
+- [ ] 모든 HTTP 메서드 테스트 (GET, POST, PUT, PATCH, DELETE)
+- [ ] 상태 코드 검증
+- [ ] 요청 유효성 검사 테스트 (422 에러)
+- [ ] 인증 및 권한 테스트
+- [ ] 의존성 재정의로 모킹
+- [ ] 에러 응답 테스트 (404, 409, 500)
+- [ ] 응답 구조와 타입 검증
+- [ ] 해당하는 경우 파일 업로드 테스트
+- [ ] 해당하는 경우 페이지네이션 테스트
+- [ ] 외부 서비스 모킹
+- [ ] 성공과 실패 경로 모두 테스트
 
 ---
 
-## Related Resources
+## 관련 리소스
 
-- [integration-testing.md](integration-testing.md) - Full workflow testing
-- [unit-testing.md](unit-testing.md) - Testing components in isolation
-- [testing-architecture.md](testing-architecture.md) - Overall testing strategy
+- [integration-testing.md](integration-testing.md) - 전체 워크플로우 테스팅
+- [unit-testing.md](unit-testing.md) - 격리된 컴포넌트 테스팅
+- [testing-architecture.md](testing-architecture.md) - 전체 테스팅 전략

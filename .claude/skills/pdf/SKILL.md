@@ -4,32 +4,32 @@ description: Use this skill whenever the user wants to do anything with PDF file
 license: Proprietary. LICENSE.txt has complete terms
 ---
 
-# PDF Processing Guide
+# PDF 처리 가이드
 
-## Overview
+## 개요
 
-This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
+이 가이드는 Python 라이브러리와 커맨드라인 도구를 사용한 필수 PDF 처리 작업을 다룹니다. 고급 기능, JavaScript 라이브러리, 상세 예시는 REFERENCE.md를 참조하세요. PDF 양식을 작성해야 할 경우 FORMS.md를 읽고 해당 지침을 따르세요.
 
-## Quick Start
+## 빠른 시작
 
 ```python
 from pypdf import PdfReader, PdfWriter
 
-# Read a PDF
+# PDF 읽기
 reader = PdfReader("document.pdf")
 print(f"Pages: {len(reader.pages)}")
 
-# Extract text
+# 텍스트 추출
 text = ""
 for page in reader.pages:
     text += page.extract_text()
 ```
 
-## Python Libraries
+## Python 라이브러리
 
-### pypdf - Basic Operations
+### pypdf - 기본 작업
 
-#### Merge PDFs
+#### PDF 병합
 ```python
 from pypdf import PdfWriter, PdfReader
 
@@ -43,7 +43,7 @@ with open("merged.pdf", "wb") as output:
     writer.write(output)
 ```
 
-#### Split PDF
+#### PDF 분할
 ```python
 reader = PdfReader("input.pdf")
 for i, page in enumerate(reader.pages):
@@ -53,7 +53,7 @@ for i, page in enumerate(reader.pages):
         writer.write(output)
 ```
 
-#### Extract Metadata
+#### 메타데이터 추출
 ```python
 reader = PdfReader("document.pdf")
 meta = reader.metadata
@@ -63,22 +63,22 @@ print(f"Subject: {meta.subject}")
 print(f"Creator: {meta.creator}")
 ```
 
-#### Rotate Pages
+#### 페이지 회전
 ```python
 reader = PdfReader("input.pdf")
 writer = PdfWriter()
 
 page = reader.pages[0]
-page.rotate(90)  # Rotate 90 degrees clockwise
+page.rotate(90)  # 시계 방향 90도 회전
 writer.add_page(page)
 
 with open("rotated.pdf", "wb") as output:
     writer.write(output)
 ```
 
-### pdfplumber - Text and Table Extraction
+### pdfplumber - 텍스트 및 테이블 추출
 
-#### Extract Text with Layout
+#### 레이아웃이 있는 텍스트 추출
 ```python
 import pdfplumber
 
@@ -88,7 +88,7 @@ with pdfplumber.open("document.pdf") as pdf:
         print(text)
 ```
 
-#### Extract Tables
+#### 테이블 추출
 ```python
 with pdfplumber.open("document.pdf") as pdf:
     for i, page in enumerate(pdf.pages):
@@ -99,7 +99,7 @@ with pdfplumber.open("document.pdf") as pdf:
                 print(row)
 ```
 
-#### Advanced Table Extraction
+#### 고급 테이블 추출
 ```python
 import pandas as pd
 
@@ -108,19 +108,19 @@ with pdfplumber.open("document.pdf") as pdf:
     for page in pdf.pages:
         tables = page.extract_tables()
         for table in tables:
-            if table:  # Check if table is not empty
+            if table:  # 테이블이 비어있지 않은지 확인
                 df = pd.DataFrame(table[1:], columns=table[0])
                 all_tables.append(df)
 
-# Combine all tables
+# 모든 테이블 합치기
 if all_tables:
     combined_df = pd.concat(all_tables, ignore_index=True)
     combined_df.to_excel("extracted_tables.xlsx", index=False)
 ```
 
-### reportlab - Create PDFs
+### reportlab - PDF 생성
 
-#### Basic PDF Creation
+#### 기본 PDF 생성
 ```python
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -128,18 +128,18 @@ from reportlab.pdfgen import canvas
 c = canvas.Canvas("hello.pdf", pagesize=letter)
 width, height = letter
 
-# Add text
+# 텍스트 추가
 c.drawString(100, height - 100, "Hello World!")
 c.drawString(100, height - 120, "This is a PDF created with reportlab")
 
-# Add a line
+# 선 추가
 c.line(100, height - 140, 400, height - 140)
 
-# Save
+# 저장
 c.save()
 ```
 
-#### Create PDF with Multiple Pages
+#### 여러 페이지 PDF 생성
 ```python
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
@@ -149,7 +149,7 @@ doc = SimpleDocTemplate("report.pdf", pagesize=letter)
 styles = getSampleStyleSheet()
 story = []
 
-# Add content
+# 콘텐츠 추가
 title = Paragraph("Report Title", styles['Title'])
 story.append(title)
 story.append(Spacer(1, 12))
@@ -158,88 +158,88 @@ body = Paragraph("This is the body of the report. " * 20, styles['Normal'])
 story.append(body)
 story.append(PageBreak())
 
-# Page 2
+# 2페이지
 story.append(Paragraph("Page 2", styles['Heading1']))
 story.append(Paragraph("Content for page 2", styles['Normal']))
 
-# Build PDF
+# PDF 빌드
 doc.build(story)
 ```
 
-#### Subscripts and Superscripts
+#### 아래첨자 및 위첨자
 
-**IMPORTANT**: Never use Unicode subscript/superscript characters (₀₁₂₃₄₅₆₇₈₉, ⁰¹²³⁴⁵⁶⁷⁸⁹) in ReportLab PDFs. The built-in fonts do not include these glyphs, causing them to render as solid black boxes.
+**중요**: ReportLab PDF에서는 Unicode 아래첨자/위첨자 문자(₀₁₂₃₄₅₆₇₈₉, ⁰¹²³⁴⁵⁶⁷⁸⁹)를 절대 사용하지 마세요. 내장 폰트에 해당 글리프가 없어 검은 사각형으로 렌더링됩니다.
 
-Instead, use ReportLab's XML markup tags in Paragraph objects:
+대신 Paragraph 객체에서 ReportLab의 XML 마크업 태그를 사용하세요:
 ```python
 from reportlab.platypus import Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
 
 styles = getSampleStyleSheet()
 
-# Subscripts: use <sub> tag
+# 아래첨자: <sub> 태그 사용
 chemical = Paragraph("H<sub>2</sub>O", styles['Normal'])
 
-# Superscripts: use <super> tag
+# 위첨자: <super> 태그 사용
 squared = Paragraph("x<super>2</super> + y<super>2</super>", styles['Normal'])
 ```
 
-For canvas-drawn text (not Paragraph objects), manually adjust font the size and position rather than using Unicode subscripts/superscripts.
+canvas로 그리는 텍스트(Paragraph 객체가 아닌 경우)에서는 Unicode 아래첨자/위첨자 대신 폰트 크기와 위치를 수동으로 조정하세요.
 
-## Command-Line Tools
+## 커맨드라인 도구
 
 ### pdftotext (poppler-utils)
 ```bash
-# Extract text
+# 텍스트 추출
 pdftotext input.pdf output.txt
 
-# Extract text preserving layout
+# 레이아웃 보존하며 텍스트 추출
 pdftotext -layout input.pdf output.txt
 
-# Extract specific pages
-pdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5
+# 특정 페이지 추출
+pdftotext -f 1 -l 5 input.pdf output.txt  # 1-5 페이지
 ```
 
 ### qpdf
 ```bash
-# Merge PDFs
+# PDF 병합
 qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf
 
-# Split pages
+# 페이지 분할
 qpdf input.pdf --pages . 1-5 -- pages1-5.pdf
 qpdf input.pdf --pages . 6-10 -- pages6-10.pdf
 
-# Rotate pages
-qpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees
+# 페이지 회전
+qpdf input.pdf output.pdf --rotate=+90:1  # 1페이지 90도 회전
 
-# Remove password
+# 비밀번호 제거
 qpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf
 ```
 
-### pdftk (if available)
+### pdftk (사용 가능한 경우)
 ```bash
-# Merge
+# 병합
 pdftk file1.pdf file2.pdf cat output merged.pdf
 
-# Split
+# 분할
 pdftk input.pdf burst
 
-# Rotate
+# 회전
 pdftk input.pdf rotate 1east output rotated.pdf
 ```
 
-## Common Tasks
+## 일반 작업
 
-### Extract Text from Scanned PDFs
+### 스캔된 PDF에서 텍스트 추출
 ```python
-# Requires: pip install pytesseract pdf2image
+# 필요: pip install pytesseract pdf2image
 import pytesseract
 from pdf2image import convert_from_path
 
-# Convert PDF to images
+# PDF를 이미지로 변환
 images = convert_from_path('scanned.pdf')
 
-# OCR each page
+# 각 페이지 OCR
 text = ""
 for i, image in enumerate(images):
     text += f"Page {i+1}:\n"
@@ -249,14 +249,14 @@ for i, image in enumerate(images):
 print(text)
 ```
 
-### Add Watermark
+### 워터마크 추가
 ```python
 from pypdf import PdfReader, PdfWriter
 
-# Create watermark (or load existing)
+# 워터마크 생성 (또는 기존 것 로드)
 watermark = PdfReader("watermark.pdf").pages[0]
 
-# Apply to all pages
+# 모든 페이지에 적용
 reader = PdfReader("document.pdf")
 writer = PdfWriter()
 
@@ -268,15 +268,15 @@ with open("watermarked.pdf", "wb") as output:
     writer.write(output)
 ```
 
-### Extract Images
+### 이미지 추출
 ```bash
-# Using pdfimages (poppler-utils)
+# pdfimages (poppler-utils) 사용
 pdfimages -j input.pdf output_prefix
 
-# This extracts all images as output_prefix-000.jpg, output_prefix-001.jpg, etc.
+# output_prefix-000.jpg, output_prefix-001.jpg 등으로 모든 이미지 추출
 ```
 
-### Password Protection
+### 비밀번호 보호
 ```python
 from pypdf import PdfReader, PdfWriter
 
@@ -286,29 +286,29 @@ writer = PdfWriter()
 for page in reader.pages:
     writer.add_page(page)
 
-# Add password
+# 비밀번호 추가
 writer.encrypt("userpassword", "ownerpassword")
 
 with open("encrypted.pdf", "wb") as output:
     writer.write(output)
 ```
 
-## Quick Reference
+## 빠른 참조
 
-| Task | Best Tool | Command/Code |
-|------|-----------|--------------|
-| Merge PDFs | pypdf | `writer.add_page(page)` |
-| Split PDFs | pypdf | One page per file |
-| Extract text | pdfplumber | `page.extract_text()` |
-| Extract tables | pdfplumber | `page.extract_tables()` |
-| Create PDFs | reportlab | Canvas or Platypus |
-| Command line merge | qpdf | `qpdf --empty --pages ...` |
-| OCR scanned PDFs | pytesseract | Convert to image first |
-| Fill PDF forms | pdf-lib or pypdf (see FORMS.md) | See FORMS.md |
+| 작업 | 최적 도구 | 명령어/코드 |
+|------|-----------|------------|
+| PDF 병합 | pypdf | `writer.add_page(page)` |
+| PDF 분할 | pypdf | 페이지당 하나의 파일 |
+| 텍스트 추출 | pdfplumber | `page.extract_text()` |
+| 테이블 추출 | pdfplumber | `page.extract_tables()` |
+| PDF 생성 | reportlab | Canvas 또는 Platypus |
+| 커맨드라인 병합 | qpdf | `qpdf --empty --pages ...` |
+| 스캔 PDF OCR | pytesseract | 먼저 이미지로 변환 |
+| PDF 양식 작성 | pdf-lib 또는 pypdf (FORMS.md 참조) | FORMS.md 참조 |
 
-## Next Steps
+## 다음 단계
 
-- For advanced pypdfium2 usage, see REFERENCE.md
-- For JavaScript libraries (pdf-lib), see REFERENCE.md
-- If you need to fill out a PDF form, follow the instructions in FORMS.md
-- For troubleshooting guides, see REFERENCE.md
+- 고급 pypdfium2 사용법은 REFERENCE.md 참조
+- JavaScript 라이브러리(pdf-lib)는 REFERENCE.md 참조
+- PDF 양식 작성이 필요한 경우 FORMS.md의 지침 따르기
+- 문제 해결 가이드는 REFERENCE.md 참조

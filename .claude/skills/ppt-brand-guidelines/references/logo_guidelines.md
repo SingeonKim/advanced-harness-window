@@ -1,87 +1,87 @@
-# VRL Logo Guidelines
+# VRL 로고 가이드라인
 
-## Logo Asset
+## 로고 에셋
 
-**File**: `assets/logo.png`
+**파일**: `assets/logo.png`
 
-The VRL logo is a minimal "Q" shaped icon. Simple, geometric, and instantly recognizable.
+VRL 로고는 미니멀한 "Q" 형태의 아이콘입니다. 단순하고 기하학적이며 즉시 인식 가능합니다.
 
-## Specifications
+## 사양
 
-### Size Requirements
-- **Minimum height**: 24px (digital)
-- **Recommended**: 32-48px for slides
-- **Large display**: 64px+
+### 크기 요구사항
+- **최소 높이**: 24px (디지털)
+- **권장**: 슬라이드에서 32-48px
+- **대형 디스플레이**: 64px 이상
 
-### Clear Space
-- Minimum margin equal to logo height on all sides
-- No elements should invade this protected space
+### 여백
+- 사방에 로고 높이와 동일한 최소 마진 유지
+- 어떤 요소도 이 보호 공간을 침범하면 안 됨
 
-## Color Versions
+## 색상 버전
 
-### On Light Backgrounds
-- Use black logo (default)
-- Works on white, light gray, lime
+### 밝은 배경에서
+- 검정 로고 사용 (기본값)
+- 흰색, 밝은 회색, 라임 배경에서 사용
 
-### On Dark Backgrounds
-- Use white logo
-- Works on slate-900, black, dark images
+### 어두운 배경에서
+- 흰색 로고 사용
+- slate-900, 검정, 어두운 이미지 배경에서 사용
 
-## Placement Guidelines
+## 배치 가이드라인
 
-### Title Slides
-- Position: Top-left corner
-- Size: 32-48px
-- Margin from edge: 5-10% of slide width
+### 타이틀 슬라이드
+- 위치: 왼쪽 상단 모서리
+- 크기: 32-48px
+- 가장자리에서 마진: 슬라이드 너비의 5-10%
 
-### Content Slides
-- Position: Bottom-right corner
-- Size: 24-32px
-- Acts as subtle brand presence
+### 콘텐츠 슬라이드
+- 위치: 오른쪽 하단 모서리
+- 크기: 24-32px
+- 미묘한 브랜드 존재감으로 작동
 
-### Section Dividers
-- Position: Centered or bottom-right
-- Size: 48-64px
-- Can be larger for emphasis
+### 섹션 구분자
+- 위치: 중앙 또는 오른쪽 하단
+- 크기: 48-64px
+- 강조를 위해 더 크게 사용 가능
 
-### Closing Slides
-- Position: Center
-- Size: 64-96px
-- Primary visual element
+### 클로징 슬라이드
+- 위치: 중앙
+- 크기: 64-96px
+- 주요 시각 요소
 
-## Usage Rules
+## 사용 규칙
 
-### DO
-- Use official logo file from `assets/`
-- Maintain aspect ratio
-- Ensure adequate clear space
-- Match color to background contrast
+### 해야 할 것
+- `assets/` 폴더의 공식 로고 파일 사용
+- 비율 유지
+- 충분한 여백 확보
+- 배경 대비에 맞는 색상 선택
 
-### DON'T
-- Rotate the logo
-- Stretch or distort
-- Add shadows, glows, or effects
-- Place on busy backgrounds without treatment
-- Use at sizes below 24px
-- Modify the logo in any way
+### 하지 말아야 할 것
+- 로고 회전
+- 늘리거나 왜곡
+- 그림자, 광선, 효과 추가
+- 처리 없이 복잡한 배경에 배치
+- 24px 이하의 크기 사용
+- 어떤 방식으로든 로고 수정
 
-## Background Treatment
+## 배경 처리
 
-### Simple Backgrounds
-- Place logo directly
-- Ensure color contrast
+### 단순한 배경
+- 로고 직접 배치
+- 색상 대비 확보
 
-### Complex/Image Backgrounds
-- Add subtle semi-transparent backing
-- Or position on less busy areas
-- White logo typically works better
+### 복잡한/이미지 배경
+- 미묘한 반투명 배경 추가
+- 또는 덜 복잡한 영역에 배치
+- 흰색 로고가 일반적으로 더 잘 어울림
 
-## Quality Checklist
+## 품질 체크리스트
 
-Before finalizing:
-- [ ] Logo is from official assets folder
-- [ ] Minimum size met (24px+)
-- [ ] Clear space maintained
-- [ ] Color appropriate for background
-- [ ] Aspect ratio preserved
-- [ ] No effects or modifications applied
+최종 확인 전:
+- [ ] 로고가 공식 에셋 폴더에서 가져온 것인지
+- [ ] 최소 크기 충족 여부 (24px 이상)
+- [ ] 여백 유지 여부
+- [ ] 배경에 적합한 색상인지
+- [ ] 비율 보존 여부
+- [ ] 효과나 수정 사항 없는지

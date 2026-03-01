@@ -1,141 +1,141 @@
-# VRL Brand Guidelines
+# VRL 브랜드 가이드라인
 
-## Brand Identity
+## 브랜드 아이덴티티
 
-VRL is a modern tech company. The brand aesthetic is:
-- **Minimal**: Clean, uncluttered design
-- **Modern**: Contemporary feel, tech-forward
-- **Professional**: Polished and trustworthy
-- **Bold**: Confident use of accent colors
+VRL은 현대적인 기술 기업입니다. 브랜드 미학:
+- **미니멀**: 깔끔하고 군더더기 없는 디자인
+- **현대적**: 현대적인 느낌, 기술 중심적
+- **전문적**: 세련되고 신뢰감 있음
+- **대담함**: 강조 색상의 자신감 있는 사용
 
-## Visual Language
+## 시각적 언어
 
-### Design Principles
+### 디자인 원칙
 
-1. **Simplicity First**
-   - Remove unnecessary elements
-   - One focal point per view
-   - Generous white space
+1. **단순성 우선**
+   - 불필요한 요소 제거
+   - 하나의 시각적 초점
+   - 여유로운 여백
 
-2. **High Contrast**
-   - Dark text on light backgrounds
-   - Bold accent colors on neutral
-   - Clear visual hierarchy
+2. **높은 대비**
+   - 밝은 배경에 어두운 텍스트
+   - 중립적 배경에 강조 색상
+   - 명확한 시각적 계층
 
-3. **Consistency**
-   - Same colors across all materials
-   - Uniform spacing and alignment
-   - Predictable layout patterns
+3. **일관성**
+   - 모든 자료에 동일한 색상
+   - 균일한 여백과 정렬
+   - 예측 가능한 레이아웃 패턴
 
-## Typography
+## 타이포그래피
 
-### Font Stack
+### 폰트 스택
 ```
-Primary: Inter, SF Pro, system-ui, sans-serif
-Code: SF Mono, Fira Code, monospace
+기본: Inter, SF Pro, system-ui, sans-serif
+코드: SF Mono, Fira Code, monospace
 ```
 
-### Weight Usage
-- **Bold (700)**: Headlines, emphasis
-- **SemiBold (600)**: Subheadings
-- **Regular (400)**: Body text
-- **Light (300)**: Captions, secondary text
+### 굵기 사용
+- **Bold (700)**: 헤드라인, 강조
+- **SemiBold (600)**: 소제목
+- **Regular (400)**: 본문 텍스트
+- **Light (300)**: 캡션, 보조 텍스트
 
-### Size Scale
-| Element | Size | Weight |
-|---------|------|--------|
-| Title | 44-60px | Bold |
-| Heading | 32-40px | Bold |
-| Subheading | 24-28px | SemiBold |
-| Body | 18-20px | Regular |
-| Caption | 14-16px | Regular |
+### 크기 체계
+| 요소 | 크기 | 굵기 |
+|------|------|------|
+| 타이틀 | 44-60px | Bold |
+| 헤딩 | 32-40px | Bold |
+| 소제목 | 24-28px | SemiBold |
+| 본문 | 18-20px | Regular |
+| 캡션 | 14-16px | Regular |
 
-## Color Application
+## 색상 적용
 
-### Primary Usage
-- **Lime (`#BDFF00`)**: Highlights, CTAs, key elements
-- **Dark (`#0F172A`)**: All text, dark backgrounds
-- **White**: Backgrounds, text on dark
+### 기본 사용
+- **라임 (`#BDFF00`)**: 강조, CTA, 핵심 요소
+- **다크 (`#0F172A`)**: 모든 텍스트, 어두운 배경
+- **흰색**: 배경, 어두운 배경의 텍스트
 
-### Accent Usage
-- **Orange (`#FF6B35`)**: Secondary emphasis
-- **Slate tones**: Supporting elements
+### 강조 색상 사용
+- **오렌지 (`#FF6B35`)**: 보조 강조
+- **슬레이트 계열**: 보조 요소
 
-### Rules
-- Lime for accents only, never body text
-- Maximum 2 accent colors per composition
-- Maintain 4.5:1 contrast ratio for text
+### 규칙
+- 라임은 강조에만 사용, 본문 텍스트에 절대 사용 금지
+- 구성당 강조 색상 최대 2개
+- 텍스트 대비 비율 4.5:1 이상 유지
 
-## Layout Guidelines
+## 레이아웃 가이드라인
 
-### Spacing
-- Base unit: 8px
-- Small: 8-16px
-- Medium: 24-32px
-- Large: 48-64px
+### 여백
+- 기본 단위: 8px
+- 소: 8-16px
+- 중: 24-32px
+- 대: 48-64px
 
-### Margins
-- Slide edges: 10% minimum
-- Between elements: 16-24px
-- Section breaks: 48px+
+### 마진
+- 슬라이드 가장자리: 최소 10%
+- 요소 사이: 16-24px
+- 섹션 구분: 48px+
 
-### Alignment
-- Left-align body text
-- Center titles on title slides
-- Consistent alignment within sections
+### 정렬
+- 본문 텍스트 왼쪽 정렬
+- 타이틀 슬라이드 타이틀 중앙 정렬
+- 섹션 내 일관된 정렬
 
-## Presentation-Specific
+## 프레젠테이션 특화
 
-### Slide Types
+### 슬라이드 유형
 
-**Title Slide**
-- Large centered title
-- Logo top-left
-- Optional subtitle
-- Dark or light background
+**타이틀 슬라이드**
+- 크고 중앙 정렬된 타이틀
+- 왼쪽 상단 로고
+- 선택적 부제목
+- 어두운 또는 밝은 배경
 
-**Content Slide**
-- Left-aligned header
-- Bullet points or key info
-- Optional visual right side
-- Logo bottom-right
+**콘텐츠 슬라이드**
+- 왼쪽 정렬 헤더
+- 불릿 포인트 또는 핵심 정보
+- 선택적 오른쪽 시각 자료
+- 오른쪽 하단 로고
 
-**Section Divider**
-- Centered section name
-- Solid color background (lime or dark)
-- Minimal elements
+**섹션 구분자**
+- 중앙 섹션 이름
+- 단색 배경 (라임 또는 다크)
+- 최소한의 요소
 
-**Data/Chart Slide**
-- Clear chart title
-- Simplified visualizations
-- Use brand colors in charts
+**데이터/차트 슬라이드**
+- 명확한 차트 타이틀
+- 단순화된 시각화
+- 차트에 브랜드 색상 사용
 
-### Animation
-- Keep animations minimal
-- Fade transitions preferred
-- No flashy effects
-- 0.3-0.5s duration
+### 애니메이션
+- 애니메이션 최소화
+- 페이드 전환 선호
+- 화려한 효과 없음
+- 0.3-0.5초 지속
 
-## Voice & Tone
+## 보이스 & 톤
 
-### Writing Style
-- Clear and direct
-- Technical but accessible
-- Confident, not arrogant
-- Professional, not stuffy
+### 글쓰기 스타일
+- 명확하고 직접적
+- 기술적이지만 접근 가능한
+- 자신감 있게, 거만하지 않게
+- 전문적이지만 딱딱하지 않게
 
-### Presentation Text
-- Short sentences
-- Active voice
-- Bullet points for lists
-- One idea per slide
+### 프레젠테이션 텍스트
+- 짧은 문장
+- 능동태
+- 목록에 불릿 포인트
+- 슬라이드당 하나의 아이디어
 
-## Brand Don'ts
+## 브랜드 금지 사항
 
-- Don't use gradients on logo
-- Don't mix more than 3 colors
-- Don't use busy backgrounds
-- Don't overcrowd slides
-- Don't use decorative fonts
-- Don't add unnecessary graphics
-- Don't deviate from color palette
+- 로고에 그라디언트 사용 금지
+- 3가지 이상의 색상 혼합 금지
+- 복잡한 배경 사용 금지
+- 슬라이드 과부하 금지
+- 장식적 폰트 사용 금지
+- 불필요한 그래픽 추가 금지
+- 색상 팔레트 이탈 금지

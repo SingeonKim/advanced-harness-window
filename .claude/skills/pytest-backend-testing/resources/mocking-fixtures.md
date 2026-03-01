@@ -1,55 +1,55 @@
-# Mocking & Fixtures
+# 모킹 & Fixture
 
-## Overview
+## 개요
 
-Mocking and fixtures are essential for writing maintainable, fast, and isolated tests. This guide covers pytest fixtures, unittest.mock, and advanced mocking patterns for FastAPI applications.
+모킹과 fixture는 유지보수가 쉽고, 빠르고, 격리된 테스트를 작성하는 데 필수적입니다. 이 가이드는 pytest fixture, unittest.mock, 그리고 FastAPI 애플리케이션을 위한 고급 모킹 패턴을 다룹니다.
 
-## Pytest Fixtures
+## Pytest Fixture
 
-### Basic Fixtures
+### 기본 Fixture
 
-Fixtures provide reusable test data and setup:
+Fixture는 재사용 가능한 테스트 데이터와 설정을 제공합니다:
 
 ```python
 import pytest
 
 @pytest.fixture
 def sample_artist():
-    """Fixture that provides a sample artist."""
+    """샘플 아티스트를 제공하는 fixture."""
     return Artist(
         id="test-id",
         name="Test Artist",
         bio="Test bio"
     )
 
-# Use in test
+# 테스트에서 사용
 def test_artist_name(sample_artist):
     assert sample_artist.name == "Test Artist"
 ```
 
-### Fixture Scope
+### Fixture 스코프
 
-Control how long fixtures live:
+fixture의 생존 기간을 제어합니다:
 
 ```python
-# Function scope (default) - new fixture for each test
+# 함수 스코프 (기본값) - 각 테스트마다 새 fixture
 @pytest.fixture
 def function_fixture():
     print("Setup")
     yield "value"
     print("Teardown")
 
-# Class scope - shared across test class
+# 클래스 스코프 - 테스트 클래스 전체에서 공유
 @pytest.fixture(scope="class")
 def class_fixture():
     return "shared_value"
 
-# Module scope - shared across module
+# 모듈 스코프 - 모듈 전체에서 공유
 @pytest.fixture(scope="module")
 def module_fixture():
     return "module_value"
 
-# Session scope - shared across entire test session
+# 세션 스코프 - 전체 테스트 세션에서 공유
 @pytest.fixture(scope="session")
 def session_fixture():
     return "session_value"
@@ -57,33 +57,33 @@ def session_fixture():
 
 ### Fixture Teardown
 
-Use `yield` for cleanup:
+정리를 위해 `yield` 사용:
 
 ```python
 @pytest.fixture
 def database_connection():
-    # Setup
+    # 설정
     conn = create_connection()
 
-    yield conn  # Provide to test
+    yield conn  # 테스트에 제공
 
-    # Teardown (runs after test)
+    # Teardown (테스트 후 실행)
     conn.close()
 
 @pytest.fixture
 async def async_session():
-    # Async setup
+    # 비동기 설정
     session = AsyncSession(engine)
 
     yield session
 
-    # Async teardown
+    # 비동기 teardown
     await session.close()
 ```
 
-### Fixture Dependencies
+### Fixture 의존성
 
-Fixtures can use other fixtures:
+Fixture가 다른 fixture를 사용할 수 있습니다:
 
 ```python
 @pytest.fixture
@@ -100,138 +100,138 @@ def artist_service(mock_session, mock_repository):
     service._repository = mock_repository
     return service
 
-# Use in test
+# 테스트에서 사용
 @pytest.mark.asyncio
 async def test_with_service(artist_service):
     result = await artist_service.get_artist("1")
-    # Test using the fully configured service
+    # 완전히 설정된 service를 사용하여 테스트
 ```
 
 ---
 
-## Fixture Organization
+## Fixture 구성
 
-### conftest.py Structure
+### conftest.py 구조
 
 ```python
-# tests/conftest.py - Global fixtures
+# tests/conftest.py - 전역 fixture
 import pytest
 
 @pytest.fixture
 def mock_session():
-    """Global mock session fixture."""
+    """전역 mock 세션 fixture."""
     return AsyncMock(spec=AsyncSession)
 
-# tests/unit/domain/artist/conftest.py - Domain-specific fixtures
+# tests/unit/domain/artist/conftest.py - 도메인 특화 fixture
 @pytest.fixture
 def sample_artist():
-    """Artist-specific fixture."""
+    """아티스트 특화 fixture."""
     return Artist(id="1", name="Test")
 
 @pytest.fixture
 def sample_artist_dto():
-    """Artist DTO fixture."""
+    """아티스트 DTO fixture."""
     return ArtistRequestDto(name="Test", bio="Bio")
 ```
 
-### Autouse Fixtures
+### Autouse Fixture
 
-Fixtures that run automatically:
+자동으로 실행되는 fixture:
 
 ```python
 @pytest.fixture(autouse=True)
 def setup_logging():
-    """Runs before every test automatically."""
+    """모든 테스트 전에 자동으로 실행됩니다."""
     import logging
     logging.basicConfig(level=logging.DEBUG)
 
 @pytest.fixture(autouse=True)
 async def reset_database():
-    """Runs before every async test."""
-    # Reset database state
+    """모든 async 테스트 전에 실행됩니다."""
+    # 데이터베이스 상태 초기화
     yield
-    # Cleanup after test
+    # 테스트 후 정리
 ```
 
 ---
 
-## unittest.mock Basics
+## unittest.mock 기본
 
 ### MagicMock
 
-For synchronous code:
+동기 코드용:
 
 ```python
 from unittest.mock import MagicMock
 
-# Create mock
+# mock 생성
 mock_obj = MagicMock()
 
-# Configure return value
+# 반환값 설정
 mock_obj.method.return_value = "result"
 
-# Use it
+# 사용
 result = mock_obj.method("arg")
 
-# Verify
+# 검증
 assert result == "result"
 mock_obj.method.assert_called_once_with("arg")
 ```
 
 ### AsyncMock
 
-For asynchronous code:
+비동기 코드용:
 
 ```python
 from unittest.mock import AsyncMock
 
-# Create async mock
+# async mock 생성
 mock_func = AsyncMock(return_value="result")
 
-# Use it
+# 사용
 result = await mock_func("arg")
 
-# Verify
+# 검증
 assert result == "result"
 mock_func.assert_awaited_once_with("arg")
 ```
 
-### Mock Configuration
+### Mock 설정
 
 ```python
-# Return value
+# 반환값
 mock.method.return_value = "value"
 
-# Side effect (different values on each call)
+# Side effect (각 호출마다 다른 값)
 mock.method.side_effect = ["first", "second", "third"]
 
-# Raise exception
+# 예외 발생
 mock.method.side_effect = ValueError("error")
 
-# Custom function
+# 커스텀 함수
 mock.method.side_effect = lambda x: x * 2
 ```
 
 ---
 
-## Mocking Patterns
+## 모킹 패턴
 
-### Pattern 1: Mocking Database Session
+### 패턴 1: 데이터베이스 세션 모킹
 
 ```python
 @pytest.fixture
 def mock_db_session():
-    """Mock SQLModel async session."""
+    """SQLModel async 세션 모킹."""
     mock_session = AsyncMock(spec=AsyncSession)
 
-    # Configure common methods
+    # 공통 메서드 설정
     mock_session.execute = AsyncMock()
     mock_session.commit = AsyncMock()
     mock_session.rollback = AsyncMock()
     mock_session.close = AsyncMock()
     mock_session.refresh = AsyncMock()
 
-    # Properties
+    # 속성
     mock_session.closed = False
 
     return mock_session
@@ -240,27 +240,27 @@ def mock_db_session():
 async def test_with_mock_session(mock_db_session):
     repository = ArtistRepository(mock_db_session)
 
-    # Configure execute to return result
+    # execute가 결과를 반환하도록 설정
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = Artist(id="1")
     mock_db_session.execute.return_value = mock_result
 
-    # Test
+    # 테스트
     result = await repository.get_by_id("1")
 
     assert result.id == "1"
     mock_db_session.execute.assert_awaited_once()
 ```
 
-### Pattern 2: Mocking Repository
+### 패턴 2: Repository 모킹
 
 ```python
 @pytest.fixture
 def mock_artist_repository():
-    """Mock artist repository."""
+    """아티스트 repository 모킹."""
     mock_repo = AsyncMock(spec=ArtistRepository)
 
-    # Configure methods
+    # 메서드 설정
     mock_repo.get_by_id = AsyncMock(return_value=None)
     mock_repo.find_all = AsyncMock(return_value=[])
     mock_repo.create = AsyncMock()
@@ -271,30 +271,30 @@ def mock_artist_repository():
 
 @pytest.mark.asyncio
 async def test_service_with_mock_repo(mock_artist_repository):
-    # Configure specific behavior for this test
+    # 이 테스트를 위한 특정 동작 설정
     artist = Artist(id="1", name="Test")
     mock_artist_repository.get_by_id.return_value = artist
 
-    # Create service with mock
+    # mock과 함께 service 생성
     service = ArtistService(mock_session)
     service._repository = mock_artist_repository
 
-    # Test
+    # 테스트
     result = await service.get_artist("1")
 
     assert result.id == "1"
     mock_artist_repository.get_by_id.assert_awaited_once_with("1")
 ```
 
-### Pattern 3: Mocking External Services
+### 패턴 3: 외부 서비스 모킹
 
 ```python
 @pytest.fixture
 def mock_s3_client():
-    """Mock boto3 S3 client."""
+    """boto3 S3 클라이언트 모킹."""
     mock_client = MagicMock()
 
-    # Configure S3 operations
+    # S3 작업 설정
     mock_client.upload_file = MagicMock(return_value=None)
     mock_client.generate_presigned_url = MagicMock(
         return_value="https://example.com/presigned"
@@ -303,31 +303,31 @@ def mock_s3_client():
     return mock_client
 
 def test_upload_to_s3(mock_s3_client, mocker):
-    # Patch boto3 to return our mock
+    # 우리 mock을 반환하도록 boto3 패치
     mocker.patch("boto3.client", return_value=mock_s3_client)
 
-    # Test code that uses S3
+    # S3를 사용하는 코드 테스트
     upload_file_to_s3("test.jpg", "bucket")
 
-    # Verify
+    # 검증
     mock_s3_client.upload_file.assert_called_once()
 ```
 
 ---
 
-## Advanced Mocking with pytest-mock
+## pytest-mock을 사용한 고급 모킹
 
-### Using mocker Fixture
+### mocker Fixture 사용
 
-pytest-mock provides the `mocker` fixture for cleaner mocking:
+pytest-mock은 더 깔끔한 모킹을 위한 `mocker` fixture를 제공합니다:
 
 ```python
 def test_with_mocker(mocker):
-    # Patch a function
+    # 함수 패치
     mock_func = mocker.patch("backend.utils.helpers.some_function")
     mock_func.return_value = "mocked"
 
-    # Use it
+    # 사용
     result = some_function()
 
     assert result == "mocked"
@@ -335,24 +335,24 @@ def test_with_mocker(mocker):
 
 @pytest.mark.asyncio
 async def test_async_with_mocker(mocker):
-    # Patch async function
+    # async 함수 패치
     mock_func = mocker.patch(
         "backend.domain.artist.service.ArtistService.get_artist",
         new_callable=AsyncMock
     )
     mock_func.return_value = ArtistResponseDto(id="1", name="Test")
 
-    # Test
+    # 테스트
     result = await service.get_artist("1")
 
     assert result.id == "1"
 ```
 
-### Patching Objects
+### 객체 패치
 
 ```python
 def test_patch_object(mocker):
-    # Patch a method on an object
+    # 객체의 메서드 패치
     service = ArtistService(mock_session)
 
     mocker.patch.object(
@@ -361,35 +361,35 @@ def test_patch_object(mocker):
         return_value=Artist(id="1")
     )
 
-    # Test uses patched method
+    # 테스트가 패치된 메서드 사용
     result = service.get_artist("1")
 ```
 
-### Patching Classes
+### 클래스 패치
 
 ```python
 def test_patch_class(mocker):
-    # Patch entire class
+    # 전체 클래스 패치
     MockRepository = mocker.patch(
         "backend.domain.artist.repository.ArtistRepository"
     )
 
-    # Configure mock instance
+    # mock 인스턴스 설정
     mock_instance = MockRepository.return_value
     mock_instance.get_by_id = AsyncMock(return_value=Artist(id="1"))
 
-    # Code that creates ArtistRepository will get mock
-    service = ArtistService(mock_session)  # Uses MockRepository
+    # ArtistRepository를 생성하는 코드는 mock을 받게 됨
+    service = ArtistService(mock_session)  # MockRepository 사용
 
-    # Verify
+    # 검증
     MockRepository.assert_called_once()
 ```
 
 ---
 
-## Mocking Database Results
+## 데이터베이스 결과 모킹
 
-### Mocking SQLModel Query Results
+### SQLModel 쿼리 결과 모킹
 
 ```python
 @pytest.mark.asyncio
@@ -397,13 +397,13 @@ async def test_repository_query():
     # Arrange
     mock_session = AsyncMock(spec=AsyncSession)
 
-    # Create mock result
+    # mock 결과 생성
     mock_result = MagicMock()
 
-    # For single result: scalar_one_or_none()
+    # 단일 결과: scalar_one_or_none()
     mock_result.scalar_one_or_none.return_value = Artist(id="1", name="Test")
 
-    # For multiple results: scalars().all()
+    # 여러 결과: scalars().all()
     mock_scalars = MagicMock()
     mock_scalars.all.return_value = [
         Artist(id="1", name="Artist 1"),
@@ -411,7 +411,7 @@ async def test_repository_query():
     ]
     mock_result.scalars.return_value = mock_scalars
 
-    # Configure session.execute to return mock result
+    # session.execute가 mock 결과를 반환하도록 설정
     mock_session.execute = AsyncMock(return_value=mock_result)
 
     # Act
@@ -422,29 +422,29 @@ async def test_repository_query():
     assert result.id == "1"
 ```
 
-### Mocking Different Query Types
+### 다양한 쿼리 유형 모킹
 
 ```python
-# 1. Get single item
+# 1. 단일 항목 조회
 mock_result = MagicMock()
 mock_result.scalar_one_or_none.return_value = artist
 mock_session.execute.return_value = mock_result
 
-# 2. Get all items
+# 2. 전체 항목 조회
 mock_result = MagicMock()
 mock_scalars = MagicMock()
 mock_scalars.all.return_value = [artist1, artist2]
 mock_result.scalars.return_value = mock_scalars
 mock_session.execute.return_value = mock_result
 
-# 3. Get first item
+# 3. 첫 번째 항목 조회
 mock_result = MagicMock()
 mock_scalars = MagicMock()
 mock_scalars.first.return_value = artist
 mock_result.scalars.return_value = mock_scalars
 mock_session.execute.return_value = mock_result
 
-# 4. Count
+# 4. 개수 조회
 mock_result = MagicMock()
 mock_result.scalar.return_value = 42
 mock_session.execute.return_value = mock_result
@@ -452,49 +452,49 @@ mock_session.execute.return_value = mock_result
 
 ---
 
-## Mock Assertions
+## Mock 검증
 
-### Verifying Calls
+### 호출 검증
 
 ```python
-# Called at all
+# 호출 여부
 mock.method.assert_called()
 
-# Called once
+# 한 번 호출
 mock.method.assert_called_once()
 
-# Called with specific arguments
+# 특정 인수로 호출
 mock.method.assert_called_with("arg1", "arg2")
 mock.method.assert_called_once_with("arg1", "arg2")
 
-# Called with any arguments
+# 임의 인수로 호출
 mock.method.assert_called()
 
-# Not called
+# 호출 안 됨
 mock.method.assert_not_called()
 
-# Number of calls
+# 호출 횟수
 assert mock.method.call_count == 3
 
-# Async versions
+# Async 버전
 await mock.async_method("arg")
 mock.async_method.assert_awaited()
 mock.async_method.assert_awaited_once()
 mock.async_method.assert_awaited_with("arg")
 ```
 
-### Inspecting Call Arguments
+### 호출 인수 검사
 
 ```python
-# Get all calls
+# 모든 호출 가져오기
 calls = mock.method.call_args_list
 
-# Get most recent call
+# 가장 최근 호출 가져오기
 args, kwargs = mock.method.call_args
 assert args == ("arg1",)
 assert kwargs == {"key": "value"}
 
-# Check specific call
+# 특정 호출 확인
 mock.method.assert_any_call("arg1")
 mock.method.assert_has_calls([
     call("first"),
@@ -504,9 +504,9 @@ mock.method.assert_has_calls([
 
 ---
 
-## Fixture Parameterization
+## Fixture 파라미터화
 
-### Testing Multiple Scenarios
+### 여러 시나리오 테스팅
 
 ```python
 @pytest.fixture(params=[
@@ -529,7 +529,7 @@ def test_name_validation(name_scenario):
             Artist(id="1", name=name)
 ```
 
-### Parameterized Fixtures with IDs
+### ID가 있는 파라미터화 Fixture
 
 ```python
 @pytest.fixture(
@@ -544,159 +544,159 @@ def artist_data(request):
     return {"name": name, "bio": bio}
 
 def test_with_named_scenarios(artist_data):
-    # Test runs twice with descriptive IDs
+    # 설명적인 ID로 두 번 실행됨
     assert artist_data["name"]
 ```
 
 ---
 
-## Mocking Best Practices
+## 모킹 모범 사례
 
-### 1. Mock at the Right Level
+### 1. 올바른 계층에서 모킹
 
 ```python
-# ✅ GOOD - Mock repository when testing service
+# service 테스팅 시 repository 모킹 (올바른 방법)
 @pytest.mark.asyncio
 async def test_service():
     mock_repo = AsyncMock()
     mock_repo.get_by_id = AsyncMock(return_value=artist)
 
     service = ArtistService(mock_session)
-    service._repository = mock_repo  # Mock at boundary
+    service._repository = mock_repo  # 경계에서 모킹
 
     result = await service.get_artist("1")
 
-# ❌ BAD - Mocking too deep
+# 너무 깊은 계층까지 모킹 (잘못된 방법)
 @pytest.mark.asyncio
 async def test_service():
-    mock_db = AsyncMock()  # Mocking database internals
-    # Too coupled to implementation
+    mock_db = AsyncMock()  # 데이터베이스 내부를 모킹
+    # 구현에 너무 결합되어 있음
 ```
 
-### 2. Don't Mock What You're Testing
+### 2. 테스트 대상은 모킹하지 않기
 
 ```python
-# ❌ BAD - Mocking the service you're testing
+# 테스트 중인 service를 모킹 (잘못된 방법)
 def test_service():
     mock_service = AsyncMock()
     mock_service.get_artist = AsyncMock(return_value=artist)
 
-    # You're testing the mock, not the service!
+    # mock을 테스트하는 것이지, 실제 service를 테스트하는 게 아님!
     result = await mock_service.get_artist("1")
 
-# ✅ GOOD - Testing actual service, mocking dependencies
+# 실제 service 테스트, 의존성만 모킹 (올바른 방법)
 @pytest.mark.asyncio
 async def test_service():
     mock_repo = AsyncMock()
     mock_repo.get_by_id = AsyncMock(return_value=artist)
 
-    service = ArtistService(mock_session)  # Real service
-    service._repository = mock_repo  # Mock dependency
+    service = ArtistService(mock_session)  # 실제 service
+    service._repository = mock_repo  # 의존성 모킹
 
     result = await service.get_artist("1")
 ```
 
-### 3. Use spec for Type Safety
+### 3. 타입 안전성을 위해 spec 사용
 
 ```python
-# ✅ GOOD - Using spec prevents invalid usage
+# spec을 사용하면 잘못된 사용을 방지 (올바른 방법)
 mock_session = AsyncMock(spec=AsyncSession)
-mock_session.nonexistent_method()  # Raises AttributeError
+mock_session.nonexistent_method()  # AttributeError 발생
 
-# ❌ BAD - Without spec, anything goes
+# spec 없이는 아무거나 허용 (잘못된 방법)
 mock_session = AsyncMock()
-mock_session.nonexistent_method()  # Allowed, but wrong
+mock_session.nonexistent_method()  # 허용되지만, 잘못된 사용
 ```
 
-### 4. Reset Mocks Between Tests
+### 4. 테스트 간 Mock 초기화
 
 ```python
 @pytest.fixture
 def mock_service():
     mock = AsyncMock()
     yield mock
-    # Automatically reset between tests
+    # 테스트 간에 자동으로 초기화됨
 
-# Or manually reset
+# 또는 수동으로 초기화
 def test_1(mock_service):
     await mock_service.method()
     mock_service.method.assert_awaited_once()
 
 def test_2(mock_service):
-    # mock_service is fresh, call count is 0
+    # mock_service가 새로 시작되어 call count가 0임
     await mock_service.method()
     mock_service.method.assert_awaited_once()
 ```
 
 ---
 
-## Common Pitfalls
+## 일반적인 함정
 
-### 1. Forgetting to Configure Mock Returns
+### 1. Mock 반환값 설정 누락
 
 ```python
-# ❌ BAD - Mock returns MagicMock by default
+# Mock이 기본적으로 MagicMock을 반환 (잘못된 방법)
 mock_repo = AsyncMock()
 result = await mock_repo.get_by_id("1")
-# result is a MagicMock, not an Artist!
+# result가 Artist가 아닌 MagicMock!
 
-# ✅ GOOD - Configure return value
+# 반환값 명시적으로 설정 (올바른 방법)
 mock_repo = AsyncMock()
 mock_repo.get_by_id = AsyncMock(return_value=Artist(id="1"))
 result = await mock_repo.get_by_id("1")
-# result is an Artist
+# result가 Artist
 ```
 
-### 2. Not Awaiting AsyncMock
+### 2. AsyncMock에 await 누락
 
 ```python
-# ❌ BAD - Missing await
+# await 누락 (잘못된 방법)
 mock_func = AsyncMock(return_value="result")
-result = mock_func()  # Returns coroutine!
+result = mock_func()  # coroutine을 반환!
 
-# ✅ GOOD - With await
-result = await mock_func()  # Returns "result"
+# await 있음 (올바른 방법)
+result = await mock_func()  # "result"를 반환
 ```
 
-### 3. Mocking in Wrong Place
+### 3. 잘못된 위치에서 모킹
 
 ```python
-# File: backend/domain/artist/service.py
+# 파일: backend/domain/artist/service.py
 from backend.domain.artist.repository import ArtistRepository
 
 class ArtistService:
     def __init__(self):
         self.repo = ArtistRepository()
 
-# ❌ BAD - Patching where it's defined
+# 정의된 위치 패치 (잘못된 방법)
 mocker.patch("backend.domain.artist.repository.ArtistRepository")
 
-# ✅ GOOD - Patch where it's used
+# 사용되는 위치 패치 (올바른 방법)
 mocker.patch("backend.domain.artist.service.ArtistRepository")
 ```
 
 ---
 
-## Summary Checklist
+## 체크리스트
 
-When using mocks and fixtures:
+Mock과 fixture 사용 시:
 
-- [ ] Use fixtures for reusable test data
-- [ ] Organize fixtures in conftest.py
-- [ ] Use appropriate fixture scope
-- [ ] Mock at layer boundaries
-- [ ] Use AsyncMock for async functions
-- [ ] Use spec parameter for type safety
-- [ ] Configure mock return values explicitly
-- [ ] Verify mock calls with assert_* methods
-- [ ] Don't mock what you're testing
-- [ ] Reset mocks between tests
-- [ ] Use pytest-mock for cleaner patching
+- [ ] 재사용 가능한 테스트 데이터에 fixture 사용
+- [ ] conftest.py에 fixture 구성
+- [ ] 적절한 fixture 스코프 사용
+- [ ] 계층 경계에서 모킹
+- [ ] async 함수에 AsyncMock 사용
+- [ ] 타입 안전성을 위해 spec 파라미터 사용
+- [ ] Mock 반환값을 명시적으로 설정
+- [ ] assert_* 메서드로 mock 호출 검증
+- [ ] 테스트 대상은 모킹하지 않기
+- [ ] 테스트 간 mock 초기화
+- [ ] 더 깔끔한 패치를 위해 pytest-mock 사용
 
 ---
 
-## Related Resources
+## 관련 리소스
 
-- [unit-testing.md](unit-testing.md) - Unit testing patterns
-- [async-testing.md](async-testing.md) - Async-specific mocking
-- [testing-architecture.md](testing-architecture.md) - Overall testing strategy
+- [unit-testing.md](unit-testing.md) - Unit 테스팅 패턴
+- [async-testing.md](async-testing.md) - Async 특화 모킹
+- [testing-architecture.md](testing-architecture.md) - 전체 테스팅 전략

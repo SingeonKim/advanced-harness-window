@@ -1,40 +1,40 @@
-# Unit Testing
+# Unit 테스팅
 
-## Overview
+## 개요
 
-Unit tests focus on testing individual functions, methods, or classes in isolation. They should be fast, independent, and test a single unit of functionality.
+Unit 테스트는 격리된 상태에서 개별 함수, 메서드 또는 클래스를 테스트하는 데 초점을 맞춥니다. 빠르고, 독립적이며, 단일 기능 단위를 테스트해야 합니다.
 
-## Unit Test Characteristics
+## Unit 테스트 특징
 
-### Fast
-- Execute in milliseconds
-- No database connections
-- No network calls
-- No file I/O
+### 빠름
+- 밀리초 단위로 실행
+- 데이터베이스 연결 없음
+- 네트워크 호출 없음
+- 파일 I/O 없음
 
-### Isolated
-- Test one thing at a time
-- Mock all dependencies
-- No shared state between tests
-- Independent of test execution order
+### 격리됨
+- 한 번에 한 가지만 테스트
+- 모든 의존성 모킹
+- 테스트 간 공유 상태 없음
+- 테스트 실행 순서에 독립적
 
-### Focused
-- Test single responsibility
-- Clear arrange-act-assert structure
-- One assertion concept per test
+### 집중됨
+- 단일 책임 테스트
+- 명확한 Arrange-Act-Assert 구조
+- 테스트당 하나의 assertion 개념
 
 ---
 
-## AAA Pattern (Arrange-Act-Assert)
+## AAA 패턴 (Arrange-Act-Assert)
 
-### Structure
+### 구조
 
-Every unit test should follow the AAA pattern:
+모든 unit 테스트는 AAA 패턴을 따라야 합니다:
 
 ```python
 @pytest.mark.asyncio
 async def test_create_artist_success():
-    # Arrange - Set up test data and mocks
+    # Arrange - 테스트 데이터와 mock 설정
     mock_session = AsyncMock(spec=AsyncSession)
     mock_repo = AsyncMock()
     mock_repo.create = AsyncMock(return_value=artist_model)
@@ -44,25 +44,25 @@ async def test_create_artist_success():
 
     request_dto = ArtistRequestDto(name="Test", bio="Bio")
 
-    # Act - Execute the code under test
+    # Act - 테스트할 코드 실행
     result = await service.create_artist(request_dto)
 
-    # Assert - Verify the outcome
+    # Assert - 결과 확인
     assert result.name == "Test"
     assert result.bio == "Bio"
     mock_repo.create.assert_awaited_once()
 ```
 
-### Benefits
-- **Readability**: Clear structure makes tests easy to understand
-- **Maintainability**: Easy to modify and debug
-- **Documentation**: Tests serve as usage examples
+### 장점
+- **가독성**: 명확한 구조로 테스트를 쉽게 이해
+- **유지보수성**: 수정과 디버깅이 용이
+- **문서화**: 테스트가 사용 예시로 활용됨
 
 ---
 
-## Testing Repository Layer
+## Repository 계층 테스팅
 
-### Basic Repository Test
+### 기본 Repository 테스트
 
 ```python
 from unittest.mock import AsyncMock, MagicMock
@@ -74,7 +74,7 @@ async def test_get_by_id_returns_artist():
     mock_session = AsyncMock(spec=AsyncSession)
     expected_artist = Artist(id="test-id", name="Test Artist")
 
-    # Mock the execute result
+    # execute 결과 모킹
     mock_result = MagicMock()
     mock_result.scalar_one_or_none.return_value = expected_artist
     mock_session.execute = AsyncMock(return_value=mock_result)
@@ -91,7 +91,7 @@ async def test_get_by_id_returns_artist():
     mock_session.execute.assert_awaited_once()
 ```
 
-### Testing Query Construction
+### 쿼리 구성 테스팅
 
 ```python
 @pytest.mark.asyncio
@@ -108,14 +108,14 @@ async def test_find_by_name_constructs_correct_query():
     await repository.find_by_name("Test Artist")
 
     # Assert
-    # Verify execute was called with a select statement
+    # execute가 select 문으로 호출되었는지 확인
     mock_session.execute.assert_awaited_once()
     call_args = mock_session.execute.call_args[0][0]
-    # You can verify the query structure here
+    # 여기서 쿼리 구조를 확인할 수 있음
     assert str(call_args).lower().__contains__("select")
 ```
 
-### Testing Error Cases
+### 에러 케이스 테스팅
 
 ```python
 @pytest.mark.asyncio
@@ -137,9 +137,9 @@ async def test_get_by_id_returns_none_when_not_found():
 
 ---
 
-## Testing Service Layer
+## Service 계층 테스팅
 
-### Basic Service Test
+### 기본 Service 테스트
 
 ```python
 @pytest.mark.asyncio
@@ -163,7 +163,7 @@ async def test_get_artist_success():
     mock_repo.get_by_id.assert_awaited_once_with("1")
 ```
 
-### Testing Business Logic
+### 비즈니스 로직 테스팅
 
 ```python
 @pytest.mark.asyncio
@@ -172,7 +172,7 @@ async def test_create_artist_validates_unique_name():
     mock_session = AsyncMock()
     mock_repo = AsyncMock()
 
-    # Simulate existing artist with same name
+    # 동일한 이름의 기존 아티스트 시뮬레이션
     existing_artist = Artist(id="existing", name="Existing Artist")
     mock_repo.find_by_name = AsyncMock(return_value=existing_artist)
 
@@ -185,11 +185,11 @@ async def test_create_artist_validates_unique_name():
     with pytest.raises(ConflictError, match="Artist.*already exists"):
         await service.create_artist(request_dto)
 
-    # Verify create was NOT called
+    # create가 호출되지 않았는지 확인
     mock_repo.create.assert_not_awaited()
 ```
 
-### Testing Data Transformation
+### 데이터 변환 테스팅
 
 ```python
 @pytest.mark.asyncio
@@ -208,14 +208,14 @@ async def test_get_artist_returns_dto():
     result = await service.get_artist("1")
 
     # Assert
-    # Verify it's a DTO, not the model
+    # 모델이 아닌 DTO인지 확인
     from backend.dtos.artist import ArtistResponseDto
     assert isinstance(result, ArtistResponseDto)
     assert result.id == artist_model.id
     assert result.name == artist_model.name
 ```
 
-### Testing Error Handling
+### 에러 처리 테스팅
 
 ```python
 @pytest.mark.asyncio
@@ -237,9 +237,9 @@ async def test_get_artist_raises_not_found_error():
 
 ---
 
-## Testing Models and DTOs
+## 모델과 DTO 테스팅
 
-### Testing Model Creation
+### 모델 생성 테스팅
 
 ```python
 def test_artist_model_creation():
@@ -256,17 +256,17 @@ def test_artist_model_creation():
     assert artist.bio == "Test bio"
 ```
 
-### Testing DTO Validation
+### DTO 유효성 검사 테스팅
 
 ```python
 from pydantic import ValidationError
 
 def test_artist_request_dto_validates_name():
-    # Valid name
+    # 유효한 이름
     dto = ArtistRequestDto(name="Valid Name", bio="Bio")
     assert dto.name == "Valid Name"
 
-    # Empty name should fail
+    # 빈 이름은 실패해야 함
     with pytest.raises(ValidationError) as exc_info:
         ArtistRequestDto(name="", bio="Bio")
 
@@ -274,7 +274,7 @@ def test_artist_request_dto_validates_name():
     assert any(e["loc"] == ("name",) for e in errors)
 
 def test_artist_request_dto_validates_name_length():
-    # Name too long (> 255 chars)
+    # 이름이 너무 긴 경우 (> 255자)
     long_name = "a" * 256
 
     with pytest.raises(ValidationError) as exc_info:
@@ -284,7 +284,7 @@ def test_artist_request_dto_validates_name_length():
     assert any("max_length" in str(e) for e in errors)
 ```
 
-### Testing Custom Validators
+### 커스텀 유효성 검사 테스팅
 
 ```python
 def test_artist_dto_custom_validator():
@@ -295,23 +295,23 @@ def test_artist_dto_custom_validator():
         @field_validator('name')
         def name_must_not_be_whitespace(cls, v):
             if not v.strip():
-                raise ValueError('Name cannot be only whitespace')
+                raise ValueError('이름은 공백으로만 구성될 수 없습니다')
             return v.strip()
 
-    # Valid name
+    # 유효한 이름
     dto = ArtistDto(name="  Test  ")
-    assert dto.name == "Test"  # Trimmed
+    assert dto.name == "Test"  # 트리밍됨
 
-    # Only whitespace should fail
+    # 공백만 있는 이름은 실패해야 함
     with pytest.raises(ValidationError):
         ArtistDto(name="   ")
 ```
 
 ---
 
-## Testing Utility Functions
+## 유틸리티 함수 테스팅
 
-### Pure Functions
+### 순수 함수
 
 ```python
 from backend.utils.slug import create_slug
@@ -329,7 +329,7 @@ def test_create_slug_handles_unicode():
     assert create_slug("Café") == "cafe"
 ```
 
-### Functions with Side Effects
+### 사이드 이펙트가 있는 함수
 
 ```python
 from unittest.mock import patch, mock_open
@@ -349,24 +349,24 @@ def test_write_file():
 
 ---
 
-## Test Organization Patterns
+## 테스트 조직화 패턴
 
-### Using Test Classes
+### 테스트 클래스 사용
 
-Group related tests with classes:
+클래스로 관련 테스트 그룹화:
 
 ```python
 class TestArtistRepository:
-    """Test suite for ArtistRepository."""
+    """ArtistRepository 테스트 스위트."""
 
     @pytest.fixture
     def mock_session(self):
-        """Fixture for mocked session, reused by all tests."""
+        """모킹된 세션 fixture, 모든 테스트에서 재사용."""
         return AsyncMock(spec=AsyncSession)
 
     @pytest.fixture
     def repository(self, mock_session):
-        """Fixture for repository instance."""
+        """repository 인스턴스 fixture."""
         return ArtistRepository(mock_session)
 
     @pytest.mark.asyncio
@@ -384,13 +384,13 @@ class TestArtistRepository:
 
     @pytest.mark.asyncio
     async def test_get_by_id_not_found(self, repository, mock_session):
-        # Similar test...
+        # 유사한 테스트...
         pass
 ```
 
-### Parametrized Tests
+### 파라미터화된 테스트
 
-Test multiple scenarios with one test function:
+하나의 테스트 함수로 여러 시나리오 테스트:
 
 ```python
 @pytest.mark.parametrize("input_name,expected_slug", [
@@ -403,9 +403,9 @@ def test_create_slug_various_inputs(input_name, expected_slug):
     assert create_slug(input_name) == expected_slug
 ```
 
-### Shared Fixtures
+### 공유 Fixture
 
-Create reusable fixtures in conftest.py:
+conftest.py에서 재사용 가능한 fixture 생성:
 
 ```python
 # conftest.py
@@ -426,19 +426,19 @@ def test_with_shared_fixture(sample_artist):
 
 ---
 
-## Common Mocking Patterns
+## 공통 모킹 패턴
 
-### Mocking Async Functions
+### Async 함수 모킹
 
 ```python
 from unittest.mock import AsyncMock
 
 @pytest.mark.asyncio
 async def test_async_function():
-    # Create async mock
+    # async mock 생성
     mock_func = AsyncMock(return_value="result")
 
-    # Call it
+    # 호출
     result = await mock_func("arg")
 
     # Assert
@@ -446,20 +446,20 @@ async def test_async_function():
     mock_func.assert_awaited_once_with("arg")
 ```
 
-### Mocking Classes
+### 클래스 모킹
 
 ```python
 from unittest.mock import MagicMock
 
 def test_mock_class():
-    # Mock the class
+    # 클래스 모킹
     MockClass = MagicMock()
     mock_instance = MockClass.return_value
 
-    # Configure mock instance
+    # mock 인스턴스 설정
     mock_instance.method.return_value = "result"
 
-    # Use it
+    # 사용
     instance = MockClass()
     result = instance.method("arg")
 
@@ -468,52 +468,52 @@ def test_mock_class():
     mock_instance.method.assert_called_once_with("arg")
 ```
 
-### Mocking Attributes
+### 속성 모킹
 
 ```python
 def test_mock_attributes():
-    # Create mock with attributes
+    # 속성이 있는 mock 생성
     mock_obj = MagicMock()
     mock_obj.attribute = "value"
     mock_obj.method.return_value = "result"
 
-    # Use it
+    # 사용
     assert mock_obj.attribute == "value"
     assert mock_obj.method() == "result"
 ```
 
 ---
 
-## Best Practices
+## 모범 사례
 
-### 1. One Assertion Concept Per Test
+### 1. 테스트당 하나의 assertion 개념
 
 ```python
-# ✅ GOOD - Tests one thing
+# 한 가지를 테스트 (권장)
 def test_create_slug_converts_to_lowercase():
     assert create_slug("HELLO") == "hello"
 
 def test_create_slug_replaces_spaces():
     assert create_slug("hello world") == "hello-world"
 
-# ❌ BAD - Tests multiple things
+# 여러 가지를 테스트 (금지)
 def test_create_slug():
     assert create_slug("HELLO") == "hello"
     assert create_slug("hello world") == "hello-world"
     assert create_slug("hello@world") == "helloworld"
 ```
 
-### 2. Descriptive Test Names
+### 2. 설명적인 테스트 이름
 
 ```python
-# ✅ GOOD - Clear what, when, expected
+# 명확한 이름 (권장)
 def test_get_artist_when_not_found_raises_not_found_error():
     pass
 
 def test_create_artist_with_duplicate_name_raises_conflict_error():
     pass
 
-# ❌ BAD - Vague
+# 모호한 이름 (금지)
 def test_get_artist():
     pass
 
@@ -521,30 +521,30 @@ def test_error():
     pass
 ```
 
-### 3. Don't Test Implementation Details
+### 3. 구현 세부사항 테스트하지 않기
 
 ```python
-# ✅ GOOD - Tests behavior
+# 동작 테스트 (권장)
 @pytest.mark.asyncio
 async def test_create_artist_saves_to_database():
     # Act
     result = await service.create_artist(dto)
 
-    # Assert - Verify it was saved (behavior)
+    # Assert - 저장되었는지 확인 (동작)
     mock_repo.create.assert_awaited_once()
     assert result.id is not None
 
-# ❌ BAD - Tests implementation
+# 구현 테스트 (금지)
 @pytest.mark.asyncio
 async def test_create_artist_calls_repository_create_method():
-    # Too focused on how it's done, not what it does
+    # 어떻게 하는지에 너무 집중, 무엇을 하는지 아님
     pass
 ```
 
-### 4. Test Error Cases
+### 4. 에러 케이스 테스트
 
 ```python
-# Always test both success and failure
+# 성공과 실패 모두 테스트
 @pytest.mark.asyncio
 async def test_get_artist_success():
     mock_repo.get_by_id = AsyncMock(return_value=artist)
@@ -558,36 +558,36 @@ async def test_get_artist_not_found():
         await service.get_artist("nonexistent")
 ```
 
-### 5. Keep Tests Simple
+### 5. 테스트를 단순하게 유지
 
 ```python
-# ✅ GOOD - Simple and clear
+# 단순하고 명확한 테스트 (권장)
 @pytest.mark.asyncio
 async def test_create_artist():
     mock_repo.create = AsyncMock(return_value=artist)
     result = await service.create_artist(dto)
     assert result.name == dto.name
 
-# ❌ BAD - Too complex
+# 너무 복잡한 테스트 (금지)
 @pytest.mark.asyncio
 async def test_create_artist_complex():
-    # Too much setup, multiple operations, unclear what's being tested
+    # 너무 많은 설정, 다중 작업, 무엇을 테스트하는지 불명확
     for i in range(10):
         dto = create_dto(f"Artist {i}")
         result = await service.create_artist(dto)
         if i % 2 == 0:
             assert result.name.startswith("Artist")
-        # ... more complex logic
+        # ... 더 복잡한 로직
 ```
 
 ---
 
-## Common Pitfalls
+## 공통 함정
 
-### 1. Not Isolating Tests
+### 1. 테스트 격리하지 않기
 
 ```python
-# ❌ BAD - Shared state between tests
+# 테스트 간 공유 상태 (금지)
 global_artist = None
 
 def test_create():
@@ -595,54 +595,55 @@ def test_create():
     global_artist = create_artist()
 
 def test_get():
-    # Depends on test_create running first!
+    # test_create가 먼저 실행되어야 함에 의존!
     assert global_artist is not None
 ```
 
-### 2. Testing Too Much
+### 2. 너무 많이 테스트하기
 
 ```python
-# ❌ BAD - Testing framework code, not your code
+# 프레임워크 코드 테스트 (금지)
 def test_pydantic_validation():
-    # Don't test that Pydantic validates - test YOUR validation logic
+    # Pydantic이 유효성 검사를 한다는 것을 테스트하지 마세요
+    # 당신의 유효성 검사 로직을 테스트하세요
     with pytest.raises(ValidationError):
-        ArtistDto(name=None)  # Pydantic handles this, not your code
+        ArtistDto(name=None)  # Pydantic이 처리, 당신의 코드가 아님
 ```
 
-### 3. Mocking What You're Testing
+### 3. 테스트하는 것을 모킹하기
 
 ```python
-# ❌ BAD - Mocking the thing you're testing
+# 테스트 중인 것을 모킹 (금지)
 def test_service():
     mock_service = AsyncMock()
     mock_service.get_artist = AsyncMock(return_value=artist)
 
-    # You're testing the mock, not the actual service!
+    # mock을 테스트하는 것, 실제 service가 아님!
     result = await mock_service.get_artist("1")
     assert result == artist
 ```
 
 ---
 
-## Summary Checklist
+## 요약 체크리스트
 
-When writing unit tests:
+unit 테스트 작성 시:
 
-- [ ] Test one unit of functionality
-- [ ] Mock all external dependencies
-- [ ] Follow AAA pattern
-- [ ] Use descriptive test names
-- [ ] Test both success and error cases
-- [ ] Keep tests simple and focused
-- [ ] Ensure tests are fast (<100ms)
-- [ ] Make tests independent
-- [ ] Don't test implementation details
-- [ ] Use fixtures for reusable setup
+- [ ] 단일 기능 단위 테스트
+- [ ] 모든 외부 의존성 모킹
+- [ ] AAA 패턴 따르기
+- [ ] 설명적인 테스트 이름 사용
+- [ ] 성공 케이스와 에러 케이스 모두 테스트
+- [ ] 테스트를 단순하고 집중적으로 유지
+- [ ] 테스트가 빠른지 확인 (<100ms)
+- [ ] 테스트를 독립적으로 만들기
+- [ ] 구현 세부사항 테스트하지 않기
+- [ ] 재사용 가능한 설정에 fixture 사용
 
 ---
 
-## Related Resources
+## 관련 리소스
 
-- [testing-architecture.md](testing-architecture.md) - Overall testing strategy
-- [mocking-fixtures.md](mocking-fixtures.md) - Advanced mocking techniques
-- [async-testing.md](async-testing.md) - Async-specific patterns
+- [testing-architecture.md](testing-architecture.md) - 전체 테스팅 전략
+- [mocking-fixtures.md](mocking-fixtures.md) - 고급 모킹 기술
+- [async-testing.md](async-testing.md) - Async 특정 패턴

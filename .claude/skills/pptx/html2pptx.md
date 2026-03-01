@@ -1,93 +1,93 @@
-# HTML to PowerPoint Guide
+# HTML을 PowerPoint로 변환 가이드
 
-Convert HTML slides to PowerPoint presentations with accurate positioning using the `html2pptx.js` library.
+`html2pptx.js` 라이브러리를 사용하여 HTML 슬라이드를 정확한 위치 지정으로 PowerPoint 프레젠테이션으로 변환합니다.
 
-## Table of Contents
+## 목차
 
-1. [Creating HTML Slides](#creating-html-slides)
-2. [Using the html2pptx Library](#using-the-html2pptx-library)
-3. [Using PptxGenJS](#using-pptxgenjs)
+1. [HTML 슬라이드 생성](#html-슬라이드-생성)
+2. [html2pptx 라이브러리 사용](#html2pptx-라이브러리-사용)
+3. [PptxGenJS 사용](#pptxgenjs-사용)
 
 ---
 
-## Creating HTML Slides
+## HTML 슬라이드 생성
 
-Every HTML slide must include proper body dimensions:
+모든 HTML 슬라이드에는 적절한 body 치수가 포함되어야 합니다:
 
-### Layout Dimensions
+### 레이아웃 치수
 
-- **16:9** (default): `width: 720pt; height: 405pt`
+- **16:9** (기본값): `width: 720pt; height: 405pt`
 - **4:3**: `width: 720pt; height: 540pt`
 - **16:10**: `width: 720pt; height: 450pt`
 
-### Supported Elements
+### 지원 요소
 
-- `<p>`, `<h1>`-`<h6>` - Text with styling
-- `<ul>`, `<ol>` - Lists (never use manual bullets •, -, *)
-- `<b>`, `<strong>` - Bold text (inline formatting)
-- `<i>`, `<em>` - Italic text (inline formatting)
-- `<u>` - Underlined text (inline formatting)
-- `<span>` - Inline formatting with CSS styles (bold, italic, underline, color)
-- `<br>` - Line breaks
-- `<div>` with bg/border - Becomes shape
-- `<img>` - Images
-- `class="placeholder"` - Reserved space for charts (returns `{ id, x, y, w, h }`)
+- `<p>`, `<h1>`-`<h6>` - 스타일이 있는 텍스트
+- `<ul>`, `<ol>` - 목록 (수동 불릿 •, -, * 절대 사용 금지)
+- `<b>`, `<strong>` - 굵은 텍스트 (인라인 포맷팅)
+- `<i>`, `<em>` - 기울임 텍스트 (인라인 포맷팅)
+- `<u>` - 밑줄 텍스트 (인라인 포맷팅)
+- `<span>` - CSS 스타일이 있는 인라인 포맷팅 (굵기, 기울임, 밑줄, 색상)
+- `<br>` - 줄바꿈
+- bg/border가 있는 `<div>` - 도형이 됨
+- `<img>` - 이미지
+- `class="placeholder"` - 차트를 위한 예약 공간 (`{ id, x, y, w, h }` 반환)
 
-### Critical Text Rules
+### 중요 텍스트 규칙
 
-**ALL text MUST be inside `<p>`, `<h1>`-`<h6>`, `<ul>`, or `<ol>` tags:**
-- ✅ Correct: `<div><p>Text here</p></div>`
-- ❌ Wrong: `<div>Text here</div>` - **Text will NOT appear in PowerPoint**
-- ❌ Wrong: `<span>Text</span>` - **Text will NOT appear in PowerPoint**
-- Text in `<div>` or `<span>` without a text tag will be silently ignored
+**모든 텍스트는 반드시 `<p>`, `<h1>`-`<h6>`, `<ul>`, 또는 `<ol>` 태그 안에 있어야 함:**
+- 올바른 예: `<div><p>Text here</p></div>`
+- 잘못된 예: `<div>Text here</div>` - **텍스트가 PowerPoint에 나타나지 않음**
+- 잘못된 예: `<span>Text</span>` - **텍스트가 PowerPoint에 나타나지 않음**
+- 텍스트 태그 없이 `<div>` 또는 `<span>` 안의 텍스트는 조용히 무시됨
 
-**NEVER use manual bullet symbols (•, -, *, etc.)** - Use `<ul>` or `<ol>` lists instead
+**수동 불릿 기호 (•, -, *, 등) 절대 사용 금지** - 대신 `<ul>` 또는 `<ol>` 목록 사용
 
-**ONLY use web-safe fonts that are universally available:**
-- ✅ Web-safe fonts: `Arial`, `Helvetica`, `Times New Roman`, `Georgia`, `Courier New`, `Verdana`, `Tahoma`, `Trebuchet MS`, `Impact`, `Comic Sans MS`
-- ❌ Wrong: `'Segoe UI'`, `'SF Pro'`, `'Roboto'`, custom fonts - **Might cause rendering issues**
+**보편적으로 사용 가능한 웹 안전 폰트만 사용:**
+- 올바른 폰트: `Arial`, `Helvetica`, `Times New Roman`, `Georgia`, `Courier New`, `Verdana`, `Tahoma`, `Trebuchet MS`, `Impact`, `Comic Sans MS`
+- 잘못된 폰트: `'Segoe UI'`, `'SF Pro'`, `'Roboto'`, 커스텀 폰트 - **렌더링 문제 발생 가능**
 
-### Styling
+### 스타일링
 
-- Use `display: flex` on body to prevent margin collapse from breaking overflow validation
-- Use `margin` for spacing (padding included in size)
-- Inline formatting: Use `<b>`, `<i>`, `<u>` tags OR `<span>` with CSS styles
-  - `<span>` supports: `font-weight: bold`, `font-style: italic`, `text-decoration: underline`, `color: #rrggbb`
-  - `<span>` does NOT support: `margin`, `padding` (not supported in PowerPoint text runs)
-  - Example: `<span style="font-weight: bold; color: #667eea;">Bold blue text</span>`
-- Flexbox works - positions calculated from rendered layout
-- Use hex colors with `#` prefix in CSS
-- **Text alignment**: Use CSS `text-align` (`center`, `right`, etc.) when needed as a hint to PptxGenJS for text formatting if text lengths are slightly off
+- 오버플로우 검증에서 마진 붕괴를 방지하기 위해 body에 `display: flex` 사용
+- 간격에는 `margin` 사용 (패딩은 크기에 포함됨)
+- 인라인 포맷팅: `<b>`, `<i>`, `<u>` 태그 또는 CSS 스타일이 있는 `<span>` 사용
+  - `<span>` 지원: `font-weight: bold`, `font-style: italic`, `text-decoration: underline`, `color: #rrggbb`
+  - `<span>` 미지원: `margin`, `padding` (PowerPoint 텍스트 런에서 미지원)
+  - 예시: `<span style="font-weight: bold; color: #667eea;">Bold blue text</span>`
+- Flexbox 사용 가능 - 렌더링된 레이아웃에서 위치 계산
+- CSS에서 `#` 접두사와 함께 hex 색상 사용
+- **텍스트 정렬**: 텍스트 길이가 약간 맞지 않을 때 PptxGenJS에 텍스트 포맷팅 힌트로 CSS `text-align` (`center`, `right` 등) 사용
 
-### Shape Styling (DIV elements only)
+### 도형 스타일링 (DIV 요소만)
 
-**IMPORTANT: Backgrounds, borders, and shadows only work on `<div>` elements, NOT on text elements (`<p>`, `<h1>`-`<h6>`, `<ul>`, `<ol>`)**
+**중요: 배경, 테두리, 그림자는 `<div>` 요소에서만 작동하고, 텍스트 요소 (`<p>`, `<h1>`-`<h6>`, `<ul>`, `<ol>`)에서는 작동하지 않음**
 
-- **Backgrounds**: CSS `background` or `background-color` on `<div>` elements only
-  - Example: `<div style="background: #f0f0f0;">` - Creates a shape with background
-- **Borders**: CSS `border` on `<div>` elements converts to PowerPoint shape borders
-  - Supports uniform borders: `border: 2px solid #333333`
-  - Supports partial borders: `border-left`, `border-right`, `border-top`, `border-bottom` (rendered as line shapes)
-  - Example: `<div style="border-left: 8pt solid #E76F51;">`
-- **Border radius**: CSS `border-radius` on `<div>` elements for rounded corners
-  - `border-radius: 50%` or higher creates circular shape
-  - Percentages <50% calculated relative to shape's smaller dimension
-  - Supports px and pt units (e.g., `border-radius: 8pt;`, `border-radius: 12px;`)
-  - Example: `<div style="border-radius: 25%;">` on 100x200px box = 25% of 100px = 25px radius
-- **Box shadows**: CSS `box-shadow` on `<div>` elements converts to PowerPoint shadows
-  - Supports outer shadows only (inset shadows are ignored to prevent corruption)
-  - Example: `<div style="box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);">`
-  - Note: Inset/inner shadows are not supported by PowerPoint and will be skipped
+- **배경**: `<div>` 요소에만 CSS `background` 또는 `background-color`
+  - 예시: `<div style="background: #f0f0f0;">` - 배경이 있는 도형 생성
+- **테두리**: `<div>` 요소의 CSS `border`가 PowerPoint 도형 테두리로 변환
+  - 균일한 테두리 지원: `border: 2px solid #333333`
+  - 부분 테두리 지원: `border-left`, `border-right`, `border-top`, `border-bottom` (선 도형으로 렌더링)
+  - 예시: `<div style="border-left: 8pt solid #E76F51;">`
+- **테두리 반경**: `<div>` 요소의 CSS `border-radius`로 둥근 모서리
+  - `border-radius: 50%` 이상은 원형 도형 생성
+  - 50% 미만 백분율은 도형의 작은 치수에 상대적으로 계산
+  - px 및 pt 단위 지원 (예: `border-radius: 8pt;`, `border-radius: 12px;`)
+  - 예시: 100x200px 박스에서 `<div style="border-radius: 25%;">` = 100px의 25% = 25px 반경
+- **박스 그림자**: `<div>` 요소의 CSS `box-shadow`가 PowerPoint 그림자로 변환
+  - 외부 그림자만 지원 (안쪽 그림자는 손상 방지를 위해 무시)
+  - 예시: `<div style="box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);">`
+  - 참고: 인셋/내부 그림자는 PowerPoint에서 미지원이므로 건너뜀
 
-### Icons & Gradients
+### 아이콘 & 그라디언트
 
-- **CRITICAL: Never use CSS gradients (`linear-gradient`, `radial-gradient`)** - They don't convert to PowerPoint
-- **ALWAYS create gradient/icon PNGs FIRST using Sharp, then reference in HTML**
-- For gradients: Rasterize SVG to PNG background images
-- For icons: Rasterize react-icons SVG to PNG images
-- All visual effects must be pre-rendered as raster images before HTML rendering
+- **중요: CSS 그라디언트 (`linear-gradient`, `radial-gradient`) 절대 사용 금지** - PowerPoint로 변환되지 않음
+- **항상 Sharp를 사용하여 그라디언트/아이콘 PNG를 먼저 생성한 후 HTML에서 참조**
+- 그라디언트의 경우: SVG를 PNG 배경 이미지로 래스터화
+- 아이콘의 경우: react-icons SVG를 PNG 이미지로 래스터화
+- 모든 시각적 효과는 HTML 렌더링 전에 래스터 이미지로 미리 렌더링되어야 함
 
-**Rasterizing Icons with Sharp:**
+**Sharp를 사용한 아이콘 래스터화:**
 
 ```javascript
 const React = require('react');
@@ -100,7 +100,7 @@ async function rasterizeIconPng(IconComponent, color, size = "256", filename) {
     React.createElement(IconComponent, { color: `#${color}`, size: size })
   );
 
-  // Convert SVG to PNG using Sharp
+  // Sharp를 사용하여 SVG를 PNG로 변환
   await sharp(Buffer.from(svgString))
     .png()
     .toFile(filename);
@@ -108,12 +108,12 @@ async function rasterizeIconPng(IconComponent, color, size = "256", filename) {
   return filename;
 }
 
-// Usage: Rasterize icon before using in HTML
+// 사용법: HTML에 사용하기 전에 아이콘 래스터화
 const iconPath = await rasterizeIconPng(FaHome, "4472c4", "256", "home-icon.png");
-// Then reference in HTML: <img src="home-icon.png" style="width: 40pt; height: 40pt;">
+// 그런 다음 HTML에서 참조: <img src="home-icon.png" style="width: 40pt; height: 40pt;">
 ```
 
-**Rasterizing Gradients with Sharp:**
+**Sharp를 사용한 그라디언트 래스터화:**
 
 ```javascript
 const sharp = require('sharp');
@@ -136,12 +136,12 @@ async function createGradientBackground(filename) {
   return filename;
 }
 
-// Usage: Create gradient background before HTML
+// 사용법: HTML 전에 그라디언트 배경 생성
 const bgPath = await createGradientBackground("gradient-bg.png");
-// Then in HTML: <body style="background-image: url('gradient-bg.png');">
+// 그런 다음 HTML에서: <body style="background-image: url('gradient-bg.png');">
 ```
 
-### Example
+### 예시
 
 ```html
 <!DOCTYPE html>
@@ -171,7 +171,7 @@ h1 { color: #2d3748; font-size: 32pt; }
   <p>Text with <b>bold</b>, <i>italic</i>, <u>underline</u>.</p>
   <div id="chart" class="placeholder" style="width: 350pt; height: 200pt;"></div>
 
-  <!-- Text MUST be in <p> tags -->
+  <!-- 텍스트는 반드시 <p> 태그 안에 있어야 함 -->
   <div class="box">
     <p>5</p>
   </div>
@@ -180,27 +180,27 @@ h1 { color: #2d3748; font-size: 32pt; }
 </html>
 ```
 
-## Using the html2pptx Library
+## html2pptx 라이브러리 사용
 
-### Dependencies
+### 의존성
 
-These libraries have been globally installed and are available to use:
+이 라이브러리들은 전역 설치되어 있으며 사용 가능합니다:
 - `pptxgenjs`
 - `playwright`
 - `sharp`
 
-### Basic Usage
+### 기본 사용법
 
 ```javascript
 const pptxgen = require('pptxgenjs');
 const html2pptx = require('./html2pptx');
 
 const pptx = new pptxgen();
-pptx.layout = 'LAYOUT_16x9';  // Must match HTML body dimensions
+pptx.layout = 'LAYOUT_16x9';  // HTML body 치수와 일치해야 함
 
 const { slide, placeholders } = await html2pptx('slide1.html', pptx);
 
-// Add chart to placeholder area
+// 플레이스홀더 영역에 차트 추가
 if (placeholders.length > 0) {
     slide.addChart(pptx.charts.LINE, chartData, placeholders[0]);
 }
@@ -208,56 +208,56 @@ if (placeholders.length > 0) {
 await pptx.writeFile('output.pptx');
 ```
 
-### API Reference
+### API 참조
 
-#### Function Signature
+#### 함수 시그니처
 ```javascript
 await html2pptx(htmlFile, pres, options)
 ```
 
-#### Parameters
-- `htmlFile` (string): Path to HTML file (absolute or relative)
-- `pres` (pptxgen): PptxGenJS presentation instance with layout already set
-- `options` (object, optional):
-  - `tmpDir` (string): Temporary directory for generated files (default: `process.env.TMPDIR || '/tmp'`)
-  - `slide` (object): Existing slide to reuse (default: creates new slide)
+#### 파라미터
+- `htmlFile` (string): HTML 파일 경로 (절대 또는 상대)
+- `pres` (pptxgen): 레이아웃이 이미 설정된 PptxGenJS 프레젠테이션 인스턴스
+- `options` (object, 선택사항):
+  - `tmpDir` (string): 생성된 파일을 위한 임시 디렉토리 (기본값: `process.env.TMPDIR || '/tmp'`)
+  - `slide` (object): 재사용할 기존 슬라이드 (기본값: 새 슬라이드 생성)
 
-#### Returns
+#### 반환값
 ```javascript
 {
-    slide: pptxgenSlide,           // The created/updated slide
-    placeholders: [                 // Array of placeholder positions
+    slide: pptxgenSlide,           // 생성/업데이트된 슬라이드
+    placeholders: [                 // 플레이스홀더 위치 배열
         { id: string, x: number, y: number, w: number, h: number },
         ...
     ]
 }
 ```
 
-### Validation
+### 검증
 
-The library automatically validates and collects all errors before throwing:
+라이브러리는 모든 오류를 수집한 후 throw합니다:
 
-1. **HTML dimensions must match presentation layout** - Reports dimension mismatches
-2. **Content must not overflow body** - Reports overflow with exact measurements
-3. **CSS gradients** - Reports unsupported gradient usage
-4. **Text element styling** - Reports backgrounds/borders/shadows on text elements (only allowed on divs)
+1. **HTML 치수가 프레젠테이션 레이아웃과 일치해야 함** - 치수 불일치 보고
+2. **콘텐츠가 body를 넘치면 안 됨** - 정확한 측정값과 함께 오버플로우 보고
+3. **CSS 그라디언트** - 미지원 그라디언트 사용 보고
+4. **텍스트 요소 스타일링** - 텍스트 요소의 배경/테두리/그림자 보고 (div에서만 허용)
 
-**All validation errors are collected and reported together** in a single error message, allowing you to fix all issues at once instead of one at a time.
+**모든 검증 오류는 수집되어 단일 오류 메시지로 함께 보고**되므로 한 번에 모든 문제 수정 가능
 
-### Working with Placeholders
+### 플레이스홀더 작업
 
 ```javascript
 const { slide, placeholders } = await html2pptx('slide.html', pptx);
 
-// Use first placeholder
+// 첫 번째 플레이스홀더 사용
 slide.addChart(pptx.charts.BAR, data, placeholders[0]);
 
-// Find by ID
+// ID로 찾기
 const chartArea = placeholders.find(p => p.id === 'chart-area');
 slide.addChart(pptx.charts.LINE, data, chartArea);
 ```
 
-### Complete Example
+### 완전한 예시
 
 ```javascript
 const pptxgen = require('pptxgenjs');
@@ -269,10 +269,10 @@ async function createPresentation() {
     pptx.author = 'Your Name';
     pptx.title = 'My Presentation';
 
-    // Slide 1: Title
+    // 슬라이드 1: 타이틀
     const { slide: slide1 } = await html2pptx('slides/title.html', pptx);
 
-    // Slide 2: Content with chart
+    // 슬라이드 2: 차트가 있는 콘텐츠
     const { slide: slide2, placeholders } = await html2pptx('slides/data.html', pptx);
 
     const chartData = [{
@@ -291,7 +291,7 @@ async function createPresentation() {
         valAxisTitle: 'Sales ($000s)'
     });
 
-    // Save
+    // 저장
     await pptx.writeFile({ fileName: 'presentation.pptx' });
     console.log('Presentation created successfully!');
 }
@@ -299,37 +299,37 @@ async function createPresentation() {
 createPresentation().catch(console.error);
 ```
 
-## Using PptxGenJS
+## PptxGenJS 사용
 
-After converting HTML to slides with `html2pptx`, you'll use PptxGenJS to add dynamic content like charts, images, and additional elements.
+HTML을 `html2pptx`로 슬라이드로 변환한 후 PptxGenJS를 사용하여 차트, 이미지, 추가 요소 등 동적 콘텐츠를 추가합니다.
 
-### ⚠️ Critical Rules
+### 중요 규칙
 
-#### Colors
-- **NEVER use `#` prefix** with hex colors in PptxGenJS - causes file corruption
-- ✅ Correct: `color: "FF0000"`, `fill: { color: "0066CC" }`
-- ❌ Wrong: `color: "#FF0000"` (breaks document)
+#### 색상
+- **PptxGenJS에서 hex 색상에 `#` 접두사 절대 사용 금지** - 파일 손상 원인
+- 올바른 예: `color: "FF0000"`, `fill: { color: "0066CC" }`
+- 잘못된 예: `color: "#FF0000"` (문서 손상)
 
-### Adding Images
+### 이미지 추가
 
-Always calculate aspect ratios from actual image dimensions:
+항상 실제 이미지 치수에서 종횡비를 계산합니다:
 
 ```javascript
-// Get image dimensions: identify image.png | grep -o '[0-9]* x [0-9]*'
-const imgWidth = 1860, imgHeight = 1519;  // From actual file
+// 이미지 치수 가져오기: identify image.png | grep -o '[0-9]* x [0-9]*'
+const imgWidth = 1860, imgHeight = 1519;  // 실제 파일에서
 const aspectRatio = imgWidth / imgHeight;
 
-const h = 3;  // Max height
+const h = 3;  // 최대 높이
 const w = h * aspectRatio;
-const x = (10 - w) / 2;  // Center on 16:9 slide
+const x = (10 - w) / 2;  // 16:9 슬라이드에서 중앙 정렬
 
 slide.addImage({ path: "chart.png", x, y: 1.5, w, h });
 ```
 
-### Adding Text
+### 텍스트 추가
 
 ```javascript
-// Rich text with formatting
+// 포맷팅이 있는 리치 텍스트
 slide.addText([
     { text: "Bold ", options: { bold: true } },
     { text: "Italic ", options: { italic: true } },
@@ -339,23 +339,23 @@ slide.addText([
 });
 ```
 
-### Adding Shapes
+### 도형 추가
 
 ```javascript
-// Rectangle
+// 사각형
 slide.addShape(pptx.shapes.RECTANGLE, {
     x: 1, y: 1, w: 3, h: 2,
     fill: { color: "4472C4" },
     line: { color: "000000", width: 2 }
 });
 
-// Circle
+// 원
 slide.addShape(pptx.shapes.OVAL, {
     x: 5, y: 1, w: 2, h: 2,
     fill: { color: "ED7D31" }
 });
 
-// Rounded rectangle
+// 둥근 사각형
 slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
     x: 1, y: 4, w: 3, h: 1.5,
     fill: { color: "70AD47" },
@@ -363,70 +363,70 @@ slide.addShape(pptx.shapes.ROUNDED_RECTANGLE, {
 });
 ```
 
-### Adding Charts
+### 차트 추가
 
-**Required for most charts:** Axis labels using `catAxisTitle` (category) and `valAxisTitle` (value).
+**대부분의 차트에 필수**: `catAxisTitle` (카테고리) 및 `valAxisTitle` (값)을 사용한 축 레이블.
 
-**Chart Data Format:**
-- Use **single series with all labels** for simple bar/line charts
-- Each series creates a separate legend entry
-- Labels array defines X-axis values
+**차트 데이터 형식:**
+- 단순 막대/선 차트에는 **모든 레이블이 있는 단일 시리즈** 사용
+- 각 시리즈는 별도의 범례 항목 생성
+- 레이블 배열이 X축 값 정의
 
-**Time Series Data - Choose Correct Granularity:**
-- **< 30 days**: Use daily grouping (e.g., "10-01", "10-02") - avoid monthly aggregation that creates single-point charts
-- **30-365 days**: Use monthly grouping (e.g., "2024-01", "2024-02")
-- **> 365 days**: Use yearly grouping (e.g., "2023", "2024")
-- **Validate**: Charts with only 1 data point likely indicate incorrect aggregation for the time period
+**시계열 데이터 - 올바른 세분성 선택:**
+- **30일 미만**: 일별 그룹화 사용 (예: "10-01", "10-02") - 단일 포인트 차트를 만드는 월별 집계 지양
+- **30-365일**: 월별 그룹화 사용 (예: "2024-01", "2024-02")
+- **365일 초과**: 연별 그룹화 사용 (예: "2023", "2024")
+- **검증**: 데이터 포인트가 1개뿐인 차트는 기간에 맞지 않는 잘못된 집계를 의미할 가능성 높음
 
 ```javascript
 const { slide, placeholders } = await html2pptx('slide.html', pptx);
 
-// CORRECT: Single series with all labels
+// 올바른 예: 모든 레이블이 있는 단일 시리즈
 slide.addChart(pptx.charts.BAR, [{
     name: "Sales 2024",
     labels: ["Q1", "Q2", "Q3", "Q4"],
     values: [4500, 5500, 6200, 7100]
 }], {
-    ...placeholders[0],  // Use placeholder position
-    barDir: 'col',       // 'col' = vertical bars, 'bar' = horizontal
+    ...placeholders[0],  // 플레이스홀더 위치 사용
+    barDir: 'col',       // 'col' = 수직 막대, 'bar' = 수평
     showTitle: true,
     title: 'Quarterly Sales',
-    showLegend: false,   // No legend needed for single series
-    // Required axis labels
+    showLegend: false,   // 단일 시리즈에는 범례 불필요
+    // 필수 축 레이블
     showCatAxisTitle: true,
     catAxisTitle: 'Quarter',
     showValAxisTitle: true,
     valAxisTitle: 'Sales ($000s)',
-    // Optional: Control scaling (adjust min based on data range for better visualization)
+    // 선택사항: 스케일 제어 (더 나은 시각화를 위해 데이터 범위에 맞게 최소값 조정)
     valAxisMaxVal: 8000,
-    valAxisMinVal: 0,  // Use 0 for counts/amounts; for clustered data (e.g., 4500-7100), consider starting closer to min value
-    valAxisMajorUnit: 2000,  // Control y-axis label spacing to prevent crowding
-    catAxisLabelRotate: 45,  // Rotate labels if crowded
+    valAxisMinVal: 0,  // 카운트/금액에는 0 사용; 클러스터된 데이터 (예: 4500-7100)에는 최소값에 더 가깝게 시작 고려
+    valAxisMajorUnit: 2000,  // 혼잡 방지를 위한 y축 레이블 간격 제어
+    catAxisLabelRotate: 45,  // 혼잡할 경우 레이블 회전
     dataLabelPosition: 'outEnd',
     dataLabelColor: '000000',
-    // Use single color for single-series charts
-    chartColors: ["4472C4"]  // All bars same color
+    // 단일 시리즈 차트에는 단일 색상 사용
+    chartColors: ["4472C4"]  // 모든 막대 같은 색상
 });
 ```
 
-#### Scatter Chart
+#### 산점도
 
-**IMPORTANT**: Scatter chart data format is unusual - first series contains X-axis values, subsequent series contain Y-values:
+**중요**: 산점도 데이터 형식은 특이함 - 첫 번째 시리즈에는 X축 값, 이후 시리즈에는 Y값 포함:
 
 ```javascript
-// Prepare data
+// 데이터 준비
 const data1 = [{ x: 10, y: 20 }, { x: 15, y: 25 }, { x: 20, y: 30 }];
 const data2 = [{ x: 12, y: 18 }, { x: 18, y: 22 }];
 
 const allXValues = [...data1.map(d => d.x), ...data2.map(d => d.x)];
 
 slide.addChart(pptx.charts.SCATTER, [
-    { name: 'X-Axis', values: allXValues },  // First series = X values
-    { name: 'Series 1', values: data1.map(d => d.y) },  // Y values only
-    { name: 'Series 2', values: data2.map(d => d.y) }   // Y values only
+    { name: 'X-Axis', values: allXValues },  // 첫 번째 시리즈 = X 값
+    { name: 'Series 1', values: data1.map(d => d.y) },  // Y 값만
+    { name: 'Series 2', values: data2.map(d => d.y) }   // Y 값만
 ], {
     x: 1, y: 1, w: 8, h: 4,
-    lineSize: 0,  // 0 = no connecting lines
+    lineSize: 0,  // 0 = 연결선 없음
     lineDataSymbol: 'circle',
     lineDataSymbolSize: 6,
     showCatAxisTitle: true,
@@ -437,7 +437,7 @@ slide.addChart(pptx.charts.SCATTER, [
 });
 ```
 
-#### Line Chart
+#### 선 차트
 
 ```javascript
 slide.addChart(pptx.charts.LINE, [{
@@ -448,40 +448,40 @@ slide.addChart(pptx.charts.LINE, [{
     x: 1, y: 1, w: 8, h: 4,
     lineSize: 4,
     lineSmooth: true,
-    // Required axis labels
+    // 필수 축 레이블
     showCatAxisTitle: true,
     catAxisTitle: 'Month',
     showValAxisTitle: true,
     valAxisTitle: 'Temperature (°F)',
-    // Optional: Y-axis range (set min based on data range for better visualization)
-    valAxisMinVal: 0,     // For ranges starting at 0 (counts, percentages, etc.)
+    // 선택사항: Y축 범위 (더 나은 시각화를 위해 데이터 범위에 맞게 최소값 설정)
+    valAxisMinVal: 0,     // 0에서 시작하는 범위용 (카운트, 백분율 등)
     valAxisMaxVal: 60,
-    valAxisMajorUnit: 20,  // Control y-axis label spacing to prevent crowding (e.g., 10, 20, 25)
-    // valAxisMinVal: 30,  // PREFERRED: For data clustered in a range (e.g., 32-55 or ratings 3-5), start axis closer to min value to show variation
-    // Optional: Chart colors
+    valAxisMajorUnit: 20,  // 혼잡 방지를 위한 y축 레이블 간격 제어 (예: 10, 20, 25)
+    // valAxisMinVal: 30,  // 권장: 범위에 클러스터된 데이터 (예: 32-55 또는 평점 3-5)에는 변동 표시를 위해 최소값에 가깝게 시작
+    // 선택사항: 차트 색상
     chartColors: ["4472C4", "ED7D31", "A5A5A5"]
 });
 ```
 
-#### Pie Chart (No Axis Labels Required)
+#### 파이 차트 (축 레이블 불필요)
 
-**CRITICAL**: Pie charts require a **single data series** with all categories in the `labels` array and corresponding values in the `values` array.
+**중요**: 파이 차트는 `labels` 배열에 모든 카테고리, `values` 배열에 해당 값이 있는 **단일 데이터 시리즈**가 필요합니다.
 
 ```javascript
 slide.addChart(pptx.charts.PIE, [{
     name: "Market Share",
-    labels: ["Product A", "Product B", "Other"],  // All categories in one array
-    values: [35, 45, 20]  // All values in one array
+    labels: ["Product A", "Product B", "Other"],  // 하나의 배열에 모든 카테고리
+    values: [35, 45, 20]  // 하나의 배열에 모든 값
 }], {
     x: 2, y: 1, w: 6, h: 4,
     showPercent: true,
     showLegend: true,
-    legendPos: 'r',  // right
+    legendPos: 'r',  // 오른쪽
     chartColors: ["4472C4", "ED7D31", "A5A5A5"]
 });
 ```
 
-#### Multiple Data Series
+#### 다중 데이터 시리즈
 
 ```javascript
 slide.addChart(pptx.charts.LINE, [
@@ -504,45 +504,45 @@ slide.addChart(pptx.charts.LINE, [
 });
 ```
 
-### Chart Colors
+### 차트 색상
 
-**CRITICAL**: Use hex colors **without** the `#` prefix - including `#` causes file corruption.
+**중요**: `#` 접두사 **없이** hex 색상 사용 - `#`을 포함하면 파일 손상 발생.
 
-**Align chart colors with your chosen design palette**, ensuring sufficient contrast and distinctiveness for data visualization. Adjust colors for:
-- Strong contrast between adjacent series
-- Readability against slide backgrounds
-- Accessibility (avoid red-green only combinations)
+**선택한 디자인 팔레트에 맞게 차트 색상 조정**하여 데이터 시각화에 충분한 대비와 구별성 확보. 다음을 위해 색상 조정:
+- 인접 시리즈 간 강한 대비
+- 슬라이드 배경에 대한 가독성
+- 접근성 (빨강-초록 조합만 사용 지양)
 
 ```javascript
-// Example: Ocean palette-inspired chart colors (adjusted for contrast)
+// 예시: Ocean 팔레트에서 영감을 받은 차트 색상 (대비를 위해 조정됨)
 const chartColors = ["16A085", "FF6B9D", "2C3E50", "F39C12", "9B59B6"];
 
-// Single-series chart: Use one color for all bars/points
+// 단일 시리즈 차트: 모든 막대/점에 한 가지 색상 사용
 slide.addChart(pptx.charts.BAR, [{
     name: "Sales",
     labels: ["Q1", "Q2", "Q3", "Q4"],
     values: [4500, 5500, 6200, 7100]
 }], {
     ...placeholders[0],
-    chartColors: ["16A085"],  // All bars same color
+    chartColors: ["16A085"],  // 모든 막대 같은 색상
     showLegend: false
 });
 
-// Multi-series chart: Each series gets a different color
+// 다중 시리즈 차트: 각 시리즈마다 다른 색상
 slide.addChart(pptx.charts.LINE, [
     { name: "Product A", labels: ["Q1", "Q2", "Q3"], values: [10, 20, 30] },
     { name: "Product B", labels: ["Q1", "Q2", "Q3"], values: [15, 25, 20] }
 ], {
     ...placeholders[0],
-    chartColors: ["16A085", "FF6B9D"]  // One color per series
+    chartColors: ["16A085", "FF6B9D"]  // 시리즈당 하나의 색상
 });
 ```
 
-### Adding Tables
+### 테이블 추가
 
-Tables can be added with basic or advanced formatting:
+기본 또는 고급 포맷팅으로 테이블을 추가할 수 있습니다:
 
-#### Basic Table
+#### 기본 테이블
 
 ```javascript
 slide.addTable([
@@ -559,17 +559,17 @@ slide.addTable([
 });
 ```
 
-#### Table with Custom Formatting
+#### 사용자 정의 포맷팅이 있는 테이블
 
 ```javascript
 const tableData = [
-    // Header row with custom styling
+    // 사용자 정의 스타일의 헤더 행
     [
         { text: "Product", options: { fill: { color: "4472C4" }, color: "FFFFFF", bold: true } },
         { text: "Revenue", options: { fill: { color: "4472C4" }, color: "FFFFFF", bold: true } },
         { text: "Growth", options: { fill: { color: "4472C4" }, color: "FFFFFF", bold: true } }
     ],
-    // Data rows
+    // 데이터 행
     ["Product A", "$50M", "+15%"],
     ["Product B", "$35M", "+22%"],
     ["Product C", "$28M", "+8%"]
@@ -580,8 +580,8 @@ slide.addTable(tableData, {
     y: 1.5,
     w: 8,
     h: 3,
-    colW: [3, 2.5, 2.5],  // Column widths
-    rowH: [0.5, 0.6, 0.6, 0.6],  // Row heights
+    colW: [3, 2.5, 2.5],  // 열 너비
+    rowH: [0.5, 0.6, 0.6, 0.6],  // 행 높이
     border: { pt: 1, color: "CCCCCC" },
     align: "center",
     valign: "middle",
@@ -589,7 +589,7 @@ slide.addTable(tableData, {
 });
 ```
 
-#### Table with Merged Cells
+#### 셀 병합이 있는 테이블
 
 ```javascript
 const mergedTableData = [
@@ -611,15 +611,15 @@ slide.addTable(mergedTableData, {
 });
 ```
 
-### Table Options
+### 테이블 옵션
 
-Common table options:
-- `x, y, w, h` - Position and size
-- `colW` - Array of column widths (in inches)
-- `rowH` - Array of row heights (in inches)
-- `border` - Border style: `{ pt: 1, color: "999999" }`
-- `fill` - Background color (no # prefix)
-- `align` - Text alignment: "left", "center", "right"
-- `valign` - Vertical alignment: "top", "middle", "bottom"
-- `fontSize` - Text size
-- `autoPage` - Auto-create new slides if content overflows
+일반적인 테이블 옵션:
+- `x, y, w, h` - 위치 및 크기
+- `colW` - 열 너비 배열 (인치 단위)
+- `rowH` - 행 높이 배열 (인치 단위)
+- `border` - 테두리 스타일: `{ pt: 1, color: "999999" }`
+- `fill` - 배경 색상 (# 접두사 없음)
+- `align` - 텍스트 정렬: "left", "center", "right"
+- `valign` - 수직 정렬: "top", "middle", "bottom"
+- `fontSize` - 텍스트 크기
+- `autoPage` - 콘텐츠가 넘치면 새 슬라이드 자동 생성

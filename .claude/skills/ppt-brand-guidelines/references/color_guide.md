@@ -1,83 +1,83 @@
-# VRL Color Guide
+# VRL 색상 가이드
 
-## Primary Colors
+## 주요 색상
 
-### Lime (Primary Accent)
+### 라임 (주요 강조색)
 - **HEX**: `#BDFF00`
 - **RGB**: 189, 255, 0
 - **HSL**: 75, 100%, 50%
-- **Usage**: Key highlights, CTAs, brand emphasis
+- **사용처**: 핵심 강조, CTA, 브랜드 강조
 
-### Dark (Primary Text)
+### 다크 (기본 텍스트)
 - **HEX**: `#0F172A`
 - **RGB**: 15, 23, 42
 - **HSL**: 222, 47%, 11%
-- **Usage**: Headlines, body text, dark backgrounds
+- **사용처**: 헤드라인, 본문 텍스트, 어두운 배경
 
-### White
+### 흰색
 - **HEX**: `#FFFFFF`
 - **RGB**: 255, 255, 255
-- **Usage**: Backgrounds, text on dark surfaces
+- **사용처**: 배경, 어두운 표면의 텍스트
 
-## Accent Colors
+## 강조 색상
 
-### Orange
+### 오렌지
 - **HEX**: `#FF6B35`
 - **RGB**: 255, 107, 53
-- **Usage**: Secondary accent, emphasis points
+- **사용처**: 보조 강조, 강조 포인트
 
-### Lime Dark
+### 라임 다크
 - **HEX**: `#84CC16`
 - **RGB**: 132, 204, 22
-- **Usage**: Supporting accent, success states
+- **사용처**: 보조 강조, 성공 상태
 
-### Slate
+### 슬레이트
 - **HEX**: `#1E293B`
 - **RGB**: 30, 41, 59
-- **Usage**: Card backgrounds, sections
+- **사용처**: 카드 배경, 섹션
 
-## Background Scale
+## 배경 스케일
 
-| Name | Hex | Usage |
-|------|-----|-------|
-| White | `#FFFFFF` | Primary background |
-| Slate 50 | `#F8FAFC` | Subtle background |
-| Slate 100 | `#F1F5F9` | Card background |
-| Slate 300 | `#CBD5E1` | Borders, dividers |
-| Slate 600 | `#475569` | Muted text |
-| Slate 800 | `#1E293B` | Dark cards |
-| Slate 900 | `#0F172A` | Dark background |
+| 이름 | Hex | 사용처 |
+|------|-----|--------|
+| 흰색 | `#FFFFFF` | 기본 배경 |
+| Slate 50 | `#F8FAFC` | 미묘한 배경 |
+| Slate 100 | `#F1F5F9` | 카드 배경 |
+| Slate 300 | `#CBD5E1` | 테두리, 구분선 |
+| Slate 600 | `#475569` | 약화된 텍스트 |
+| Slate 800 | `#1E293B` | 어두운 카드 |
+| Slate 900 | `#0F172A` | 어두운 배경 |
 
-## Color Combinations
+## 색상 조합
 
-### Light Theme
-- Background: `#FFFFFF`
-- Text: `#0F172A`
-- Accent: `#BDFF00`
-- Muted: `#475569`
+### 라이트 테마
+- 배경: `#FFFFFF`
+- 텍스트: `#0F172A`
+- 강조: `#BDFF00`
+- 약화: `#475569`
 
-### Dark Theme
-- Background: `#0F172A`
-- Text: `#FFFFFF`
-- Accent: `#BDFF00`
-- Muted: `#CBD5E1`
+### 다크 테마
+- 배경: `#0F172A`
+- 텍스트: `#FFFFFF`
+- 강조: `#BDFF00`
+- 약화: `#CBD5E1`
 
-## Contrast Guidelines
+## 대비 가이드라인
 
-### Good Combinations
-- `#0F172A` text on `#FFFFFF` background
-- `#FFFFFF` text on `#0F172A` background
-- `#0F172A` text on `#BDFF00` background
-- `#BDFF00` accent on `#0F172A` background
+### 좋은 조합
+- `#0F172A` 텍스트 on `#FFFFFF` 배경
+- `#FFFFFF` 텍스트 on `#0F172A` 배경
+- `#0F172A` 텍스트 on `#BDFF00` 배경
+- `#BDFF00` 강조 on `#0F172A` 배경
 
-### Avoid
-- `#BDFF00` text on `#FFFFFF` (poor contrast)
-- `#84CC16` text on `#FFFFFF` (poor contrast)
-- Light text on light backgrounds
+### 피해야 할 조합
+- `#BDFF00` 텍스트 on `#FFFFFF` (낮은 대비)
+- `#84CC16` 텍스트 on `#FFFFFF` (낮은 대비)
+- 밝은 배경에 밝은 텍스트
 
-## Usage Rules
+## 사용 규칙
 
-1. **Lime sparingly**: Use for key highlights only, never for body text
-2. **Dark for text**: Always use `#0F172A` for readable text on light
-3. **Orange for emphasis**: Secondary to lime, use for variation
-4. **Consistent backgrounds**: Stick to white or slate-900 primarily
+1. **라임은 절제하여 사용**: 핵심 강조에만, 본문 텍스트에 절대 사용 금지
+2. **텍스트에 다크 사용**: 밝은 배경의 읽기 가능한 텍스트에는 항상 `#0F172A` 사용
+3. **강조에 오렌지 사용**: 라임의 보조로, 변화를 위해 사용
+4. **일관된 배경 사용**: 주로 흰색 또는 slate-900 사용
