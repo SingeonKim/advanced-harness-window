@@ -1,10 +1,10 @@
-# Routing Guide - Next.js 15 App Router
+# 라우팅 가이드 - Next.js 15 App Router
 
-## File-Based Routing
+## 파일 기반 라우팅
 
-Next.js 15 uses file-based routing in the `app/` directory.
+Next.js 15는 `app/` 디렉토리에서 파일 기반 라우팅을 사용합니다.
 
-### Basic Routes
+### 기본 라우트
 
 ```
 app/
@@ -17,7 +17,7 @@ app/
       page.tsx          → /artists/:id
 ```
 
-### Dynamic Routes
+### 동적 라우트
 
 ```typescript
 // app/artists/[id]/page.tsx
@@ -31,7 +31,7 @@ export default async function ArtistPage({ params }: PageProps) {
 }
 ```
 
-### Catch-All Routes
+### Catch-All 라우트
 
 ```typescript
 // app/docs/[...slug]/page.tsx
@@ -45,9 +45,9 @@ export default function DocsPage({ params }: PageProps) {
 }
 ```
 
-## Navigation
+## 네비게이션
 
-### Client-Side (useRouter)
+### 클라이언트 사이드 (useRouter)
 
 ```typescript
 'use client';
@@ -59,13 +59,13 @@ export function Component() {
 
   return (
     <button onClick={() => router.push('/artists')}>
-      Go to Artists
+      아티스트 목록으로
     </button>
   );
 }
 ```
 
-### Server-Side (redirect)
+### 서버 사이드 (redirect)
 
 ```typescript
 import { redirect } from 'next/navigation';
@@ -77,11 +77,11 @@ export default async function Page() {
     redirect('/login');
   }
 
-  return <div>Protected Content</div>;
+  return <div>보호된 콘텐츠</div>;
 }
 ```
 
-### Link Component
+### Link 컴포넌트
 
 ```typescript
 import Link from 'next/link';
@@ -89,18 +89,18 @@ import Link from 'next/link';
 export function Nav() {
   return (
     <nav>
-      <Link href="/">Home</Link>
-      <Link href="/artists">Artists</Link>
-      <Link href="/about">About</Link>
+      <Link href="/">홈</Link>
+      <Link href="/artists">아티스트</Link>
+      <Link href="/about">소개</Link>
     </nav>
   );
 }
 ```
 
-## Layouts
+## 레이아웃
 
 ```typescript
-// app/layout.tsx (Root Layout)
+// app/layout.tsx (루트 레이아웃)
 export default function RootLayout({ children }) {
   return (
     <html>
@@ -113,7 +113,7 @@ export default function RootLayout({ children }) {
   );
 }
 
-// app/dashboard/layout.tsx (Nested Layout)
+// app/dashboard/layout.tsx (중첩 레이아웃)
 export default function DashboardLayout({ children }) {
   return (
     <div>
@@ -124,7 +124,7 @@ export default function DashboardLayout({ children }) {
 }
 ```
 
-## Route Groups
+## 라우트 그룹
 
 ```
 app/
@@ -137,4 +137,4 @@ app/
       page.tsx          → /dashboard
 ```
 
-Route groups organize files without affecting URL structure.
+라우트 그룹은 URL 구조에 영향을 주지 않으면서 파일을 구성할 때 사용합니다.

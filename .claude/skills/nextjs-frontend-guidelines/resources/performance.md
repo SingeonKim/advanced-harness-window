@@ -1,11 +1,11 @@
-# Performance Optimization - Next.js 15
+# 성능 최적화 - Next.js 15
 
-## Server Components (Zero JS)
+## Server Components (JavaScript 제로)
 
-Default to Server Components for better performance:
+더 나은 성능을 위해 기본적으로 Server Components를 사용하세요:
 
 ```typescript
-// No JavaScript sent to client
+// 클라이언트에 JavaScript 전송 없음
 export default async function Page() {
   const data = await fetchData();
   return <StaticContent data={data} />;
@@ -18,8 +18,8 @@ export default async function Page() {
 import dynamic from 'next/dynamic';
 
 const HeavyComponent = dynamic(() => import('./HeavyComponent'), {
-  loading: () => <div>Loading...</div>,
-  ssr: false, // Disable SSR if needed
+  loading: () => <div>로딩 중...</div>,
+  ssr: false, // 필요한 경우 SSR 비활성화
 });
 
 export function Page() {
@@ -27,7 +27,7 @@ export function Page() {
 }
 ```
 
-## Image Optimization
+## 이미지 최적화
 
 ```typescript
 import Image from 'next/image';
@@ -36,17 +36,17 @@ export function Component() {
   return (
     <Image
       src="/path/to/image.jpg"
-      alt="Description"
+      alt="설명"
       width={500}
       height={300}
-      priority // For above-the-fold images
+      priority // 뷰포트 상단 이미지에 사용
       quality={90}
     />
   );
 }
 ```
 
-## React Optimization Hooks
+## React 최적화 Hooks
 
 ### useMemo
 
@@ -73,7 +73,7 @@ import { useCallback } from 'react';
 
 export function Component() {
   const handleClick = useCallback(() => {
-    // Handler logic
+    // 핸들러 로직
   }, []);
 
   return <ChildComponent onClick={handleClick} />;
@@ -88,17 +88,17 @@ export function Component() {
 import { memo } from 'react';
 
 export const ExpensiveComponent = memo(function ExpensiveComponent({ data }) {
-  // Expensive rendering
+  // 비용이 큰 렌더링
   return <div>{data}</div>;
 });
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **Server Components First**: Less JavaScript to client
-2. **Dynamic Imports**: For heavy components
-3. **Image Optimization**: Always use next/image
-4. **Memoization**: Use useMemo/useCallback appropriately
-5. **Code Splitting**: Automatic with Next.js routes
-6. **Caching**: Use revalidate for data fetching
-7. **Minimal Client JS**: Only use 'use client' when necessary
+1. **Server Components 우선**: 클라이언트에 전송되는 JavaScript 최소화
+2. **Dynamic Imports**: 무거운 컴포넌트에 사용
+3. **이미지 최적화**: 항상 next/image 사용
+4. **메모이제이션**: 적절하게 useMemo/useCallback 사용
+5. **코드 분할**: Next.js 라우트로 자동 처리
+6. **캐싱**: 데이터 패칭에 revalidate 사용
+7. **클라이언트 JS 최소화**: 필요한 경우에만 'use client' 사용

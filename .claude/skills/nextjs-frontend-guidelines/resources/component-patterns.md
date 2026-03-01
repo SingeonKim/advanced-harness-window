@@ -1,26 +1,26 @@
-# Component Patterns - Next.js 15
+# Component 패턴 - Next.js 15
 
 ## Server Components vs Client Components
 
-### Server Components (Default)
+### Server Components (기본값)
 
-**When to use:**
-- Static content that doesn't change
-- Data fetching from APIs or databases
-- No interactivity needed
-- SEO-critical content
+**사용 시점:**
+- 변경되지 않는 정적 콘텐츠
+- API 또는 데이터베이스에서 데이터 패칭
+- 인터랙티비티 불필요
+- SEO에 중요한 콘텐츠
 
-**Characteristics:**
-- No `'use client'` directive
-- Can be async functions
-- Fetch data directly
-- Zero JavaScript sent to client
-- Cannot use hooks (useState, useEffect, etc.)
-- Cannot use browser APIs
-- Cannot use event handlers
+**특징:**
+- `'use client'` 지시문 없음
+- async 함수 가능
+- 직접 데이터 패칭
+- 클라이언트에 JavaScript 전송 없음
+- hooks 사용 불가 (useState, useEffect 등)
+- 브라우저 API 사용 불가
+- 이벤트 핸들러 사용 불가
 
 ```typescript
-// Server Component (no 'use client')
+// Server Component ('use client' 없음)
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { api } from '@/lib/api';
 import type { Artist } from '@/types/artist';
@@ -30,7 +30,7 @@ interface ArtistProfileProps {
 }
 
 export default async function ArtistProfile({ artistId }: ArtistProfileProps) {
-  // Fetch data directly - this runs on the server
+  // 서버에서 직접 데이터 패칭
   const artist: Artist = await api.artists.getById(artistId);
 
   return (
@@ -48,20 +48,20 @@ export default async function ArtistProfile({ artistId }: ArtistProfileProps) {
 
 ### Client Components
 
-**When to use:**
-- State management (useState)
-- Effects (useEffect)
-- Event handlers (onClick, onChange, etc.)
-- Browser APIs (localStorage, window, etc.)
-- Custom hooks
+**사용 시점:**
+- 상태 관리 (useState)
+- 사이드 이펙트 (useEffect)
+- 이벤트 핸들러 (onClick, onChange 등)
+- 브라우저 API (localStorage, window 등)
+- 커스텀 hooks
 - Context providers
 
-**Characteristics:**
-- Must have `'use client'` at the top of the file
-- Can use all React hooks
-- Can use browser APIs
-- Sends JavaScript to the client
-- Interactive elements
+**특징:**
+- 파일 상단에 반드시 `'use client'` 필요
+- 모든 React hooks 사용 가능
+- 브라우저 API 사용 가능
+- 클라이언트에 JavaScript 전송
+- 인터랙티브 요소
 
 ```typescript
 'use client';
@@ -98,23 +98,23 @@ export function CommentForm({ artworkId, onSubmit }: CommentFormProps) {
       <Textarea
         value={comment}
         onChange={(e) => setComment(e.target.value)}
-        placeholder="Add a comment..."
+        placeholder="댓글을 입력하세요..."
         className="min-h-[100px]"
       />
       <Button onClick={handleSubmit} disabled={loading}>
-        {loading ? 'Submitting...' : 'Submit'}
+        {loading ? '제출 중...' : '제출'}
       </Button>
     </div>
   );
 }
 ```
 
-## Component Structure Pattern
+## Component 구조 패턴
 
-### Recommended Order
+### 권장 순서
 
 ```typescript
-'use client'; // Only if needed
+'use client'; // 필요한 경우에만
 
 // 1. Imports
 import { useState, useCallback } from 'react';
@@ -124,20 +124,20 @@ import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import type { User } from '@/types/user';
 
-// 2. Types/Interfaces
+// 2. 타입/인터페이스
 interface MyComponentProps {
   userId: string;
   className?: string;
   onUpdate?: (user: User) => void;
 }
 
-// 3. Component Function
+// 3. 컴포넌트 함수
 export function MyComponent({ userId, className, onUpdate }: MyComponentProps) {
-  // 4. State
+  // 4. 상태
   const [data, setData] = useState<User | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // 5. Hooks (useCallback, useMemo, useEffect, custom hooks)
+  // 5. Hooks (useCallback, useMemo, useEffect, 커스텀 hooks)
   const fetchUser = useCallback(async () => {
     setLoading(true);
     try {
@@ -149,12 +149,12 @@ export function MyComponent({ userId, className, onUpdate }: MyComponentProps) {
     }
   }, [userId, onUpdate]);
 
-  // 6. Render
+  // 6. 렌더링
   return (
     <Card className={cn("p-4", className)}>
       <CardContent>
         <Button onClick={fetchUser} disabled={loading}>
-          {loading ? 'Loading...' : 'Fetch User'}
+          {loading ? '로딩 중...' : '사용자 불러오기'}
         </Button>
         {data && <p className="mt-4 text-muted-foreground">{data.name}</p>}
       </CardContent>
@@ -163,9 +163,9 @@ export function MyComponent({ userId, className, onUpdate }: MyComponentProps) {
 }
 ```
 
-## Mixing Server and Client Components
+## Server와 Client Components 혼합
 
-### Pattern: Server Component with Client Child
+### 패턴: Client 자식이 있는 Server Component
 
 ```typescript
 // app/artists/page.tsx (Server Component)
@@ -174,22 +174,22 @@ import { ArtistFilters } from '@/components/artist/ArtistFilters'; // Client
 import { api } from '@/lib/api';
 
 export default async function ArtistsPage() {
-  // Fetch data on server
+  // 서버에서 데이터 패칭
   const artists = await api.artists.getAll();
 
   return (
     <div className="container py-8">
-      {/* Client Component for interactive filters */}
+      {/* 인터랙티브 필터를 위한 Client Component */}
       <ArtistFilters />
 
-      {/* Server Component for static list */}
+      {/* 정적 목록을 위한 Server Component */}
       <ArtistList artists={artists} />
     </div>
   );
 }
 ```
 
-### Pattern: Passing Data from Server to Client
+### 패턴: Server에서 Client로 데이터 전달
 
 ```typescript
 // Server Component
@@ -198,7 +198,7 @@ import { ClientComponent } from './ClientComponent';
 export default async function ServerPage() {
   const data = await fetch('...');
 
-  // Pass data as props to Client Component
+  // props를 통해 Client Component에 데이터 전달
   return <ClientComponent initialData={data} />;
 }
 
@@ -211,26 +211,26 @@ interface ClientComponentProps {
 
 export function ClientComponent({ initialData }: ClientComponentProps) {
   const [data, setData] = useState(initialData);
-  // ... client-side logic
+  // ... 클라이언트 사이드 로직
 }
 ```
 
-## Performance Patterns
+## 성능 패턴
 
 ### Dynamic Imports
 
-For heavy Client Components, use dynamic imports:
+무거운 Client Components에는 dynamic imports 사용:
 
 ```typescript
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Lazy load with loading state
+// 로딩 상태와 함께 지연 로딩
 const HeavyChart = dynamic(
   () => import('@/components/charts/HeavyChart'),
   {
     loading: () => <Skeleton className="h-[400px] w-full" />,
-    ssr: false, // Disable SSR if component uses browser APIs
+    ssr: false, // 컴포넌트가 브라우저 API를 사용하면 SSR 비활성화
   }
 );
 
@@ -243,7 +243,7 @@ export function Dashboard() {
 }
 ```
 
-### React.memo for Expensive Components
+### 비용이 큰 컴포넌트에 React.memo 사용
 
 ```typescript
 'use client';
@@ -256,7 +256,7 @@ interface ExpensiveListProps {
 }
 
 export const ExpensiveList = memo(function ExpensiveList({ items }: ExpensiveListProps) {
-  // Expensive rendering logic
+  // 비용이 큰 렌더링 로직
   return (
     <div className="grid gap-4">
       {items.map(item => (
@@ -271,11 +271,11 @@ export const ExpensiveList = memo(function ExpensiveList({ items }: ExpensiveLis
 });
 ```
 
-## Common Patterns
+## 공통 패턴
 
-### useCallback for Event Handlers
+### 이벤트 핸들러에 useCallback
 
-Always use `useCallback` for event handlers passed to child components:
+자식 컴포넌트에 전달되는 이벤트 핸들러는 항상 `useCallback` 사용:
 
 ```typescript
 'use client';
@@ -286,7 +286,7 @@ import { Button } from '@/components/ui/button';
 export function Parent() {
   const [count, setCount] = useState(0);
 
-  // Wrapped in useCallback
+  // useCallback으로 감쌈
   const handleClick = useCallback(() => {
     setCount(prev => prev + 1);
   }, []);
@@ -295,7 +295,7 @@ export function Parent() {
 }
 ```
 
-### Form Handling with shadcn/ui
+### shadcn/ui로 폼 처리
 
 ```typescript
 'use client';
@@ -315,7 +315,7 @@ export function LoginForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      // Handle submission
+      // 제출 처리
     } finally {
       setLoading(false);
     }
@@ -324,32 +324,32 @@ export function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
-        <CardTitle>Login</CardTitle>
+        <CardTitle>로그인</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">이메일</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
+              placeholder="이메일을 입력하세요"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">비밀번호</Label>
             <Input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
+              placeholder="비밀번호를 입력하세요"
             />
           </div>
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? '로그인 중...' : '로그인'}
           </Button>
         </form>
       </CardContent>
@@ -358,32 +358,32 @@ export function LoginForm() {
 }
 ```
 
-## TypeScript Patterns
+## TypeScript 패턴
 
-### Component Props with JSDoc
+### JSDoc이 있는 컴포넌트 Props
 
 ```typescript
 interface ButtonProps {
-  /** The text to display on the button */
+  /** 버튼에 표시할 텍스트 */
   label: string;
-  /** Optional click handler */
+  /** 선택적 클릭 핸들러 */
   onClick?: () => void;
-  /** Whether the button is in a loading state */
+  /** 버튼이 로딩 상태인지 여부 */
   loading?: boolean;
-  /** Additional CSS classes */
+  /** 추가 CSS 클래스 */
   className?: string;
 }
 
 export function CustomButton({ label, onClick, loading = false, className }: ButtonProps) {
   return (
     <Button onClick={onClick} disabled={loading} className={className}>
-      {loading ? 'Loading...' : label}
+      {loading ? '로딩 중...' : label}
     </Button>
   );
 }
 ```
 
-### Extracting Types
+### 타입 추출
 
 ```typescript
 // types/artist.ts
@@ -394,7 +394,7 @@ export interface Artist {
   artworks: Artwork[];
 }
 
-// Component
+// 컴포넌트
 import type { Artist } from '@/types/artist';
 
 interface ArtistCardProps {
@@ -403,7 +403,7 @@ interface ArtistCardProps {
 }
 ```
 
-### Using cn() for className Props
+### className Props에 cn() 사용
 
 ```typescript
 import { cn } from '@/lib/utils';
@@ -425,15 +425,15 @@ export function Component({ className, children }: ComponentProps) {
 }
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **Default to Server Components**: Only use Client Components when you need interactivity
-2. **Keep Client Components Small**: Extract non-interactive parts to Server Components
-3. **Pass Data Down**: Fetch in Server Components, pass to Client Components via props
-4. **Use Callbacks**: Wrap event handlers in `useCallback` to prevent re-renders
-5. **Type Everything**: Explicit types for props, state, and return values
-6. **Named Exports**: Use named exports for components (easier to search and refactor)
-7. **Async Server Components**: Take advantage of async/await in Server Components
-8. **Error Boundaries**: Wrap Client Components with error.tsx for graceful failures
-9. **Always accept className**: Components should accept `className` prop for customization
-10. **Use cn() for class merging**: Always use `cn()` when combining classes
+1. **Server Components 기본값**: 인터랙티비티가 필요할 때만 Client Components 사용
+2. **Client Components 작게 유지**: 비인터랙티브 부분은 Server Components로 추출
+3. **데이터를 아래로 전달**: Server Components에서 패칭하여 Client Components에 props로 전달
+4. **Callbacks 사용**: 리렌더링 방지를 위해 `useCallback`으로 이벤트 핸들러 감싸기
+5. **모든 것 타입 지정**: props, 상태, 반환 값에 명시적 타입 사용
+6. **Named Exports**: 컴포넌트에 named exports 사용 (검색과 리팩토링에 용이)
+7. **Async Server Components**: Server Components에서 async/await 활용
+8. **에러 경계**: 우아한 실패를 위해 error.tsx로 Client Components 감싸기
+9. **항상 className 허용**: 커스터마이즈를 위해 컴포넌트가 `className` prop 허용
+10. **클래스 병합에 cn() 사용**: 클래스 조합 시 항상 `cn()` 사용

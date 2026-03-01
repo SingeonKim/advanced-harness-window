@@ -1,10 +1,10 @@
-# Common Patterns - YGS Next.js 15
+# 공통 패턴 - YGS Next.js 15
 
-## Authentication
+## 인증
 
-### AuthProvider Pattern (Primary Method)
+### AuthProvider 패턴 (주요 방법)
 
-YGS uses a centralized AuthProvider for client-side auth state:
+YGS는 클라이언트 사이드 인증 상태를 위해 중앙화된 AuthProvider를 사용합니다:
 
 ```typescript
 'use client';
@@ -13,18 +13,18 @@ import { useAuth } from '@/providers/AuthProvider';
 
 export function MyComponent() {
   const {
-    user,              // Current user info
-    isLoading,         // Auth initialization loading
-    isAuthenticated,   // Boolean check
-    signupRequired,    // Signup data if needed
-    loginWithKakao,    // Kakao OAuth login
-    loginWithGoogle,   // Google Firebase login
-    loginWithKakaoFirebase, // Kakao via Firebase
-    completeSignup,    // Complete signup flow
+    user,              // 현재 사용자 정보
+    isLoading,         // 인증 초기화 로딩
+    isAuthenticated,   // 인증 여부 Boolean
+    signupRequired,    // 회원가입이 필요한 경우 데이터
+    loginWithKakao,    // Kakao OAuth 로그인
+    loginWithGoogle,   // Google Firebase 로그인
+    loginWithKakaoFirebase, // Firebase를 통한 Kakao 로그인
+    completeSignup,    // 회원가입 완료 플로우
     clearSignupRequired,
-    login,             // Manual login
-    logout,            // Logout
-    refreshUser,       // Refresh user data
+    login,             // 수동 로그인
+    logout,            // 로그아웃
+    refreshUser,       // 사용자 데이터 갱신
   } = useAuth();
 
   if (isLoading) return <Loading />;
@@ -34,9 +34,9 @@ export function MyComponent() {
 }
 ```
 
-### Server-Side Auth Check
+### 서버 사이드 인증 확인
 
-For protected routes (layouts):
+보호된 라우트(레이아웃)에 사용:
 
 ```typescript
 // app/admin/layout.tsx
@@ -56,7 +56,7 @@ export default async function AdminLayout({
     redirect('/login');
   }
 
-  // Check admin claim from JWT
+  // JWT의 admin claim 확인
   if (!session.isAdmin) {
     redirect('/');
   }
@@ -70,9 +70,9 @@ export default async function AdminLayout({
 }
 ```
 
-### Hydration Protection Pattern
+### Hydration 보호 패턴
 
-Prevent hydration mismatches with auth-dependent content:
+인증에 의존하는 콘텐츠의 hydration 불일치 방지:
 
 ```typescript
 'use client';
@@ -92,7 +92,7 @@ export function Navbar() {
     <nav className="flex items-center justify-between h-16 px-6">
       <Logo />
 
-      {/* Auth-dependent content only after mount */}
+      {/* 마운트 후에만 인증에 의존하는 콘텐츠 표시 */}
       {mounted && !isLoading ? (
         isAuthenticated ? (
           <UserMenu user={user} />
@@ -100,7 +100,7 @@ export function Navbar() {
           <Button onClick={() => router.push('/login')}>로그인</Button>
         )
       ) : (
-        // Placeholder to prevent layout shift
+        // 레이아웃 이동 방지를 위한 플레이스홀더
         <div className="w-[72px] h-10" />
       )}
     </nav>
@@ -110,7 +110,7 @@ export function Navbar() {
 
 ---
 
-## File Upload to S3
+## S3 파일 업로드
 
 ```typescript
 'use client';
@@ -133,7 +133,7 @@ export function FileUploadForm() {
     setError(null);
 
     try {
-      // Optional: compress image before upload
+      // 선택사항: 업로드 전 이미지 압축
       const compressed = await compressImage(file);
       const s3Key = await uploadToS3(compressed);
       console.log('업로드 완료:', s3Key);
@@ -163,11 +163,11 @@ export function FileUploadForm() {
 
 ---
 
-## Form Handling
+## 폼 처리
 
-### Manual State Management (YGS Primary Pattern)
+### 수동 상태 관리 (YGS 주요 패턴)
 
-YGS uses manual state management with field-level validation:
+YGS는 필드 레벨 유효성 검사와 함께 수동 상태 관리를 사용합니다:
 
 ```typescript
 'use client';
@@ -204,7 +204,7 @@ export function SignupForm() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
 
-  // Phone number auto-formatting
+  // 전화번호 자동 포맷팅
   const formatPhoneNumber = (value: string): string => {
     const numbers = value.replace(/\D/g, '');
     if (numbers.length <= 3) return numbers;
@@ -235,7 +235,7 @@ export function SignupForm() {
   const handleInputChange = useCallback((field: keyof FormData, value: string) => {
     const formattedValue = field === 'phone' ? formatPhoneNumber(value) : value;
     setFormData(prev => ({ ...prev, [field]: formattedValue }));
-    // Clear error on input
+    // 입력 시 에러 초기화
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -248,7 +248,7 @@ export function SignupForm() {
     setLoading(true);
     try {
       await api.post('/api/v1/auth/signup', formData);
-      // Handle success
+      // 성공 처리
     } catch (err) {
       if (err instanceof Error) {
         setErrors({ phone: err.message });
@@ -260,7 +260,7 @@ export function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {/* Phone */}
+      {/* 전화번호 */}
       <div className="space-y-2">
         <label className="text-sm font-medium">전화번호</label>
         <Input
@@ -272,7 +272,7 @@ export function SignupForm() {
         {errors.phone && <p className="text-sm text-red-500">{errors.phone}</p>}
       </div>
 
-      {/* Name */}
+      {/* 이름 */}
       <div className="space-y-2">
         <label className="text-sm font-medium">이름</label>
         <Input
@@ -284,7 +284,7 @@ export function SignupForm() {
         {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
       </div>
 
-      {/* Gender */}
+      {/* 성별 */}
       <div className="space-y-2">
         <label className="text-sm font-medium">성별</label>
         <Select value={formData.gender} onValueChange={v => handleInputChange('gender', v)}>
@@ -311,7 +311,7 @@ export function SignupForm() {
 
 ---
 
-## URL-Based State (Pagination/Filtering)
+## URL 기반 상태 (페이지네이션/필터링)
 
 ```typescript
 'use client';
@@ -324,7 +324,7 @@ export function useMemberFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Parse current filters from URL
+  // URL에서 현재 필터 파싱
   const filters: MemberFilter = {
     status: searchParams.get('status') || '',
     gender: searchParams.get('gender') || '',
@@ -333,7 +333,7 @@ export function useMemberFilters() {
     limit: Number(searchParams.get('limit')) || 20,
   };
 
-  // Update URL with new filters
+  // 새 필터로 URL 업데이트
   const updateURL = useCallback((newFilters: Partial<MemberFilter>) => {
     const params = new URLSearchParams();
     const merged = { ...filters, ...newFilters };
@@ -347,7 +347,7 @@ export function useMemberFilters() {
     router.push(`/admin/members${params.toString() ? `?${params}` : ''}`);
   }, [filters, router]);
 
-  // Reset filters
+  // 필터 초기화
   const resetFilters = useCallback(() => {
     router.push('/admin/members');
   }, [router]);
@@ -355,7 +355,7 @@ export function useMemberFilters() {
   return { filters, updateURL, resetFilters };
 }
 
-// Usage in component
+// 컴포넌트에서 사용
 export function MemberFilters() {
   const { filters, updateURL, resetFilters } = useMemberFilters();
 
@@ -370,7 +370,7 @@ export function MemberFilters() {
         value={filters.status || 'all'}
         onValueChange={v => updateURL({ status: v === 'all' ? '' : v, skip: 0 })}
       >
-        {/* options */}
+        {/* 옵션 */}
       </Select>
       <Button variant="outline" onClick={resetFilters}>
         초기화
@@ -382,9 +382,9 @@ export function MemberFilters() {
 
 ---
 
-## Dialog/Modal Pattern
+## Dialog/Modal 패턴
 
-### Edit Modal (YGS Pattern)
+### 편집 모달 (YGS 패턴)
 
 ```typescript
 'use client';
@@ -424,7 +424,7 @@ export function BasicInfoEditModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Reset form when modal opens
+  // 모달이 열릴 때 폼 초기화
   useEffect(() => {
     if (isOpen) {
       setFormData({
@@ -441,12 +441,12 @@ export function BasicInfoEditModal({
     setError('');
 
     try {
-      // Only send changed fields
+      // 변경된 필드만 전송
       const changes: BasicInfoUpdateRequest = {};
       if (formData.name !== member.name) changes.name = formData.name;
       if (formData.status !== member.status) changes.status = formData.status;
 
-      // Skip if no changes
+      // 변경사항 없으면 건너뜀
       if (Object.keys(changes).length === 0) {
         onClose();
         return;
@@ -517,7 +517,7 @@ export function BasicInfoEditModal({
 
 ---
 
-## Select with Constants
+## 상수를 활용한 Select
 
 ```typescript
 'use client';
@@ -538,7 +538,7 @@ export function FilterSelect() {
 
   return (
     <div className="flex gap-4">
-      {/* Status Select */}
+      {/* 상태 Select */}
       <Select value={status} onValueChange={setStatus}>
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="상태 선택" />
@@ -553,7 +553,7 @@ export function FilterSelect() {
         </SelectContent>
       </Select>
 
-      {/* Gender Select */}
+      {/* 성별 Select */}
       <Select value={gender} onValueChange={setGender}>
         <SelectTrigger className="w-[120px]">
           <SelectValue placeholder="성별" />
@@ -574,7 +574,7 @@ export function FilterSelect() {
 
 ---
 
-## Loading Button Pattern
+## 로딩 버튼 패턴
 
 ```typescript
 'use client';
@@ -618,9 +618,9 @@ export function LoadingButton({ children, onClick, variant, className }: Loading
 
 ---
 
-## Error Handling Pattern
+## 에러 처리 패턴
 
-### API Error Class
+### API 에러 클래스
 
 ```typescript
 // lib/api.ts
@@ -635,19 +635,19 @@ export class ApiError extends Error {
   }
 }
 
-// Usage in component
+// 컴포넌트에서 사용
 try {
   await api.post('/endpoint', data);
 } catch (err) {
   if (err instanceof ApiError) {
     if (err.status === 401) {
-      // Unauthorized - redirect to login
+      // 인증 실패 - 로그인으로 리다이렉트
       router.push('/login');
     } else if (err.status === 409) {
-      // Conflict - duplicate entry
+      // 충돌 - 중복 데이터
       setError('이미 등록된 정보입니다.');
     } else if (err.status === 404) {
-      // Not found
+      // 찾을 수 없음
       setError('데이터를 찾을 수 없습니다.');
     } else {
       setError('오류가 발생했습니다. 다시 시도해주세요.');
@@ -660,7 +660,7 @@ try {
 }
 ```
 
-### Social Login Error Handling
+### 소셜 로그인 에러 처리
 
 ```typescript
 const handleSocialLogin = async (provider: 'kakao' | 'google') => {
@@ -675,11 +675,11 @@ const handleSocialLogin = async (provider: 'kakao' | 'google') => {
     }
   } catch (err) {
     if (err instanceof Error) {
-      // Silent failures for user cancellations
+      // 사용자가 취소한 경우 무시
       if (err.message.includes('popup-closed-by-user')) return;
       if (err.message.includes('cancelled')) return;
 
-      // Show specific error messages
+      // 특정 에러 메시지 표시
       setError(getErrorMessage(provider, err));
     } else {
       setError('로그인에 실패했습니다. 다시 시도해주세요.');
@@ -706,13 +706,13 @@ function getErrorMessage(provider: string, error: Error): string {
 
 ---
 
-## Skeleton Loading Pattern
+## 스켈레톤 로딩 패턴
 
 ```typescript
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
-// Table skeleton
+// 테이블 스켈레톤
 export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   return (
     <div className="space-y-4">
@@ -723,7 +723,7 @@ export function TableSkeleton({ rows = 5 }: { rows?: number }) {
   );
 }
 
-// Card grid skeleton
+// 카드 그리드 스켈레톤
 export function CardGridSkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
@@ -741,7 +741,7 @@ export function CardGridSkeleton({ count = 4 }: { count?: number }) {
   );
 }
 
-// Stats skeleton
+// 통계 스켈레톤
 export function DashboardSkeleton() {
   return (
     <div className="space-y-6">
@@ -758,7 +758,7 @@ export function DashboardSkeleton() {
 
 ---
 
-## Status Badge Pattern
+## 상태 배지 패턴
 
 ```typescript
 import { Badge } from '@/components/ui/badge';

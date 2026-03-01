@@ -1,19 +1,19 @@
-# Data Fetching - Next.js 15
+# 데이터 패칭 - Next.js 15
 
-## Overview
+## 개요
 
-Next.js 15 provides multiple ways to fetch data. Choose based on your use case:
+Next.js 15는 데이터를 패칭하는 다양한 방법을 제공합니다. 용도에 따라 선택하세요:
 
-1. **Server Components** (Recommended): Fetch data directly in async components
-2. **Client-Side Fetching**: Use in Client Components for dynamic data
-3. **API Routes**: For external API calls or complex server logic
-4. **Server Actions**: For mutations and form submissions
+1. **Server Components** (권장): async 컴포넌트에서 직접 데이터 패칭
+2. **클라이언트 사이드 패칭**: 동적 데이터를 위한 Client Components에서 사용
+3. **API Routes**: 외부 API 호출 또는 복잡한 서버 로직에 사용
+4. **Server Actions**: 변이 및 폼 제출에 사용
 
 ---
 
-## Server Component Data Fetching (Recommended)
+## Server Component 데이터 패칭 (권장)
 
-### Basic Pattern
+### 기본 패턴
 
 ```typescript
 // app/artists/page.tsx
@@ -21,7 +21,7 @@ import { api } from '@/lib/api';
 import type { Artist } from '@/types/artist';
 
 export default async function ArtistsPage() {
-  // Fetch directly in the component
+  // 컴포넌트에서 직접 패칭
   const artists: Artist[] = await api.artists.getAll();
 
   return (
@@ -34,7 +34,7 @@ export default async function ArtistsPage() {
 }
 ```
 
-### With Error Handling
+### 에러 처리 포함
 
 ```typescript
 export default async function ArtistsPage() {
@@ -43,16 +43,16 @@ export default async function ArtistsPage() {
     return <ArtistList artists={artists} />;
   } catch (error) {
     console.error('Failed to fetch artists:', error);
-    return <ErrorDisplay message="Failed to load artists" />;
+    return <ErrorDisplay message="아티스트를 불러오는데 실패했습니다" />;
   }
 }
 ```
 
-### Parallel Data Fetching
+### 병렬 데이터 패칭
 
 ```typescript
 export default async function DashboardPage() {
-  // Fetch multiple data sources in parallel
+  // 여러 데이터 소스를 병렬로 패칭
   const [artists, artworks, exhibitions] = await Promise.all([
     api.artists.getAll(),
     api.artworks.getAll(),
@@ -69,10 +69,10 @@ export default async function DashboardPage() {
 }
 ```
 
-### With Caching
+### 캐싱 사용
 
 ```typescript
-// Revalidate every 60 seconds
+// 60초마다 재검증
 export const revalidate = 60;
 
 export default async function ArtistsPage() {
@@ -81,24 +81,24 @@ export default async function ArtistsPage() {
 }
 ```
 
-Or per-request:
+또는 요청별로:
 
 ```typescript
 export default async function ArtistsPage() {
   const artists = await fetch('https://api.example.com/artists', {
-    next: { revalidate: 60 }, // Revalidate every 60 seconds
+    next: { revalidate: 60 }, // 60초마다 재검증
   }).then(res => res.json());
 
   return <ArtistList artists={artists} />;
 }
 ```
 
-### No Caching (Always Fresh)
+### 캐싱 없음 (항상 최신 데이터)
 
 ```typescript
 export default async function ArtistsPage() {
   const artists = await fetch('https://api.example.com/artists', {
-    cache: 'no-store', // Always fetch fresh data
+    cache: 'no-store', // 항상 최신 데이터 패칭
   }).then(res => res.json());
 
   return <ArtistList artists={artists} />;
@@ -107,9 +107,9 @@ export default async function ArtistsPage() {
 
 ---
 
-## Client-Side Data Fetching
+## 클라이언트 사이드 데이터 패칭
 
-### Basic Pattern with useState
+### useState를 사용한 기본 패턴
 
 ```typescript
 'use client';
@@ -129,7 +129,7 @@ export function ArtistList() {
         const data = await api.artists.getAll();
         setArtists(data);
       } catch (err) {
-        setError('Failed to fetch artists');
+        setError('아티스트를 불러오는데 실패했습니다');
         console.error(err);
       } finally {
         setLoading(false);
@@ -139,8 +139,8 @@ export function ArtistList() {
     fetchArtists();
   }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>오류: {error}</div>;
 
   return (
     <div>
@@ -152,7 +152,7 @@ export function ArtistList() {
 }
 ```
 
-### With Custom Hook
+### 커스텀 Hook 사용
 
 ```typescript
 // hooks/useArtists.ts
@@ -177,7 +177,7 @@ export function useArtists() {
   return { artists, loading, error };
 }
 
-// Component usage
+// 컴포넌트에서 사용
 'use client';
 
 import { useArtists } from '@/hooks/useArtists';
@@ -185,10 +185,10 @@ import { useArtists } from '@/hooks/useArtists';
 export function ArtistList() {
   const { artists, loading, error } = useArtists();
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>오류: {error.message}</div>;
 
-  return <div>{/* render artists */}</div>;
+  return <div>{/* 아티스트 렌더링 */}</div>;
 }
 ```
 
@@ -196,7 +196,7 @@ export function ArtistList() {
 
 ## API Routes
 
-### Creating API Routes
+### API Routes 생성
 
 ```typescript
 // app/api/artists/route.ts
@@ -205,13 +205,13 @@ import { getAuth } from '@/lib/serverAuth';
 
 export async function GET(request: NextRequest) {
   try {
-    // Optional: Check authentication
+    // 선택사항: 인증 확인
     const auth = await getAuth(request);
     if (!auth.isAuthenticated) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch data (from database, external API, etc.)
+    // 데이터 패칭 (데이터베이스, 외부 API 등)
     const artists = await fetchArtistsFromDatabase();
 
     return NextResponse.json({ artists });
@@ -238,14 +238,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to create artist' },
+      { error: '아티스트 생성에 실패했습니다' },
       { status: 500 }
     );
   }
 }
 ```
 
-### Dynamic API Routes
+### 동적 API Routes
 
 ```typescript
 // app/api/artists/[id]/route.ts
@@ -259,7 +259,7 @@ export async function GET(
   const artist = await fetchArtistById(artistId);
 
   if (!artist) {
-    return NextResponse.json({ error: 'Artist not found' }, { status: 404 });
+    return NextResponse.json({ error: '아티스트를 찾을 수 없습니다' }, { status: 404 });
   }
 
   return NextResponse.json({ artist });
@@ -292,7 +292,7 @@ export async function DELETE(
 
 ## Server Actions
 
-### Basic Server Action
+### 기본 Server Action
 
 ```typescript
 // app/actions.ts
@@ -308,18 +308,18 @@ export async function createArtist(formData: FormData) {
   try {
     const artist = await api.artists.create({ name, bio });
 
-    // Revalidate the artists page to show new data
+    // 아티스트 페이지를 재검증하여 새 데이터 표시
     revalidatePath('/artists');
 
     return { success: true, artist };
   } catch (error) {
-    console.error('Failed to create artist:', error);
-    return { success: false, error: 'Failed to create artist' };
+    console.error('아티스트 생성 실패:', error);
+    return { success: false, error: '아티스트 생성에 실패했습니다' };
   }
 }
 ```
 
-### Using Server Actions in Forms
+### 폼에서 Server Actions 사용
 
 ```typescript
 'use client';
@@ -340,10 +340,10 @@ export function ArtistForm() {
     const result = await createArtist(formData);
 
     if (result.success) {
-      setMessage('Artist created successfully!');
+      setMessage('아티스트가 성공적으로 생성되었습니다!');
       e.currentTarget.reset();
     } else {
-      setMessage(result.error || 'Failed to create artist');
+      setMessage(result.error || '아티스트 생성에 실패했습니다');
     }
 
     setLoading(false);
@@ -351,10 +351,10 @@ export function ArtistForm() {
 
   return (
     <Box component="form" onSubmit={handleSubmit}>
-      <TextField name="name" label="Name" required fullWidth />
-      <TextField name="bio" label="Bio" multiline rows={4} fullWidth />
+      <TextField name="name" label="이름" required fullWidth />
+      <TextField name="bio" label="소개" multiline rows={4} fullWidth />
       <Button type="submit" disabled={loading}>
-        {loading ? 'Creating...' : 'Create Artist'}
+        {loading ? '생성 중...' : '아티스트 생성'}
       </Button>
       {message && <div>{message}</div>}
     </Box>
@@ -362,7 +362,7 @@ export function ArtistForm() {
 }
 ```
 
-### Server Action with redirect
+### redirect가 있는 Server Action
 
 ```typescript
 'use server';
@@ -376,24 +376,24 @@ export async function createArtist(formData: FormData) {
     bio: formData.get('bio') as string,
   });
 
-  // Redirect to the new artist page
+  // 새 아티스트 페이지로 리다이렉트
   redirect(`/artists/${artist.id}`);
 }
 ```
 
 ---
 
-## Data Fetching Patterns
+## 데이터 패칭 패턴
 
-Your project supports **two patterns** for data fetching:
+프로젝트는 **두 가지 패턴**을 지원합니다:
 
-### Pattern 1: Centralized API Client (Recommended for Complex Requests)
+### 패턴 1: 중앙화된 API 클라이언트 (복잡한 요청에 권장)
 
-**Use `@/lib/api` for:**
-- Type-safe API calls
-- Complex requests with authentication
-- Centralized error handling
-- Consistent request formatting
+**`@/lib/api` 사용 시:**
+- 타입 안전한 API 호출
+- 인증이 있는 복잡한 요청
+- 중앙화된 에러 처리
+- 일관된 요청 포맷
 
 ```typescript
 // Server Component
@@ -417,16 +417,16 @@ export function ClientComponent() {
     api.artists.getAll().then(setData);
   }, []);
 
-  return <div>{/* render */}</div>;
+  return <div>{/* 렌더링 */}</div>;
 }
 ```
 
-### Pattern 2: Direct Fetch (Acceptable for Simple Public Endpoints)
+### 패턴 2: 직접 Fetch (간단한 공개 엔드포인트에 적합)
 
-**Use direct `fetch()` with `little_boy_server_endpoint` for:**
-- Simple GET requests
-- Public endpoints without authentication
-- Quick prototyping
+**`little_boy_server_endpoint`와 함께 직접 `fetch()` 사용 시:**
+- 간단한 GET 요청
+- 인증 없는 공개 엔드포인트
+- 빠른 프로토타이핑
 
 ```typescript
 import { little_boy_server_endpoint } from '@/const/endpoint';
@@ -438,15 +438,15 @@ export default async function Page() {
 }
 ```
 
-**When to use which:**
-- ✅ API Client: Authenticated requests, complex operations, need type safety
-- ✅ Direct Fetch: Public endpoints, simple GET requests, rapid prototyping
+**언제 무엇을 사용할지:**
+- API 클라이언트: 인증된 요청, 복잡한 작업, 타입 안전성 필요 시
+- 직접 Fetch: 공개 엔드포인트, 간단한 GET 요청, 빠른 프로토타이핑
 
 ---
 
-## Authentication with Server Auth
+## Server 인증과 함께 데이터 패칭
 
-For authenticated requests on the server:
+서버에서 인증된 요청을 위해:
 
 ```typescript
 // app/protected/page.tsx
@@ -462,7 +462,7 @@ export default async function ProtectedPage() {
     redirect('/login');
   }
 
-  // User is authenticated, fetch protected data
+  // 사용자 인증됨, 보호된 데이터 패칭
   const userData = await api.users.getProfile(auth.userId);
 
   return <UserProfile user={userData} />;
@@ -471,15 +471,15 @@ export default async function ProtectedPage() {
 
 ---
 
-## Best Practices
+## 모범 사례
 
-1. **Prefer Server Components**: Fetch data in Server Components when possible
-2. **Use API Client**: Always use your centralized API client (`@/lib/api`)
-3. **Handle Errors**: Always wrap data fetching in try/catch
-4. **Loading States**: Show loading UI while data is being fetched
-5. **Parallel Fetching**: Use `Promise.all()` for independent data sources
-6. **Caching**: Use `revalidate` for data that can be cached
-7. **Type Safety**: Always type your data with TypeScript interfaces
-8. **Server Actions**: Use for mutations and form submissions
-9. **Authentication**: Use `getAuth()` from `src/lib/serverAuth` for protected routes
-10. **Revalidation**: Use `revalidatePath()` after mutations to refresh data
+1. **Server Components 우선**: 가능하면 Server Components에서 데이터 패칭
+2. **API 클라이언트 사용**: 항상 중앙화된 API 클라이언트(`@/lib/api`) 사용
+3. **에러 처리**: 항상 데이터 패칭을 try/catch로 감싸기
+4. **로딩 상태**: 데이터를 패칭하는 동안 로딩 UI 표시
+5. **병렬 패칭**: 독립적인 데이터 소스에 `Promise.all()` 사용
+6. **캐싱**: 캐시 가능한 데이터에 `revalidate` 사용
+7. **타입 안전성**: 항상 TypeScript interfaces로 데이터 타입 지정
+8. **Server Actions**: 변이 및 폼 제출에 사용
+9. **인증**: 보호된 라우트에 `src/lib/serverAuth`의 `getAuth()` 사용
+10. **재검증**: 변이 후 데이터 갱신에 `revalidatePath()` 사용

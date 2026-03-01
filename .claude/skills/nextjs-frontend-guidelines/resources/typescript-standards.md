@@ -1,8 +1,8 @@
-# TypeScript Standards - Next.js 15
+# TypeScript 표준 - Next.js 15
 
-## Strict Mode
+## Strict 모드
 
-Your project should have strict TypeScript enabled:
+프로젝트에 TypeScript strict 모드를 활성화하세요:
 
 ```json
 {
@@ -14,15 +14,15 @@ Your project should have strict TypeScript enabled:
 }
 ```
 
-## Component Props
+## 컴포넌트 Props
 
 ```typescript
 interface ComponentProps {
-  /** The user's name */
+  /** 사용자 이름 */
   name: string;
-  /** Optional callback function */
+  /** 선택적 콜백 함수 */
   onUpdate?: (value: string) => void;
-  /** Loading state */
+  /** 로딩 상태 */
   loading?: boolean;
 }
 
@@ -31,25 +31,25 @@ export function Component({ name, onUpdate, loading = false }: ComponentProps) {
 }
 ```
 
-## Type Imports
+## 타입 Imports
 
 ```typescript
-// ✅ Use type imports
+// 타입 imports 사용 (권장)
 import type { User } from '@/types/user';
 import type { SxProps, Theme } from '@mui/material';
 
-// ❌ Avoid mixing
+// 값과 혼용 금지
 import { User } from '@/types/user';
 ```
 
-## Next.js Types
+## Next.js 타입
 
 ```typescript
 import type { Metadata } from 'next';
 import type { NextRequest } from 'next/server';
 
 export const metadata: Metadata = {
-  title: 'Page Title',
+  title: '페이지 제목',
 };
 
 export async function GET(request: NextRequest) {
@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 }
 ```
 
-## Page Props
+## 페이지 Props
 
 ```typescript
 interface PageProps {
@@ -70,7 +70,7 @@ export default async function Page({ params, searchParams }: PageProps) {
 }
 ```
 
-## API Response Types
+## API 응답 타입
 
 ```typescript
 // types/api.ts
@@ -80,11 +80,11 @@ export interface ApiResponse<T> {
   error?: string;
 }
 
-// Usage
+// 사용 예시
 const response: ApiResponse<User> = await api.users.get(id);
 ```
 
-## Event Handlers
+## 이벤트 핸들러
 
 ```typescript
 'use client';
@@ -104,11 +104,11 @@ export function Form() {
 }
 ```
 
-## Best Practices
+## 모범 사례
 
-1. **Explicit Types**: Always type function parameters and returns
-2. **Type Imports**: Use `import type` for types
-3. **Interfaces**: Use interfaces for object shapes
-4. **No any**: Use `unknown` if type is truly unknown
-5. **JSDoc**: Document complex types and props
-6. **Utility Types**: Use Partial, Pick, Omit when appropriate
+1. **명시적 타입**: 항상 함수 매개변수와 반환 값에 타입 지정
+2. **타입 Imports**: 타입에는 `import type` 사용
+3. **Interfaces**: 객체 형태에는 인터페이스 사용
+4. **any 금지**: 타입을 알 수 없는 경우 `unknown` 사용
+5. **JSDoc**: 복잡한 타입과 props 문서화
+6. **유틸리티 타입**: 적절히 Partial, Pick, Omit 활용

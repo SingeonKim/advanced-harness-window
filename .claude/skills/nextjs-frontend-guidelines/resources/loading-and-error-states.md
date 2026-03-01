@@ -1,8 +1,8 @@
-# Loading & Error States - Next.js 15
+# 로딩 및 에러 상태 - Next.js 15
 
-## Loading States
+## 로딩 상태
 
-### Route-Level Loading
+### 라우트 레벨 로딩
 
 ```typescript
 // app/artists/loading.tsx
@@ -15,7 +15,7 @@ export default function Loading() {
 }
 ```
 
-### Suspense Boundaries
+### Suspense 경계
 
 ```typescript
 import { Suspense } from 'react';
@@ -23,7 +23,7 @@ import { Suspense } from 'react';
 export default function Page() {
   return (
     <div>
-      <h1>Artists</h1>
+      <h1>아티스트</h1>
       <Suspense fallback={<LoadingSpinner />}>
         <ArtistList />
       </Suspense>
@@ -32,7 +32,7 @@ export default function Page() {
 }
 ```
 
-### Client-Side Loading
+### 클라이언트 사이드 로딩
 
 ```typescript
 'use client';
@@ -54,15 +54,15 @@ export function Component() {
 
   return (
     <Button onClick={handleClick} disabled={loading}>
-      {loading ? <CircularProgress size={20} /> : 'Click Me'}
+      {loading ? <CircularProgress size={20} /> : '클릭'}
     </Button>
   );
 }
 ```
 
-## Error Handling
+## 에러 처리
 
-### Route-Level Error Boundary
+### 라우트 레벨 에러 경계
 
 ```typescript
 // app/artists/error.tsx
@@ -78,21 +78,21 @@ export default function Error({
   return (
     <div className="p-8 text-center">
       <h2 className="text-xl font-bold text-red-600 mb-4">
-        Something went wrong!
+        오류가 발생했습니다!
       </h2>
       <p className="text-gray-600 mb-4">{error.message}</p>
       <button
         onClick={reset}
         className="px-4 py-2 bg-blue-500 text-white rounded"
       >
-        Try Again
+        다시 시도
       </button>
     </div>
   );
 }
 ```
 
-### Client-Side Error Handling
+### 클라이언트 사이드 에러 처리
 
 ```typescript
 'use client';
@@ -106,7 +106,7 @@ export function Component() {
     try {
       await api.doSomething();
     } catch (err) {
-      setError('Something went wrong');
+      setError('오류가 발생했습니다');
       console.error(err);
     }
   };
@@ -114,28 +114,28 @@ export function Component() {
   return (
     <div>
       {error && <div className="text-red-600">{error}</div>}
-      <button onClick={handleAction}>Action</button>
+      <button onClick={handleAction}>액션</button>
     </div>
   );
 }
 ```
 
-### Not Found
+### Not Found (찾을 수 없음)
 
 ```typescript
 // app/artists/[id]/not-found.tsx
 export default function NotFound() {
   return (
     <div className="text-center p-8">
-      <h2 className="text-2xl font-bold">Artist Not Found</h2>
+      <h2 className="text-2xl font-bold">아티스트를 찾을 수 없습니다</h2>
       <p className="text-gray-600 mt-2">
-        The artist you're looking for doesn't exist.
+        찾으시는 아티스트가 존재하지 않습니다.
       </p>
     </div>
   );
 }
 
-// In page component
+// 페이지 컴포넌트에서 사용
 import { notFound } from 'next/navigation';
 
 export default async function ArtistPage({ params }) {

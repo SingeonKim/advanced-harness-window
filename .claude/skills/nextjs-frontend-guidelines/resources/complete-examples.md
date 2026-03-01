@@ -1,6 +1,6 @@
-# Complete Examples - Next.js 15
+# 완전한 예제 - Next.js 15
 
-## Full Server Component Example
+## 완전한 Server Component 예제
 
 ```typescript
 // app/artists/page.tsx
@@ -17,10 +17,10 @@ export const metadata: Metadata = {
   description: 'Browse our collection of talented artists',
 };
 
-export const revalidate = 60; // Revalidate every 60 seconds
+export const revalidate = 60; // 60초마다 재검증
 
 export default async function ArtistsPage() {
-  // Fetch data directly on the server
+  // 서버에서 직접 데이터 패칭
   const artists: Artist[] = await api.artists.getAll();
 
   return (
@@ -37,7 +37,7 @@ export default async function ArtistsPage() {
 }
 ```
 
-## Full Client Component Example
+## 완전한 Client Component 예제
 
 ```typescript
 // components/artist/ArtistFilters.tsx
@@ -92,7 +92,7 @@ export function ArtistFilters({ onFilterChange }: ArtistFiltersProps) {
   return (
     <div className="flex flex-col sm:flex-row gap-4 mb-6">
       <Input
-        placeholder="Search artists..."
+        placeholder="아티스트 검색..."
         value={filters.search}
         onChange={handleSearchChange}
         className="flex-1"
@@ -100,25 +100,25 @@ export function ArtistFilters({ onFilterChange }: ArtistFiltersProps) {
 
       <Select value={filters.category} onValueChange={handleCategoryChange}>
         <SelectTrigger className="w-full sm:w-[180px]">
-          <SelectValue placeholder="Category" />
+          <SelectValue placeholder="카테고리" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Categories</SelectItem>
-          <SelectItem value="painting">Painting</SelectItem>
-          <SelectItem value="sculpture">Sculpture</SelectItem>
-          <SelectItem value="digital">Digital Art</SelectItem>
+          <SelectItem value="all">전체 카테고리</SelectItem>
+          <SelectItem value="painting">회화</SelectItem>
+          <SelectItem value="sculpture">조각</SelectItem>
+          <SelectItem value="digital">디지털 아트</SelectItem>
         </SelectContent>
       </Select>
 
       <Button variant="outline" onClick={handleReset}>
-        Reset Filters
+        필터 초기화
       </Button>
     </div>
   );
 }
 ```
 
-## API Route Example
+## API Route 예제
 
 ```typescript
 // app/api/artists/route.ts
@@ -128,12 +128,12 @@ import { getAuth } from '@/lib/serverAuth';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get search params
+    // 검색 파라미터 가져오기
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    // Fetch artists (from database, external API, etc.)
+    // 아티스트 데이터 패칭 (데이터베이스, 외부 API 등에서)
     const artists = await fetchArtistsFromDatabase({ page, limit });
 
     return NextResponse.json({
@@ -145,7 +145,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch artists' },
+      { success: false, error: '아티스트 목록을 불러오는데 실패했습니다' },
       { status: 500 }
     );
   }
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
+    // 인증 확인
     const cookieStore = await cookies();
     const auth = await getAuth({ cookies: cookieStore });
 
@@ -164,10 +164,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get request body
+    // 요청 본문 가져오기
     const body = await request.json();
 
-    // Validate and create artist
+    // 유효성 검사 및 아티스트 생성
     const newArtist = await createArtist(body);
 
     return NextResponse.json(
@@ -177,14 +177,14 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('API Error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to create artist' },
+      { success: false, error: '아티스트 생성에 실패했습니다' },
       { status: 500 }
     );
   }
 }
 ```
 
-## Form with react-hook-form + zod + shadcn/ui
+## react-hook-form + zod + shadcn/ui를 사용한 폼
 
 ```typescript
 // components/artist/CreateArtistForm.tsx
@@ -218,10 +218,10 @@ import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
 const artistSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  bio: z.string().min(10, 'Bio must be at least 10 characters'),
-  category: z.string().min(1, 'Please select a category'),
+  name: z.string().min(2, '이름은 2자 이상이어야 합니다'),
+  email: z.string().email('올바른 이메일 형식이 아닙니다'),
+  bio: z.string().min(10, '소개는 10자 이상이어야 합니다'),
+  category: z.string().min(1, '카테고리를 선택해주세요'),
 });
 
 type ArtistFormValues = z.infer<typeof artistSchema>;
@@ -243,14 +243,14 @@ export function CreateArtistForm() {
       await api.artists.create(values);
       router.push('/artists');
     } catch (error) {
-      console.error('Failed to create artist:', error);
+      console.error('아티스트 생성 실패:', error);
     }
   }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Create New Artist</CardTitle>
+        <CardTitle>새 아티스트 생성</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -260,12 +260,12 @@ export function CreateArtistForm() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>이름</FormLabel>
                   <FormControl>
-                    <Input placeholder="Artist name" {...field} />
+                    <Input placeholder="아티스트 이름" {...field} />
                   </FormControl>
                   <FormDescription>
-                    The artist's display name.
+                    아티스트의 표시 이름입니다.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -277,7 +277,7 @@ export function CreateArtistForm() {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>이메일</FormLabel>
                   <FormControl>
                     <Input type="email" placeholder="artist@example.com" {...field} />
                   </FormControl>
@@ -291,18 +291,18 @@ export function CreateArtistForm() {
               name="category"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Category</FormLabel>
+                  <FormLabel>카테고리</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
+                        <SelectValue placeholder="카테고리 선택" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="painting">Painting</SelectItem>
-                      <SelectItem value="sculpture">Sculpture</SelectItem>
-                      <SelectItem value="digital">Digital Art</SelectItem>
-                      <SelectItem value="photography">Photography</SelectItem>
+                      <SelectItem value="painting">회화</SelectItem>
+                      <SelectItem value="sculpture">조각</SelectItem>
+                      <SelectItem value="digital">디지털 아트</SelectItem>
+                      <SelectItem value="photography">사진</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -315,10 +315,10 @@ export function CreateArtistForm() {
               name="bio"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Biography</FormLabel>
+                  <FormLabel>소개</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Tell us about the artist..."
+                      placeholder="아티스트에 대해 소개해주세요..."
                       className="min-h-[120px]"
                       {...field}
                     />
@@ -334,13 +334,13 @@ export function CreateArtistForm() {
                 variant="outline"
                 onClick={() => router.back()}
               >
-                Cancel
+                취소
               </Button>
               <Button type="submit" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
-                Create Artist
+                아티스트 생성
               </Button>
             </div>
           </form>
@@ -351,7 +351,7 @@ export function CreateArtistForm() {
 }
 ```
 
-## Page with Suspense Boundaries
+## Suspense 경계가 있는 페이지
 
 ```typescript
 // app/artists/[id]/page.tsx
@@ -366,7 +366,7 @@ interface PageProps {
   params: { id: string };
 }
 
-// Loading skeleton for artworks
+// 작품 목록 로딩 스켈레톤
 function ArtworksSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -383,7 +383,7 @@ function ArtworksSkeleton() {
   );
 }
 
-// Async component for artworks
+// 작품 목록을 가져오는 async 컴포넌트
 async function ArtistArtworks({ artistId }: { artistId: string }) {
   const artworks = await api.artworks.getByArtist(artistId);
   return <ArtworkList artworks={artworks} />;
@@ -407,7 +407,7 @@ export default async function ArtistDetailPage({ params }: PageProps) {
         </CardContent>
       </Card>
 
-      <h2 className="text-2xl font-bold mb-6">Artworks</h2>
+      <h2 className="text-2xl font-bold mb-6">작품 목록</h2>
 
       <Suspense fallback={<ArtworksSkeleton />}>
         <ArtistArtworks artistId={params.id} />
@@ -417,36 +417,36 @@ export default async function ArtistDetailPage({ params }: PageProps) {
 }
 ```
 
-## Complete Feature Example
+## 완전한 기능 예제 구조
 
 ```
 src/
   components/
     artist/
-      ArtistCard.tsx          # Card component for artist display
-      ArtistProfile.tsx       # Server component for profile
-      ArtistFilters.tsx       # Client component for filters
-      CreateArtistForm.tsx    # Form with react-hook-form
+      ArtistCard.tsx          # 아티스트 표시용 카드 컴포넌트
+      ArtistProfile.tsx       # 프로필을 위한 Server Component
+      ArtistFilters.tsx       # 필터를 위한 Client Component
+      CreateArtistForm.tsx    # react-hook-form을 사용한 폼
 
   app/
     artists/
-      page.tsx                # Server component - list page
+      page.tsx                # Server Component - 목록 페이지
       [id]/
-        page.tsx              # Server component - detail page
+        page.tsx              # Server Component - 상세 페이지
       new/
-        page.tsx              # Create artist page
-      loading.tsx             # Loading UI
-      error.tsx               # Error UI
+        page.tsx              # 아티스트 생성 페이지
+      loading.tsx             # 로딩 UI
+      error.tsx               # 에러 UI
 
   types/
-    artist.ts                 # TypeScript types
+    artist.ts                 # TypeScript 타입 정의
 
   lib/
-    api.ts                    # API client with artist methods
-    utils.ts                  # cn() utility
+    api.ts                    # 아티스트 메서드가 있는 API 클라이언트
+    utils.ts                  # cn() 유틸리티
 ```
 
-## ArtistCard Component
+## ArtistCard 컴포넌트
 
 ```typescript
 // components/artist/ArtistCard.tsx
@@ -496,7 +496,7 @@ export function ArtistCard({ artist, className }: ArtistCardProps) {
 }
 ```
 
-## Loading UI
+## 로딩 UI
 
 ```typescript
 // app/artists/loading.tsx
@@ -527,7 +527,7 @@ export default function Loading() {
 }
 ```
 
-## Error UI
+## 에러 UI
 
 ```typescript
 // app/artists/error.tsx
@@ -554,14 +554,14 @@ export default function Error({ error, reset }: ErrorProps) {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-destructive">
             <AlertCircle className="h-5 w-5" />
-            Something went wrong
+            오류가 발생했습니다
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-muted-foreground">
-            We encountered an error while loading this page. Please try again.
+            페이지를 불러오는 중 오류가 발생했습니다. 다시 시도해주세요.
           </p>
-          <Button onClick={reset}>Try again</Button>
+          <Button onClick={reset}>다시 시도</Button>
         </CardContent>
       </Card>
     </div>
@@ -569,11 +569,11 @@ export default function Error({ error, reset }: ErrorProps) {
 }
 ```
 
-This structure provides:
-- Server-side data fetching and rendering
-- Client-side interactivity where needed
-- Type safety throughout
-- Proper error and loading states
-- Clean separation of concerns
-- shadcn/ui components for consistent design
-- Tailwind CSS for custom styling
+이 구조가 제공하는 것:
+- 서버 사이드 데이터 패칭 및 렌더링
+- 필요한 곳에서만 클라이언트 사이드 인터랙티비티
+- 전반적인 타입 안전성
+- 적절한 에러 및 로딩 상태 처리
+- 관심사의 명확한 분리
+- 일관된 디자인을 위한 shadcn/ui 컴포넌트
+- 커스텀 스타일링을 위한 Tailwind CSS
