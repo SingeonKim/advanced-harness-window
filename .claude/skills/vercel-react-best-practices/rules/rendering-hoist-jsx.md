@@ -5,11 +5,11 @@ impactDescription: avoids re-creation
 tags: rendering, jsx, static, optimization
 ---
 
-## Hoist Static JSX Elements
+## 정적 JSX 요소 호이스팅
 
-Extract static JSX outside components to avoid re-creation.
+재생성을 방지하기 위해 컴포넌트 외부로 정적 JSX를 추출합니다.
 
-**Incorrect (recreates element every render):**
+**잘못된 방법 (매 렌더마다 요소 재생성):**
 
 ```tsx
 function LoadingSkeleton() {
@@ -25,7 +25,7 @@ function Container() {
 }
 ```
 
-**Correct (reuses same element):**
+**올바른 방법 (동일한 요소 재사용):**
 
 ```tsx
 const loadingSkeleton = (
@@ -41,6 +41,6 @@ function Container() {
 }
 ```
 
-This is especially helpful for large and static SVG nodes, which can be expensive to recreate on every render.
+이는 매 렌더마다 재생성하기 비용이 많이 드는 크고 정적인 SVG 노드에 특히 유용합니다.
 
-**Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, the compiler automatically hoists static JSX elements and optimizes component re-renders, making manual hoisting unnecessary.
+**참고:** 프로젝트에 [React Compiler](https://react.dev/learn/react-compiler)가 활성화된 경우 컴파일러가 정적 JSX 요소를 자동으로 호이스팅하고 컴포넌트 리렌더를 최적화하므로 수동 호이스팅이 불필요합니다.

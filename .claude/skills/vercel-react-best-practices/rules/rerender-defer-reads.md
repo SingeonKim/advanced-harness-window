@@ -5,11 +5,11 @@ impactDescription: avoids unnecessary subscriptions
 tags: rerender, searchParams, localStorage, optimization
 ---
 
-## Defer State Reads to Usage Point
+## 상태 읽기를 사용 시점으로 지연
 
-Don't subscribe to dynamic state (searchParams, localStorage) if you only read it inside callbacks.
+콜백 내부에서만 읽는다면 동적 상태(searchParams, localStorage)를 구독하지 않습니다.
 
-**Incorrect (subscribes to all searchParams changes):**
+**잘못된 방법 (모든 searchParams 변경을 구독):**
 
 ```tsx
 function ShareButton({ chatId }: { chatId: string }) {
@@ -24,7 +24,7 @@ function ShareButton({ chatId }: { chatId: string }) {
 }
 ```
 
-**Correct (reads on demand, no subscription):**
+**올바른 방법 (필요 시 읽기, 구독 없음):**
 
 ```tsx
 function ShareButton({ chatId }: { chatId: string }) {

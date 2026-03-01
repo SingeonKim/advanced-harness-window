@@ -5,17 +5,17 @@ impactDescription: avoids unnecessary computation
 tags: javascript, functions, optimization, early-return
 ---
 
-## Early Return from Functions
+## 함수에서 조기 반환
 
-Return early when result is determined to skip unnecessary processing.
+결과가 결정되면 즉시 반환하여 불필요한 처리를 건너뜁니다.
 
-**Incorrect (processes all items even after finding answer):**
+**잘못된 방법 (답을 찾은 후에도 모든 항목 처리):**
 
 ```typescript
 function validateUsers(users: User[]) {
   let hasError = false
   let errorMessage = ''
-  
+
   for (const user of users) {
     if (!user.email) {
       hasError = true
@@ -25,14 +25,14 @@ function validateUsers(users: User[]) {
       hasError = true
       errorMessage = 'Name required'
     }
-    // Continues checking all users even after error found
+    // 에러 발견 후에도 모든 사용자 계속 확인
   }
-  
+
   return hasError ? { valid: false, error: errorMessage } : { valid: true }
 }
 ```
 
-**Correct (returns immediately on first error):**
+**올바른 방법 (첫 번째 에러에서 즉시 반환):**
 
 ```typescript
 function validateUsers(users: User[]) {

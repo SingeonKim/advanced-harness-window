@@ -5,70 +5,70 @@ impactDescription: prevents stale closures and unnecessary callback recreations
 tags: react, hooks, useState, useCallback, callbacks, closures
 ---
 
-## Use Functional setState Updates
+## 함수형 setState 업데이트 사용
 
-When updating state based on the current state value, use the functional update form of setState instead of directly referencing the state variable. This prevents stale closures, eliminates unnecessary dependencies, and creates stable callback references.
+현재 상태 값을 기반으로 상태를 업데이트할 때 상태 변수를 직접 참조하는 대신 setState의 함수형 업데이트 형식을 사용합니다. 이는 오래된 클로저를 방지하고, 불필요한 의존성을 제거하며, 안정적인 콜백 참조를 생성합니다.
 
-**Incorrect (requires state as dependency):**
+**잘못된 방법 (state를 의존성으로 필요):**
 
 ```tsx
 function TodoList() {
   const [items, setItems] = useState(initialItems)
-  
-  // Callback must depend on items, recreated on every items change
+
+  // 콜백이 items에 의존해야 하며, items 변경마다 재생성됨
   const addItems = useCallback((newItems: Item[]) => {
     setItems([...items, ...newItems])
-  }, [items])  // ❌ items dependency causes recreations
-  
-  // Risk of stale closure if dependency is forgotten
+  }, [items])  // items 의존성으로 인해 재생성 발생
+
+  // 의존성을 잊으면 오래된 클로저 위험
   const removeItem = useCallback((id: string) => {
     setItems(items.filter(item => item.id !== id))
-  }, [])  // ❌ Missing items dependency - will use stale items!
-  
+  }, [])  // items 의존성 누락 - 오래된 items를 사용하게 됨!
+
   return <ItemsEditor items={items} onAdd={addItems} onRemove={removeItem} />
 }
 ```
 
-The first callback is recreated every time `items` changes, which can cause child components to re-render unnecessarily. The second callback has a stale closure bug—it will always reference the initial `items` value.
+첫 번째 콜백은 `items`가 변경될 때마다 재생성되어 자식 컴포넌트가 불필요하게 리렌더될 수 있습니다. 두 번째 콜백에는 오래된 클로저 버그가 있어 항상 초기 `items` 값을 참조합니다.
 
-**Correct (stable callbacks, no stale closures):**
+**올바른 방법 (안정적인 콜백, 오래된 클로저 없음):**
 
 ```tsx
 function TodoList() {
   const [items, setItems] = useState(initialItems)
-  
-  // Stable callback, never recreated
+
+  // 안정적인 콜백, 재생성되지 않음
   const addItems = useCallback((newItems: Item[]) => {
     setItems(curr => [...curr, ...newItems])
-  }, [])  // ✅ No dependencies needed
-  
-  // Always uses latest state, no stale closure risk
+  }, [])  // 의존성 불필요
+
+  // 항상 최신 상태 사용, 오래된 클로저 위험 없음
   const removeItem = useCallback((id: string) => {
     setItems(curr => curr.filter(item => item.id !== id))
-  }, [])  // ✅ Safe and stable
-  
+  }, [])  // 안전하고 안정적
+
   return <ItemsEditor items={items} onAdd={addItems} onRemove={removeItem} />
 }
 ```
 
-**Benefits:**
+**장점:**
 
-1. **Stable callback references** - Callbacks don't need to be recreated when state changes
-2. **No stale closures** - Always operates on the latest state value
-3. **Fewer dependencies** - Simplifies dependency arrays and reduces memory leaks
-4. **Prevents bugs** - Eliminates the most common source of React closure bugs
+1. **안정적인 콜백 참조** - 상태가 변경되어도 콜백이 재생성될 필요 없음
+2. **오래된 클로저 없음** - 항상 최신 상태 값으로 동작
+3. **더 적은 의존성** - 의존성 배열 단순화 및 메모리 누수 감소
+4. **버그 방지** - React 클로저 버그의 가장 일반적인 원인 제거
 
-**When to use functional updates:**
+**함수형 업데이트를 사용해야 할 때:**
 
-- Any setState that depends on the current state value
-- Inside useCallback/useMemo when state is needed
-- Event handlers that reference state
-- Async operations that update state
+- 현재 상태 값에 의존하는 모든 setState
+- state가 필요할 때 useCallback/useMemo 내부
+- state를 참조하는 이벤트 핸들러
+- state를 업데이트하는 비동기 작업
 
-**When direct updates are fine:**
+**직접 업데이트가 괜찮은 경우:**
 
-- Setting state to a static value: `setCount(0)`
-- Setting state from props/arguments only: `setName(newName)`
-- State doesn't depend on previous value
+- 정적 값으로 상태 설정: `setCount(0)`
+- props/인자에서만 상태 설정: `setName(newName)`
+- 상태가 이전 값에 의존하지 않을 때
 
-**Note:** If your project has [React Compiler](https://react.dev/learn/react-compiler) enabled, the compiler can automatically optimize some cases, but functional updates are still recommended for correctness and to prevent stale closure bugs.
+**참고:** 프로젝트에 [React Compiler](https://react.dev/learn/react-compiler)가 활성화된 경우 컴파일러가 일부 경우를 자동으로 최적화할 수 있지만, 정확성과 오래된 클로저 버그 방지를 위해 함수형 업데이트가 여전히 권장됩니다.

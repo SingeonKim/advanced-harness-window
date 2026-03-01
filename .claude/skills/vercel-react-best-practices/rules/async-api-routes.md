@@ -5,11 +5,11 @@ impactDescription: 2-10× improvement
 tags: api-routes, server-actions, waterfalls, parallelization
 ---
 
-## Prevent Waterfall Chains in API Routes
+## API 라우트에서 워터폴 체인 방지
 
-In API routes and Server Actions, start independent operations immediately, even if you don't await them yet.
+API 라우트와 Server Actions에서 독립적인 작업은 아직 await하지 않더라도 즉시 시작합니다.
 
-**Incorrect (config waits for auth, data waits for both):**
+**잘못된 방법 (config가 auth를 기다리고, data가 둘 다 기다림):**
 
 ```typescript
 export async function GET(request: Request) {
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 }
 ```
 
-**Correct (auth and config start immediately):**
+**올바른 방법 (auth와 config가 즉시 시작):**
 
 ```typescript
 export async function GET(request: Request) {
@@ -35,4 +35,4 @@ export async function GET(request: Request) {
 }
 ```
 
-For operations with more complex dependency chains, use `better-all` to automatically maximize parallelism (see Dependency-Based Parallelization).
+더 복잡한 의존성 체인이 있는 작업의 경우 `better-all`을 사용하여 자동으로 병렬성을 최대화합니다 (의존성 기반 병렬화 참조).

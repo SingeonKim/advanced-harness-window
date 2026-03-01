@@ -5,11 +5,11 @@ impactDescription: avoids redundant renders and state drift
 tags: rerender, derived-state, useEffect, state
 ---
 
-## Calculate Derived State During Rendering
+## 렌더링 중 파생 상태 계산
 
-If a value can be computed from current props/state, do not store it in state or update it in an effect. Derive it during render to avoid extra renders and state drift. Do not set state in effects solely in response to prop changes; prefer derived values or keyed resets instead.
+값이 현재 props/state에서 계산될 수 있다면 state에 저장하거나 effect에서 업데이트하지 않습니다. 렌더 중에 파생하여 추가적인 렌더와 상태 불일치를 방지합니다. prop 변경에만 응답하는 effect에서 상태를 설정하지 않고 파생 값이나 키 기반 리셋을 선호합니다.
 
-**Incorrect (redundant state and effect):**
+**잘못된 방법 (중복 state와 effect):**
 
 ```tsx
 function Form() {
@@ -25,7 +25,7 @@ function Form() {
 }
 ```
 
-**Correct (derive during render):**
+**올바른 방법 (렌더 중에 파생):**
 
 ```tsx
 function Form() {
@@ -37,4 +37,4 @@ function Form() {
 }
 ```
 
-References: [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
+참조: [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)

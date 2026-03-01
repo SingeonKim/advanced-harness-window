@@ -5,11 +5,11 @@ impactDescription: preserves state/DOM
 tags: rendering, activity, visibility, state-preservation
 ---
 
-## Use Activity Component for Show/Hide
+## show/hide에 Activity 컴포넌트 사용
 
-Use React's `<Activity>` to preserve state/DOM for expensive components that frequently toggle visibility.
+자주 가시성을 토글하는 비용이 많이 드는 컴포넌트의 state/DOM을 보존하기 위해 React의 `<Activity>`를 사용합니다.
 
-**Usage:**
+**사용법:**
 
 ```tsx
 import { Activity } from 'react'
@@ -23,4 +23,4 @@ function Dropdown({ isOpen }: Props) {
 }
 ```
 
-Avoids expensive re-renders and state loss.
+비용이 많이 드는 리렌더와 state 손실을 방지합니다.

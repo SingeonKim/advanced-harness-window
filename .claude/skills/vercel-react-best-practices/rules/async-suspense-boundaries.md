@@ -5,16 +5,16 @@ impactDescription: faster initial paint
 tags: async, suspense, streaming, layout-shift
 ---
 
-## Strategic Suspense Boundaries
+## 전략적 Suspense 경계
 
-Instead of awaiting data in async components before returning JSX, use Suspense boundaries to show the wrapper UI faster while data loads.
+JSX를 반환하기 전에 비동기 컴포넌트에서 데이터를 await하는 대신, Suspense 경계를 사용하여 데이터가 로드되는 동안 래퍼 UI를 더 빠르게 표시합니다.
 
-**Incorrect (wrapper blocked by data fetching):**
+**잘못된 방법 (래퍼가 데이터 페칭으로 인해 차단됨):**
 
 ```tsx
 async function Page() {
-  const data = await fetchData() // Blocks entire page
-  
+  const data = await fetchData() // 전체 페이지를 차단
+
   return (
     <div>
       <div>Sidebar</div>
@@ -28,9 +28,9 @@ async function Page() {
 }
 ```
 
-The entire layout waits for data even though only the middle section needs it.
+중간 섹션만 데이터가 필요한데도 전체 레이아웃이 데이터를 기다립니다.
 
-**Correct (wrapper shows immediately, data streams in):**
+**올바른 방법 (래퍼가 즉시 표시되고, 데이터가 스트리밍됨):**
 
 ```tsx
 function Page() {
@@ -49,20 +49,20 @@ function Page() {
 }
 
 async function DataDisplay() {
-  const data = await fetchData() // Only blocks this component
+  const data = await fetchData() // 이 컴포넌트만 차단
   return <div>{data.content}</div>
 }
 ```
 
-Sidebar, Header, and Footer render immediately. Only DataDisplay waits for data.
+Sidebar, Header, Footer는 즉시 렌더링됩니다. DataDisplay만 데이터를 기다립니다.
 
-**Alternative (share promise across components):**
+**대안 (컴포넌트 간 프로미스 공유):**
 
 ```tsx
 function Page() {
-  // Start fetch immediately, but don't await
+  // 즉시 페치를 시작하지만 await하지 않음
   const dataPromise = fetchData()
-  
+
   return (
     <div>
       <div>Sidebar</div>
@@ -77,23 +77,23 @@ function Page() {
 }
 
 function DataDisplay({ dataPromise }: { dataPromise: Promise<Data> }) {
-  const data = use(dataPromise) // Unwraps the promise
+  const data = use(dataPromise) // 프로미스를 언래핑
   return <div>{data.content}</div>
 }
 
 function DataSummary({ dataPromise }: { dataPromise: Promise<Data> }) {
-  const data = use(dataPromise) // Reuses the same promise
+  const data = use(dataPromise) // 동일한 프로미스 재사용
   return <div>{data.summary}</div>
 }
 ```
 
-Both components share the same promise, so only one fetch occurs. Layout renders immediately while both components wait together.
+두 컴포넌트가 동일한 프로미스를 공유하므로 페치가 한 번만 발생합니다. 레이아웃은 즉시 렌더링되고 두 컴포넌트가 함께 기다립니다.
 
-**When NOT to use this pattern:**
+**이 패턴을 사용하지 말아야 할 경우:**
 
-- Critical data needed for layout decisions (affects positioning)
-- SEO-critical content above the fold
-- Small, fast queries where suspense overhead isn't worth it
-- When you want to avoid layout shift (loading → content jump)
+- 레이아웃 결정에 필요한 중요 데이터 (위치에 영향을 줌)
+- 폴드 위의 SEO 중요 콘텐츠
+- Suspense 오버헤드가 그만한 가치가 없는 작고 빠른 쿼리
+- 레이아웃 이동(로딩 → 콘텐츠 전환)을 피하고 싶을 때
 
-**Trade-off:** Faster initial paint vs potential layout shift. Choose based on your UX priorities.
+**트레이드오프:** 더 빠른 초기 페인트 vs 잠재적 레이아웃 이동. UX 우선순위에 따라 선택하세요.

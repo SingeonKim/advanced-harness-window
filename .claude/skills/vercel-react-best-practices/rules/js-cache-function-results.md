@@ -5,20 +5,20 @@ impactDescription: avoid redundant computation
 tags: javascript, cache, memoization, performance
 ---
 
-## Cache Repeated Function Calls
+## 반복 함수 호출 캐시
 
-Use a module-level Map to cache function results when the same function is called repeatedly with the same inputs during render.
+렌더 중 동일한 함수가 같은 입력으로 반복 호출될 때 모듈 레벨 Map을 사용하여 함수 결과를 캐시합니다.
 
-**Incorrect (redundant computation):**
+**잘못된 방법 (중복 계산):**
 
 ```typescript
 function ProjectList({ projects }: { projects: Project[] }) {
   return (
     <div>
       {projects.map(project => {
-        // slugify() called 100+ times for same project names
+        // 동일한 프로젝트 이름에 대해 slugify() 100번 이상 호출
         const slug = slugify(project.name)
-        
+
         return <ProjectCard key={project.id} slug={slug} />
       })}
     </div>
@@ -26,10 +26,10 @@ function ProjectList({ projects }: { projects: Project[] }) {
 }
 ```
 
-**Correct (cached results):**
+**올바른 방법 (캐시된 결과):**
 
 ```typescript
-// Module-level cache
+// 모듈 레벨 캐시
 const slugifyCache = new Map<string, string>()
 
 function cachedSlugify(text: string): string {
@@ -45,9 +45,9 @@ function ProjectList({ projects }: { projects: Project[] }) {
   return (
     <div>
       {projects.map(project => {
-        // Computed only once per unique project name
+        // 고유한 프로젝트 이름당 한 번만 계산
         const slug = cachedSlugify(project.name)
-        
+
         return <ProjectCard key={project.id} slug={slug} />
       })}
     </div>
@@ -55,7 +55,7 @@ function ProjectList({ projects }: { projects: Project[] }) {
 }
 ```
 
-**Simpler pattern for single-value functions:**
+**단일 값 함수를 위한 더 간단한 패턴:**
 
 ```typescript
 let isLoggedInCache: boolean | null = null
@@ -64,17 +64,17 @@ function isLoggedIn(): boolean {
   if (isLoggedInCache !== null) {
     return isLoggedInCache
   }
-  
+
   isLoggedInCache = document.cookie.includes('auth=')
   return isLoggedInCache
 }
 
-// Clear cache when auth changes
+// 인증이 변경될 때 캐시 초기화
 function onAuthChange() {
   isLoggedInCache = null
 }
 ```
 
-Use a Map (not a hook) so it works everywhere: utilities, event handlers, not just React components.
+훅이 아닌 Map을 사용하면 유틸리티, 이벤트 핸들러 등 어디서든 동작합니다.
 
-Reference: [How we made the Vercel Dashboard twice as fast](https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast)
+참조: [How we made the Vercel Dashboard twice as fast](https://vercel.com/blog/how-we-made-the-vercel-dashboard-twice-as-fast)

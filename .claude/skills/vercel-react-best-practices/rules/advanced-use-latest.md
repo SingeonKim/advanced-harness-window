@@ -5,11 +5,11 @@ impactDescription: prevents effect re-runs
 tags: advanced, hooks, useEffectEvent, refs, optimization
 ---
 
-## useEffectEvent for Stable Callback Refs
+## 안정적인 콜백 Ref를 위한 useEffectEvent
 
-Access latest values in callbacks without adding them to dependency arrays. Prevents effect re-runs while avoiding stale closures.
+의존성 배열에 추가하지 않고도 콜백에서 최신 값에 접근합니다. 클로저 캐싱 없이 effect 재실행을 방지합니다.
 
-**Incorrect (effect re-runs on every callback change):**
+**잘못된 방법 (콜백 변경마다 effect 재실행):**
 
 ```tsx
 function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
@@ -22,7 +22,7 @@ function SearchInput({ onSearch }: { onSearch: (q: string) => void }) {
 }
 ```
 
-**Correct (using React's useEffectEvent):**
+**올바른 방법 (React의 useEffectEvent 사용):**
 
 ```tsx
 import { useEffectEvent } from 'react';

@@ -5,14 +5,14 @@ impactDescription: prevents forced synchronous layouts and reduces performance b
 tags: javascript, dom, css, performance, reflow, layout-thrashing
 ---
 
-## Avoid Layout Thrashing
+## 레이아웃 스래싱 방지
 
-Avoid interleaving style writes with layout reads. When you read a layout property (like `offsetWidth`, `getBoundingClientRect()`, or `getComputedStyle()`) between style changes, the browser is forced to trigger a synchronous reflow.
+스타일 쓰기와 레이아웃 읽기를 섞어서 사용하지 않습니다. 스타일 변경 사이에 레이아웃 속성(`offsetWidth`, `getBoundingClientRect()`, `getComputedStyle()`)을 읽으면 브라우저가 강제로 동기 리플로우를 실행합니다.
 
-**This is OK (browser batches style changes):**
+**괜찮은 방법 (브라우저가 스타일 변경을 배치 처리):**
 ```typescript
 function updateElementStyles(element: HTMLElement) {
-  // Each line invalidates style, but browser batches the recalculation
+  // 각 줄이 스타일을 무효화하지만 브라우저가 재계산을 배치 처리
   element.style.width = '100px'
   element.style.height = '200px'
   element.style.backgroundColor = 'blue'
@@ -20,45 +20,45 @@ function updateElementStyles(element: HTMLElement) {
 }
 ```
 
-**Incorrect (interleaved reads and writes force reflows):**
+**잘못된 방법 (읽기와 쓰기가 섞여 리플로우 강제):**
 ```typescript
 function layoutThrashing(element: HTMLElement) {
   element.style.width = '100px'
-  const width = element.offsetWidth  // Forces reflow
+  const width = element.offsetWidth  // 리플로우 강제
   element.style.height = '200px'
-  const height = element.offsetHeight  // Forces another reflow
+  const height = element.offsetHeight  // 다시 리플로우 강제
 }
 ```
 
-**Correct (batch writes, then read once):**
+**올바른 방법 (쓰기 배치 처리 후 한 번 읽기):**
 ```typescript
 function updateElementStyles(element: HTMLElement) {
-  // Batch all writes together
+  // 모든 쓰기를 함께 배치
   element.style.width = '100px'
   element.style.height = '200px'
   element.style.backgroundColor = 'blue'
   element.style.border = '1px solid black'
-  
-  // Read after all writes are done (single reflow)
+
+  // 모든 쓰기가 완료된 후 읽기 (단일 리플로우)
   const { width, height } = element.getBoundingClientRect()
 }
 ```
 
-**Correct (batch reads, then writes):**
+**올바른 방법 (읽기 배치 후 쓰기):**
 ```typescript
 function avoidThrashing(element: HTMLElement) {
-  // Read phase - all layout queries first
+  // 읽기 단계 - 모든 레이아웃 쿼리를 먼저
   const rect1 = element.getBoundingClientRect()
   const offsetWidth = element.offsetWidth
   const offsetHeight = element.offsetHeight
-  
-  // Write phase - all style changes after
+
+  // 쓰기 단계 - 모든 스타일 변경을 나중에
   element.style.width = '100px'
   element.style.height = '200px'
 }
 ```
 
-**Better: use CSS classes**
+**더 나은 방법: CSS 클래스 사용**
 ```css
 .highlighted-box {
   width: 100px;
@@ -70,29 +70,29 @@ function avoidThrashing(element: HTMLElement) {
 ```typescript
 function updateElementStyles(element: HTMLElement) {
   element.classList.add('highlighted-box')
-  
+
   const { width, height } = element.getBoundingClientRect()
 }
 ```
 
-**React example:**
+**React 예시:**
 ```tsx
-// Incorrect: interleaving style changes with layout queries
+// 잘못된 방법: 스타일 변경과 레이아웃 쿼리 섞기
 function Box({ isHighlighted }: { isHighlighted: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
-  
+
   useEffect(() => {
     if (ref.current && isHighlighted) {
       ref.current.style.width = '100px'
-      const width = ref.current.offsetWidth // Forces layout
+      const width = ref.current.offsetWidth // 레이아웃 강제
       ref.current.style.height = '200px'
     }
   }, [isHighlighted])
-  
+
   return <div ref={ref}>Content</div>
 }
 
-// Correct: toggle class
+// 올바른 방법: 클래스 토글
 function Box({ isHighlighted }: { isHighlighted: boolean }) {
   return (
     <div className={isHighlighted ? 'highlighted-box' : ''}>
@@ -102,6 +102,6 @@ function Box({ isHighlighted }: { isHighlighted: boolean }) {
 }
 ```
 
-Prefer CSS classes over inline styles when possible. CSS files are cached by the browser, and classes provide better separation of concerns and are easier to maintain.
+가능한 경우 인라인 스타일 대신 CSS 클래스를 선호합니다. CSS 파일은 브라우저에 캐시되며 관심사 분리가 더 잘 이루어지고 유지 관리가 더 쉽습니다.
 
-See [this gist](https://gist.github.com/paulirish/5d52fb081b3570c81e3a) and [CSS Triggers](https://csstriggers.com/) for more information on layout-forcing operations.
+레이아웃을 강제하는 작업에 대한 자세한 내용은 [this gist](https://gist.github.com/paulirish/5d52fb081b3570c81e3a)와 [CSS Triggers](https://csstriggers.com/)를 참조하세요.

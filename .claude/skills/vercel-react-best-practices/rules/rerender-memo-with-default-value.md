@@ -7,24 +7,24 @@ tags: rerender, memo, optimization
 
 ---
 
-## Extract Default Non-primitive Parameter Value from Memoized Component to Constant
+## 메모이즈된 컴포넌트의 기본 비원시형 매개변수 값을 상수로 추출
 
-When memoized component has a default value for some non-primitive optional parameter, such as an array, function, or object, calling the component without that parameter results in broken memoization. This is because new value instances are created on every rerender, and they do not pass strict equality comparison in `memo()`.
+메모이즈된 컴포넌트가 배열, 함수, 객체 같은 비원시형 선택적 매개변수에 기본값을 가질 때, 해당 매개변수 없이 컴포넌트를 호출하면 메모이제이션이 깨집니다. 이는 리렌더마다 새 값 인스턴스가 생성되어 `memo()`의 엄격한 동등성 비교를 통과하지 못하기 때문입니다.
 
-To address this issue, extract the default value into a constant.
+이 문제를 해결하려면 기본값을 상수로 추출합니다.
 
-**Incorrect (`onClick` has different values on every rerender):**
+**잘못된 방법 (`onClick`이 리렌더마다 다른 값을 가짐):**
 
 ```tsx
 const UserAvatar = memo(function UserAvatar({ onClick = () => {} }: { onClick?: () => void }) {
   // ...
 })
 
-// Used without optional onClick
+// 선택적 onClick 없이 사용
 <UserAvatar />
 ```
 
-**Correct (stable default value):**
+**올바른 방법 (안정적인 기본값):**
 
 ```tsx
 const NOOP = () => {};
@@ -33,6 +33,6 @@ const UserAvatar = memo(function UserAvatar({ onClick = NOOP }: { onClick?: () =
   // ...
 })
 
-// Used without optional onClick
+// 선택적 onClick 없이 사용
 <UserAvatar />
 ```

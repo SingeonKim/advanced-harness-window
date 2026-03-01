@@ -5,11 +5,11 @@ impactDescription: loads large data only when needed
 tags: bundle, conditional-loading, lazy-loading
 ---
 
-## Conditional Module Loading
+## 조건부 모듈 로딩
 
-Load large data or modules only when a feature is activated.
+기능이 활성화될 때만 대용량 데이터나 모듈을 로드합니다.
 
-**Example (lazy-load animation frames):**
+**예시 (애니메이션 프레임 지연 로드):**
 
 ```tsx
 function AnimationPlayer({ enabled, setEnabled }: { enabled: boolean; setEnabled: React.Dispatch<React.SetStateAction<boolean>> }) {
@@ -28,4 +28,4 @@ function AnimationPlayer({ enabled, setEnabled }: { enabled: boolean; setEnabled
 }
 ```
 
-The `typeof window !== 'undefined'` check prevents bundling this module for SSR, optimizing server bundle size and build speed.
+`typeof window !== 'undefined'` 검사는 SSR을 위해 이 모듈이 번들링되는 것을 방지하여 서버 번들 크기와 빌드 속도를 최적화합니다.
