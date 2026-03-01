@@ -1,54 +1,54 @@
-# Hook Mechanisms - Deep Dive
+# 훅 메커니즘 - 심층 분석
 
-Technical deep dive into how the UserPromptSubmit and PreToolUse hooks work.
+UserPromptSubmit 및 PreToolUse 훅이 어떻게 작동하는지 기술적으로 심층 분석합니다.
 
-## Table of Contents
+## 목차
 
-- [UserPromptSubmit Hook Flow](#userpromptsubmit-hook-flow)
-- [PreToolUse Hook Flow](#pretooluse-hook-flow)
-- [Exit Code Behavior (CRITICAL)](#exit-code-behavior-critical)
-- [Session State Management](#session-state-management)
-- [Performance Considerations](#performance-considerations)
+- [UserPromptSubmit 훅 흐름](#userpromptsubmit-훅-흐름)
+- [PreToolUse 훅 흐름](#pretooluse-훅-흐름)
+- [종료 코드 동작 (중요)](#종료-코드-동작-중요)
+- [세션 상태 관리](#세션-상태-관리)
+- [성능 고려 사항](#성능-고려-사항)
 
 ---
 
-## UserPromptSubmit Hook Flow
+## UserPromptSubmit 훅 흐름
 
-### Execution Sequence
+### 실행 순서
 
 ```
-User submits prompt
+사용자가 프롬프트 제출
     ↓
-.claude/settings.json registers hook
+.claude/settings.json이 훅 등록
     ↓
-skill-activation-prompt.sh executes
+skill-activation-prompt.sh 실행
     ↓
 npx tsx skill-activation-prompt.ts
     ↓
-Hook reads stdin (JSON with prompt)
+훅이 stdin 읽기 (프롬프트가 있는 JSON)
     ↓
-Loads skill-rules.json
+skill-rules.json 로드
     ↓
-Matches keywords + intent patterns
+키워드 + 의도 패턴 매칭
     ↓
-Groups matches by priority (critical → high → medium → low)
+우선순위별 매칭 그룹화 (critical → high → medium → low)
     ↓
-Outputs formatted message to stdout
+형식화된 메시지를 stdout으로 출력
     ↓
-stdout becomes context for Claude (injected before prompt)
+stdout이 Claude의 컨텍스트가 됨 (프롬프트 전에 주입)
     ↓
-Claude sees: [skill suggestion] + user's prompt
+Claude가 봄: [스킬 제안] + 사용자 프롬프트
 ```
 
-### Key Points
+### 핵심 사항
 
-- **Exit code**: Always 0 (allow)
-- **stdout**: → Claude's context (injected as system message)
-- **Timing**: Runs BEFORE Claude processes prompt
-- **Behavior**: Non-blocking, advisory only
-- **Purpose**: Make Claude aware of relevant skills
+- **종료 코드**: 항상 0 (허용)
+- **stdout**: → Claude의 컨텍스트 (시스템 메시지로 주입)
+- **타이밍**: Claude가 프롬프트를 처리하기 전에 실행
+- **동작**: 비차단, 권고만
+- **목적**: Claude가 관련 스킬을 인식하도록 함
 
-### Input Format
+### 입력 형식
 
 ```json
 {
@@ -61,7 +61,7 @@ Claude sees: [skill suggestion] + user's prompt
 }
 ```
 
-### Output Format (to stdout)
+### 출력 형식 (stdout으로)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -75,60 +75,60 @@ ACTION: Use Skill tool BEFORE responding
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Claude sees this output as additional context before processing the user's prompt.
+Claude는 사용자 프롬프트를 처리하기 전에 이 출력을 추가 컨텍스트로 봅니다.
 
 ---
 
-## PreToolUse Hook Flow
+## PreToolUse 훅 흐름
 
-### Execution Sequence
+### 실행 순서
 
 ```
-Claude calls Edit/Write tool
+Claude가 Edit/Write 도구 호출
     ↓
-.claude/settings.json registers hook (matcher: Edit|Write)
+.claude/settings.json이 훅 등록 (matcher: Edit|Write)
     ↓
-skill-verification-guard.sh executes
+skill-verification-guard.sh 실행
     ↓
 npx tsx skill-verification-guard.ts
     ↓
-Hook reads stdin (JSON with tool_name, tool_input)
+훅이 stdin 읽기 (tool_name, tool_input이 있는 JSON)
     ↓
-Loads skill-rules.json
+skill-rules.json 로드
     ↓
-Checks file path patterns (glob matching)
+파일 경로 패턴 확인 (glob 매칭)
     ↓
-Reads file for content patterns (if file exists)
+콘텐츠 패턴을 위해 파일 읽기 (파일이 존재하는 경우)
     ↓
-Checks session state (was skill already used?)
+세션 상태 확인 (스킬이 이미 사용됐는가?)
     ↓
-Checks skip conditions (file markers, env vars)
+건너뛰기 조건 확인 (파일 마커, 환경 변수)
     ↓
-IF MATCHED AND NOT SKIPPED:
-  Update session state (mark skill as enforced)
-  Output block message to stderr
-  Exit with code 2 (BLOCK)
-ELSE:
-  Exit with code 0 (ALLOW)
+매칭되고 건너뛰기 않은 경우:
+  세션 상태 업데이트 (스킬이 강제됨으로 표시)
+  차단 메시지를 stderr로 출력
+  코드 2로 종료 (차단)
+아닌 경우:
+  코드 0으로 종료 (허용)
     ↓
-IF BLOCKED:
-  stderr → Claude sees message
-  Edit/Write tool does NOT execute
-  Claude must use skill and retry
-IF ALLOWED:
-  Tool executes normally
+차단된 경우:
+  stderr → Claude가 메시지 봄
+  Edit/Write 도구가 실행되지 않음
+  Claude가 스킬을 사용하고 재시도해야 함
+허용된 경우:
+  도구가 정상 실행
 ```
 
-### Key Points
+### 핵심 사항
 
-- **Exit code 2**: BLOCK (stderr → Claude)
-- **Exit code 0**: ALLOW
-- **Timing**: Runs BEFORE tool execution
-- **Session tracking**: Prevents repeated blocks in same session
-- **Fail open**: On errors, allows operation (don't break workflow)
-- **Purpose**: Enforce critical guardrails
+- **종료 코드 2**: 차단 (stderr → Claude)
+- **종료 코드 0**: 허용
+- **타이밍**: 도구 실행 전에 실행
+- **세션 추적**: 같은 세션에서 반복 차단 방지
+- **실패 개방**: 오류 시 작업 허용 (워크플로우 방해 없음)
+- **목적**: 중요한 가드레일 강제
 
-### Input Format
+### 입력 형식
 
 ```json
 {
@@ -146,7 +146,7 @@ IF ALLOWED:
 }
 ```
 
-### Output Format (to stderr when blocked)
+### 출력 형식 (차단 시 stderr로)
 
 ```
 ⚠️ BLOCKED - Database Operation Detected
@@ -163,62 +163,62 @@ File: form/src/services/user.ts
 💡 TIP: Add '// @skip-validation' comment to skip future checks
 ```
 
-Claude receives this message and understands it needs to use the skill before retrying the edit.
+Claude는 이 메시지를 받고 편집을 재시도하기 전에 스킬을 사용해야 한다는 것을 이해합니다.
 
 ---
 
-## Exit Code Behavior (CRITICAL)
+## 종료 코드 동작 (중요)
 
-### Exit Code Reference Table
+### 종료 코드 참조 표
 
-| Exit Code | stdout | stderr | Tool Execution | Claude Sees |
-|-----------|--------|--------|----------------|-------------|
-| 0 (UserPromptSubmit) | → Context | → User only | N/A | stdout content |
-| 0 (PreToolUse) | → User only | → User only | **Proceeds** | Nothing |
-| 2 (PreToolUse) | → User only | → **CLAUDE** | **BLOCKED** | stderr content |
-| Other | → User only | → User only | Blocked | Nothing |
+| 종료 코드 | stdout | stderr | 도구 실행 | Claude가 봄 |
+|-----------|--------|--------|-----------|-------------|
+| 0 (UserPromptSubmit) | → 컨텍스트 | → 사용자만 | 해당 없음 | stdout 내용 |
+| 0 (PreToolUse) | → 사용자만 | → 사용자만 | **진행** | 없음 |
+| 2 (PreToolUse) | → 사용자만 | → **Claude** | **차단** | stderr 내용 |
+| 기타 | → 사용자만 | → 사용자만 | 차단 | 없음 |
 
-### Why Exit Code 2 Matters
+### 종료 코드 2가 중요한 이유
 
-This is THE critical mechanism for enforcement:
+이것이 강제의 핵심 메커니즘입니다:
 
-1. **Only way** to send message to Claude from PreToolUse
-2. stderr content is "fed back to Claude automatically"
-3. Claude sees the block message and understands what to do
-4. Tool execution is prevented
-5. Critical for enforcement of guardrails
+1. PreToolUse에서 Claude에게 메시지를 보내는 **유일한 방법**
+2. stderr 내용이 "Claude에게 자동으로 피드백"됨
+3. Claude가 차단 메시지를 보고 무엇을 해야 하는지 이해
+4. 도구 실행이 방지됨
+5. 가드레일 강제에 중요
 
-### Example Conversation Flow
+### 예시 대화 흐름
 
 ```
-User: "Add a new user service with Prisma"
+사용자: "Add a new user service with Prisma"
 
 Claude: "I'll create the user service..."
-    [Attempts to Edit form/src/services/user.ts]
+    [form/src/services/user.ts 편집 시도]
 
-PreToolUse Hook: [Exit code 2]
+PreToolUse 훅: [종료 코드 2]
     stderr: "⚠️ BLOCKED - Use database-verification"
 
-Claude sees error, responds:
+Claude가 오류를 보고 응답:
     "I need to verify the database schema first."
-    [Uses Skill tool: database-verification]
-    [Verifies column names]
-    [Retries Edit - now allowed (session tracking)]
+    [스킬 도구 사용: database-verification]
+    [컬럼명 검증]
+    [편집 재시도 - 이제 허용 (세션 추적)]
 ```
 
 ---
 
-## Session State Management
+## 세션 상태 관리
 
-### Purpose
+### 목적
 
-Prevent repeated nagging in the same session - once Claude uses a skill, don't block again.
+같은 세션에서 반복 알림 방지 - Claude가 스킬을 사용하면 다시 차단하지 않음.
 
-### State File Location
+### 상태 파일 위치
 
 `.claude/hooks/state/skills-used-{session_id}.json`
 
-### State File Structure
+### 상태 파일 구조
 
 ```json
 {
@@ -230,77 +230,77 @@ Prevent repeated nagging in the same session - once Claude uses a skill, don't b
 }
 ```
 
-### How It Works
+### 작동 방식
 
-1. **First edit** of file with Prisma:
-   - Hook blocks with exit code 2
-   - Updates session state: adds "database-verification" to skills_used
-   - Claude sees message, uses skill
+1. **Prisma가 있는 파일의 첫 번째 편집**:
+   - 훅이 종료 코드 2로 차단
+   - 세션 상태 업데이트: skills_used에 "database-verification" 추가
+   - Claude가 메시지를 보고 스킬 사용
 
-2. **Second edit** (same session):
-   - Hook checks session state
-   - Finds "database-verification" in skills_used
-   - Exits with code 0 (allow)
-   - No message to Claude
+2. **두 번째 편집 (같은 세션)**:
+   - 훅이 세션 상태 확인
+   - skills_used에서 "database-verification" 발견
+   - 코드 0으로 종료 (허용)
+   - Claude에게 메시지 없음
 
-3. **Different session**:
-   - New session ID = new state file
-   - Hook blocks again
+3. **다른 세션**:
+   - 새 세션 ID = 새 상태 파일
+   - 훅이 다시 차단
 
-### Limitation
+### 제한 사항
 
-The hook cannot detect when the skill is *actually* invoked - it just blocks once per session per skill. This means:
+훅은 스킬이 *실제로* 호출됐는지 감지할 수 없음 - 세션당 스킬당 한 번만 차단합니다. 즉:
 
-- If Claude doesn't use the skill but makes a different edit, it won't block again
-- Trust that Claude follows the instruction
-- Future enhancement: detect actual Skill tool usage
+- Claude가 스킬을 사용하지 않지만 다른 편집을 하면 다시 차단하지 않음
+- Claude가 지시를 따른다고 신뢰
+- 향후 개선: 실제 스킬 도구 사용 감지
 
 ---
 
-## Performance Considerations
+## 성능 고려 사항
 
-### Target Metrics
+### 목표 지표
 
 - **UserPromptSubmit**: < 100ms
 - **PreToolUse**: < 200ms
 
-### Performance Bottlenecks
+### 성능 병목 지점
 
-1. **Loading skill-rules.json** (every execution)
-   - Future: Cache in memory
-   - Future: Watch for changes, reload only when needed
+1. **skill-rules.json 로드** (매 실행마다)
+   - 향후: 메모리에 캐시
+   - 향후: 변경 사항 감시, 필요시에만 다시 로드
 
-2. **Reading file content** (PreToolUse)
-   - Only when contentPatterns configured
-   - Only if file exists
-   - Can be slow for large files
+2. **파일 내용 읽기** (PreToolUse)
+   - contentPatterns가 설정된 경우에만
+   - 파일이 존재하는 경우에만
+   - 대용량 파일에서 느릴 수 있음
 
-3. **Glob matching** (PreToolUse)
-   - Regex compilation for each pattern
-   - Future: Compile once, cache
+3. **Glob 매칭** (PreToolUse)
+   - 각 패턴에 대한 Regex 컴파일
+   - 향후: 한 번 컴파일, 캐시
 
-4. **Regex matching** (Both hooks)
-   - Intent patterns (UserPromptSubmit)
-   - Content patterns (PreToolUse)
-   - Future: Lazy compile, cache compiled regexes
+4. **Regex 매칭** (두 훅 모두)
+   - 의도 패턴 (UserPromptSubmit)
+   - 콘텐츠 패턴 (PreToolUse)
+   - 향후: 지연 컴파일, 컴파일된 regex 캐시
 
-### Optimization Strategies
+### 최적화 전략
 
-**Reduce patterns:**
-- Use more specific patterns (fewer to check)
-- Combine similar patterns where possible
+**패턴 줄이기:**
+- 더 구체적인 패턴 사용 (확인할 패턴 줄이기)
+- 가능한 경우 유사한 패턴 결합
 
-**File path patterns:**
-- More specific = fewer files to check
-- Example: `form/src/services/**` better than `form/**`
+**파일 경로 패턴:**
+- 더 구체적 = 확인할 파일 줄어듦
+- 예: `form/src/services/**`가 `form/**`보다 좋음
 
-**Content patterns:**
-- Only add when truly necessary
-- Simpler regex = faster matching
+**콘텐츠 패턴:**
+- 진정으로 필요할 때만 추가
+- 단순한 regex = 더 빠른 매칭
 
 ---
 
-**Related Files:**
-- [SKILL.md](SKILL.md) - Main skill guide
-- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - Debug hook issues
-- [SKILL_RULES_REFERENCE.md](SKILL_RULES_REFERENCE.md) - Configuration reference
+**관련 파일:**
+- [SKILL.md](SKILL.md) - 메인 스킬 가이드
+- [TROUBLESHOOTING.md](TROUBLESHOOTING.md) - 훅 문제 디버깅
+- [SKILL_RULES_REFERENCE.md](SKILL_RULES_REFERENCE.md) - 설정 참조
