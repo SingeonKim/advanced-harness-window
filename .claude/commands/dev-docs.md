@@ -1,51 +1,51 @@
 ---
-description: Create a comprehensive strategic plan with structured task breakdown
-argument-hint: Describe what you need planned (e.g., "refactor authentication system", "implement microservices")
+description: 구조화된 태스크 분류가 있는 포괄적인 전략 계획 생성
+argument-hint: 계획이 필요한 것을 설명하세요 (예: "인증 시스템 리팩토링", "마이크로서비스 구현")
 ---
 
-You are an elite strategic planning specialist. Create a comprehensive, actionable plan for: $ARGUMENTS
+당신은 엘리트 전략 계획 전문가입니다. $ARGUMENTS에 대한 포괄적이고 실행 가능한 계획을 생성하세요.
 
-## Instructions
+## 지침
 
-1. **Analyze the request** and determine the scope of planning needed
-2. **Examine relevant files** in the codebase to understand current state
-3. **Create a structured plan** with:
-   - Executive Summary
-   - Current State Analysis
-   - Proposed Future State
-   - Implementation Phases (broken into sections)
-   - Detailed Tasks (actionable items with clear acceptance criteria)
-   - Risk Assessment and Mitigation Strategies
-   - Success Metrics
-   - Required Resources and Dependencies
-   - Timeline Estimates
+1. **요청을 분석**하여 필요한 계획의 범위를 파악
+2. **관련 파일을 검토**하여 코드베이스의 현재 상태 이해
+3. 다음을 포함한 **구조화된 계획 생성**:
+   - 경영진 요약
+   - 현재 상태 분석
+   - 제안된 미래 상태
+   - 구현 단계 (섹션별로 분류)
+   - 상세 태스크 (명확한 승인 기준이 있는 실행 가능한 항목)
+   - 위험 평가 및 완화 전략
+   - 성공 지표
+   - 필요한 리소스 및 의존성
+   - 타임라인 추정
 
-4. **Task Breakdown Structure**: 
-   - Each major section represents a phase or component
-   - Number and prioritize tasks within sections
-   - Include clear acceptance criteria for each task
-   - Specify dependencies between tasks
-   - Estimate effort levels (S/M/L/XL)
+4. **태스크 분류 구조**:
+   - 각 주요 섹션은 단계 또는 컴포넌트를 나타냄
+   - 섹션 내 태스크의 번호 매기기 및 우선순위 지정
+   - 각 태스크에 명확한 승인 기준 포함
+   - 태스크 간 의존성 명시
+   - 노력 수준 추정 (S/M/L/XL)
 
-5. **Create task management structure**:
-   - Create directory: `dev/active/[task-name]/` (relative to project root)
-   - Generate three files:
-     - `[task-name]-plan.md` - The comprehensive plan
-     - `[task-name]-context.md` - Key files, decisions, dependencies
-     - `[task-name]-tasks.md` - Checklist format for tracking progress
-   - Include "Last Updated: YYYY-MM-DD" in each file
+5. **태스크 관리 구조 생성**:
+   - 디렉토리 생성: `dev/active/[task-name]/` (프로젝트 루트 기준)
+   - 세 개의 파일 생성:
+     - `[task-name]-plan.md` - 포괄적인 계획
+     - `[task-name]-context.md` - 주요 파일, 결정, 의존성
+     - `[task-name]-tasks.md` - 진행 추적을 위한 체크리스트 형식
+   - 각 파일에 "마지막 업데이트: YYYY-MM-DD" 포함
 
-## Quality Standards
-- Plans must be self-contained with all necessary context
-- Use clear, actionable language
-- Include specific technical details where relevant
-- Consider both technical and business perspectives
-- Account for potential risks and edge cases
+## 품질 표준
+- 계획은 필요한 모든 컨텍스트와 함께 자립적이어야 함
+- 명확하고 실행 가능한 언어 사용
+- 관련 있는 경우 특정 기술 세부 사항 포함
+- 기술적 및 비즈니스적 관점 모두 고려
+- 잠재적인 위험 및 엣지 케이스 처리
 
-## Context References
-- Check `PROJECT_KNOWLEDGE.md` for architecture overview (if exists)
-- Consult `BEST_PRACTICES.md` for coding standards (if exists)
-- Reference `TROUBLESHOOTING.md` for common issues to avoid (if exists)
-- Use `dev/README.md` for task management guidelines (if exists)
+## 컨텍스트 참조
+- 아키텍처 개요는 `PROJECT_KNOWLEDGE.md` 확인 (존재하는 경우)
+- 코딩 표준은 `BEST_PRACTICES.md` 참고 (존재하는 경우)
+- 피해야 할 일반적인 문제는 `TROUBLESHOOTING.md` 참조 (존재하는 경우)
+- 태스크 관리 지침은 `dev/README.md` 사용 (존재하는 경우)
 
-**Note**: This command is ideal to use AFTER exiting plan mode when you have a clear vision of what needs to be done. It will create the persistent task structure that survives context resets.
+**참고**: 이 명령어는 무엇을 해야 하는지에 대한 명확한 비전이 있을 때 플랜 모드를 종료한 후 사용하기에 이상적입니다. 컨텍스트 리셋에서도 유지되는 영구적인 태스크 구조를 생성합니다.
