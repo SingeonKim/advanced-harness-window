@@ -1,300 +1,300 @@
-# Agents
+# 에이전트 (Agents)
 
-Specialized agents for complex, multi-step tasks.
-
----
-
-## What Are Agents?
-
-Agents are autonomous Claude instances that handle specific complex tasks. Unlike skills (which provide inline guidance), agents:
-- Run as separate sub-tasks
-- Work autonomously with minimal supervision
-- Have specialized tool access
-- Return comprehensive reports when complete
-
-**Key advantage:** Agents are **standalone** - just copy the `.md` file and use immediately!
+복잡한 다단계 작업을 위한 전문화된 에이전트입니다.
 
 ---
 
-## Available Agents (10)
+## 에이전트란?
+
+에이전트는 특정 복잡한 작업을 처리하는 자율적인 Claude 인스턴스입니다. 스킬(인라인 가이드 제공)과 달리 에이전트는:
+- 별도의 하위 작업으로 실행
+- 최소한의 감독으로 자율적으로 작동
+- 전문화된 도구 접근 권한 보유
+- 완료 시 종합 보고서 반환
+
+**주요 장점:** 에이전트는 **독립적** - `.md` 파일을 복사하고 바로 사용!
+
+---
+
+## 사용 가능한 에이전트 (10개)
 
 ### code-architecture-reviewer
-**Purpose:** Review code for architectural consistency and best practices
+**목적:** 코드의 아키텍처 일관성 및 모범 사례 검토
 
-**When to use:**
-- After implementing a new feature
-- Before merging significant changes
-- When refactoring code
-- To validate architectural decisions
+**사용 시점:**
+- 새 기능 구현 후
+- 중대한 변경 사항 병합 전
+- 코드 리팩토링 시
+- 아키텍처 결정 검증 시
 
-**Integration:** ✅ Copy as-is
+**통합:** ✅ 그대로 복사
 
 ---
 
 ### code-refactor-master
-**Purpose:** Plan and execute comprehensive refactoring
+**목적:** 포괄적인 리팩토링 계획 및 실행
 
-**When to use:**
-- Reorganizing file structures
-- Breaking down large components
-- Updating import paths after moves
-- Improving code maintainability
+**사용 시점:**
+- 파일 구조 재구성
+- 대규모 컴포넌트 분해
+- import 경로 업데이트
+- 코드 유지보수성 개선
 
-**Integration:** ✅ Copy as-is
+**통합:** ✅ 그대로 복사
 
 ---
 
 ### documentation-architect
-**Purpose:** Create comprehensive documentation
+**목적:** 종합 문서 생성
 
-**When to use:**
-- Documenting new features
-- Creating API documentation
-- Writing developer guides
-- Generating architectural overviews
+**사용 시점:**
+- 새 기능 문서화
+- API 문서 생성
+- 개발자 가이드 작성
+- 아키텍처 개요 생성
 
-**Integration:** ✅ Copy as-is
+**통합:** ✅ 그대로 복사
 
 ---
 
 ### frontend-error-fixer
-**Purpose:** Debug and fix frontend errors
+**목적:** 프론트엔드 에러 디버깅 및 수정
 
-**When to use:**
-- Browser console errors
-- TypeScript compilation errors in frontend
-- React errors
-- Build failures
+**사용 시점:**
+- 브라우저 콘솔 에러
+- 프론트엔드 TypeScript 컴파일 에러
+- React 에러
+- 빌드 실패
 
-**Integration:** ⚠️ May reference screenshot paths - update if needed
+**통합:** ⚠️ 스크린샷 경로 참조 가능 - 필요 시 업데이트
 
 ---
 
 ### plan-reviewer
-**Purpose:** Review development plans before implementation
+**목적:** 구현 전 개발 계획 검토
 
-**When to use:**
-- Before starting complex features
-- Validating architectural plans
-- Identifying potential issues early
-- Getting second opinion on approach
+**사용 시점:**
+- 복잡한 기능 시작 전
+- 아키텍처 계획 검증 시
+- 잠재적 문제 조기 파악
+- 접근 방식에 대한 의견 수렴
 
-**Integration:** ✅ Copy as-is
+**통합:** ✅ 그대로 복사
 
 ---
 
 ### refactor-planner
-**Purpose:** Create comprehensive refactoring strategies
+**목적:** 포괄적인 리팩토링 전략 수립
 
-**When to use:**
-- Planning code reorganization
-- Modernizing legacy code
-- Breaking down large files
-- Improving code structure
+**사용 시점:**
+- 코드 재구성 계획
+- 레거시 코드 현대화
+- 대규모 파일 분해
+- 코드 구조 개선
 
-**Integration:** ✅ Copy as-is
+**통합:** ✅ 그대로 복사
 
 ---
 
 ### web-research-specialist
-**Purpose:** Research technical issues online
+**목적:** 기술 문제 온라인 조사
 
-**When to use:**
-- Debugging obscure errors
-- Finding solutions to problems
-- Researching best practices
-- Comparing implementation approaches
+**사용 시점:**
+- 불명확한 에러 디버깅
+- 문제 해결 방법 찾기
+- 모범 사례 조사
+- 구현 접근 방식 비교
 
-**Integration:** ✅ Copy as-is
+**통합:** ✅ 그대로 복사
 
 ---
 
 ### auth-route-tester
-**Purpose:** Test authenticated API endpoints
+**목적:** 인증된 API 엔드포인트 테스팅
 
-**When to use:**
-- Testing routes with JWT cookie auth
-- Validating endpoint functionality
-- Debugging authentication issues
+**사용 시점:**
+- JWT 쿠키 인증으로 라우트 테스팅
+- 엔드포인트 기능 검증
+- 인증 문제 디버깅
 
-**Integration:** ⚠️ Requires JWT cookie-based auth
+**통합:** ⚠️ JWT 쿠키 기반 인증 필요
 
 ---
 
 ### auth-route-debugger
-**Purpose:** Debug authentication issues
+**목적:** 인증 문제 디버깅
 
-**When to use:**
-- Auth failures
-- Token issues
-- Cookie problems
-- Permission errors
+**사용 시점:**
+- 인증 실패
+- 토큰 문제
+- 쿠키 문제
+- 권한 에러
 
-**Integration:** ⚠️ Requires JWT cookie-based auth
+**통합:** ⚠️ JWT 쿠키 기반 인증 필요
 
 ---
 
 ### auto-error-resolver
-**Purpose:** Automatically fix TypeScript compilation errors
+**목적:** TypeScript 컴파일 에러 자동 수정
 
-**When to use:**
-- Build failures with TypeScript errors
-- After refactoring that breaks types
-- Systematic error resolution needed
+**사용 시점:**
+- TypeScript 에러가 있는 빌드 실패
+- 타입을 깨뜨리는 리팩토링 후
+- 체계적인 에러 해결 필요
 
-**Integration:** ⚠️ May need path updates
+**통합:** ⚠️ 경로 업데이트 필요할 수 있음
 
 ---
 
-## How to Integrate an Agent
+## 에이전트를 통합하는 방법
 
-### Standard Integration (Most Agents)
+### 표준 통합 (대부분의 에이전트)
 
-**Step 1: Copy the file**
+**Step 1: 파일 복사**
 ```bash
-cp showcase/.claude/agents/agent-name.md \\
+cp showcase/.claude/agents/agent-name.md \
    your-project/.claude/agents/
 ```
 
-**Step 2: Verify (optional)**
+**Step 2: 검증 (선택)**
 ```bash
-# Check for hardcoded paths
+# 하드코딩된 경로 확인
 grep -n "~/git/\|/root/git/\|/Users/" your-project/.claude/agents/agent-name.md
 ```
 
-**Step 3: Use it**
-Ask Claude: "Use the [agent-name] agent to [task]"
+**Step 3: 사용**
+Claude에게 물어보기: "Use the [agent-name] agent to [task]"
 
-That's it! Agents work immediately.
+완료! 에이전트는 즉시 작동합니다.
 
 ---
 
-### Agents Requiring Customization
+### 커스터마이징이 필요한 에이전트
 
 **frontend-error-fixer:**
-- May reference screenshot paths
-- Ask user: "Where should screenshots be saved?"
-- Update paths in agent file
+- 스크린샷 경로 참조 가능
+- 사용자에게 물어보기: "스크린샷을 어디에 저장할까요?"
+- 에이전트 파일의 경로 업데이트
 
 **auth-route-tester / auth-route-debugger:**
-- Require JWT cookie authentication
-- Update service URLs from examples
-- Customize for user's auth setup
+- JWT 쿠키 인증 필요
+- 예시에서 서비스 URL 업데이트
+- 사용자의 인증 설정에 맞게 커스터마이징
 
 **auto-error-resolver:**
-- May have hardcoded project paths
-- Update to use `$CLAUDE_PROJECT_DIR` or relative paths
+- 하드코딩된 프로젝트 경로 가능
+- `$CLAUDE_PROJECT_DIR` 또는 상대 경로 사용으로 업데이트
 
 ---
 
-## When to Use Agents vs Skills
+## 에이전트 vs 스킬 사용 시점
 
-| Use Agents When... | Use Skills When... |
+| 에이전트 사용... | 스킬 사용... |
 |-------------------|-------------------|
-| Task requires multiple steps | Need inline guidance |
-| Complex analysis needed | Checking best practices |
-| Autonomous work preferred | Want to maintain control |
-| Task has clear end goal | Ongoing development work |
-| Example: "Review all controllers" | Example: "Creating a new route" |
+| 작업이 다단계 필요 | 인라인 가이드 필요 |
+| 복잡한 분석 필요 | 모범 사례 확인 |
+| 자율적 작업 선호 | 제어 유지 원함 |
+| 명확한 종료 목표 | 지속적인 개발 작업 |
+| 예: "모든 컨트롤러 검토" | 예: "새 라우트 생성" |
 
-**Both can work together:**
-- Skill provides patterns during development
-- Agent reviews the result when complete
+**둘 다 함께 작동:**
+- 개발 중 스킬이 패턴 제공
+- 완료 시 에이전트가 결과 검토
 
 ---
 
-## Agent Quick Reference
+## 에이전트 빠른 참조
 
-| Agent | Complexity | Customization | Auth Required |
+| 에이전트 | 복잡도 | 커스터마이징 | 인증 필수 |
 |-------|-----------|---------------|---------------|
-| code-architecture-reviewer | Medium | ✅ None | No |
-| code-refactor-master | High | ✅ None | No |
-| documentation-architect | Medium | ✅ None | No |
-| frontend-error-fixer | Medium | ⚠️ Screenshot paths | No |
-| plan-reviewer | Low | ✅ None | No |
-| refactor-planner | Medium | ✅ None | No |
-| web-research-specialist | Low | ✅ None | No |
-| auth-route-tester | Medium | ⚠️ Auth setup | JWT cookies |
-| auth-route-debugger | Medium | ⚠️ Auth setup | JWT cookies |
-| auto-error-resolver | Low | ⚠️ Paths | No |
+| code-architecture-reviewer | 중간 | ✅ 없음 | 없음 |
+| code-refactor-master | 높음 | ✅ 없음 | 없음 |
+| documentation-architect | 중간 | ✅ 없음 | 없음 |
+| frontend-error-fixer | 중간 | ⚠️ 스크린샷 경로 | 없음 |
+| plan-reviewer | 낮음 | ✅ 없음 | 없음 |
+| refactor-planner | 중간 | ✅ 없음 | 없음 |
+| web-research-specialist | 낮음 | ✅ 없음 | 없음 |
+| auth-route-tester | 중간 | ⚠️ 인증 설정 | JWT 쿠키 |
+| auth-route-debugger | 중간 | ⚠️ 인증 설정 | JWT 쿠키 |
+| auto-error-resolver | 낮음 | ⚠️ 경로 | 없음 |
 
 ---
 
-## For Claude Code
+## Claude Code를 위한 안내
 
-**When integrating agents for a user:**
+**사용자를 위해 에이전트를 통합할 때:**
 
-1. **Read [CLAUDE_INTEGRATION_GUIDE.md](../../CLAUDE_INTEGRATION_GUIDE.md)**
-2. **Just copy the .md file** - agents are standalone
-3. **Check for hardcoded paths:**
+1. **[CLAUDE_INTEGRATION_GUIDE.md](../../CLAUDE_INTEGRATION_GUIDE.md) 읽기**
+2. **.md 파일만 복사** - 에이전트는 독립적
+3. **하드코딩된 경로 확인:**
    ```bash
    grep "~/git/\|/root/" agent-name.md
    ```
-4. **Update paths if found** to `$CLAUDE_PROJECT_DIR` or `.`
-5. **For auth agents:** Ask if they use JWT cookie auth first
+4. **경로 발견 시 업데이트** - `$CLAUDE_PROJECT_DIR` 또는 `.` 사용
+5. **인증 에이전트의 경우:** JWT 쿠키 인증 사용 여부 먼저 확인
 
-**That's it!** Agents are the easiest components to integrate.
+**끝!** 에이전트는 통합이 가장 쉬운 컴포넌트입니다.
 
 ---
 
-## Creating Your Own Agents
+## 자체 에이전트 생성
 
-Agents are markdown files with optional YAML frontmatter:
+에이전트는 선택적 YAML frontmatter가 있는 마크다운 파일입니다:
 
 ```markdown
-# Agent Name
+# 에이전트 이름
 
-## Purpose
-What this agent does
+## 목적
+이 에이전트가 하는 일
 
-## Instructions
-Step-by-step instructions for autonomous execution
+## 지침
+자율 실행을 위한 단계별 지침
 
-## Tools Available
-List of tools this agent can use
+## 사용 가능한 도구
+이 에이전트가 사용할 수 있는 도구 목록
 
-## Expected Output
-What format to return results in
+## 예상 출력
+결과 반환 형식
 ```
 
-**Tips:**
-- Be very specific in instructions
-- Break complex tasks into numbered steps
-- Specify exactly what to return
-- Include examples of good output
-- List available tools explicitly
+**팁:**
+- 지침에서 매우 구체적
+- 복잡한 작업을 번호 매기기 단계로 분해
+- 정확히 반환할 내용 명시
+- 좋은 출력의 예시 포함
+- 사용 가능한 도구 명시적 나열
 
 ---
 
-## Troubleshooting
+## 문제 해결
 
-### Agent not found
+### 에이전트를 찾을 수 없음
 
-**Check:**
+**확인:**
 ```bash
-# Is agent file present?
+# 에이전트 파일 존재 여부?
 ls -la .claude/agents/[agent-name].md
 ```
 
-### Agent fails with path errors
+### 에이전트가 경로 에러로 실패
 
-**Check for hardcoded paths:**
+**하드코딩된 경로 확인:**
 ```bash
 grep "~/\|/root/\|/Users/" .claude/agents/[agent-name].md
 ```
 
-**Fix:**
+**수정:**
 ```bash
 sed -i 's|~/git/.*project|$CLAUDE_PROJECT_DIR|g' .claude/agents/[agent-name].md
 ```
 
 ---
 
-## Next Steps
+## 다음 단계
 
-1. **Browse agents above** - Find ones useful for your work
-2. **Copy what you need** - Just the .md file
-3. **Ask Claude to use them** - "Use [agent] to [task]"
-4. **Create your own** - Follow the pattern for your specific needs
+1. **위의 에이전트 찾아보기** - 업무에 유용한 것 찾기
+2. **필요한 것 복사** - 단지 .md 파일만
+3. **Claude에게 사용 요청** - "Use [agent] to [task]"
+4. **자체 에이전트 생성** - 특정 요구사항에 맞는 패턴 따르기
 
-**Questions?** See [CLAUDE_INTEGRATION_GUIDE.md](../../CLAUDE_INTEGRATION_GUIDE.md)
+**질문이 있으신가요?** [CLAUDE_INTEGRATION_GUIDE.md](../../CLAUDE_INTEGRATION_GUIDE.md) 참고
